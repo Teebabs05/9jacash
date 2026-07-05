@@ -53,6 +53,18 @@ lets you overwrite these credentials during Step 3.
 3. Edit `config.php` at the project root with your real `DB_*` constants and `APP_URL`.
 4. Create `install/installed.lock` (any content) so the app stops redirecting to the installer.
 
+### Cron Jobs
+
+Add this to your cPanel Cron Jobs (or crontab) once the platform is installed:
+
+```
+0 * * * * /usr/bin/php /home/USERNAME/public_html/cron/mining-payout.php >> /home/USERNAME/public_html/logs/cron.log 2>&1
+```
+
+Runs hourly and credits any mining position whose `next_payout_at` has
+elapsed — it's idempotent, so running it more or less often than once a
+day is safe.
+
 ## Folder Structure
 
 ```
@@ -133,15 +145,29 @@ lets you overwrite these credentials during Step 3.
 - Seeded starter mining plans (Starter/Bronze/Silver/Gold Miner) so the
   landing page and future Mining module have real data to work with
 
-### 🔜 Next: Module 3 — Mining System
-Mining plan purchase flow, active mining dashboard with countdown to next
-payout, `cron/mining-payout.php` for automatic daily crediting via
-`wallet_credit()`, pause/resume, and mining logs.
+### ✅ Module 3 — Mining System
+- `includes/mining.php` — core primitives: `mining_purchase_plan()`,
+  `mining_toggle_status()` (pause/resume), `mining_process_payouts()`
+- `mining/index.php` — available plans + "My Mining Positions" table with
+  a live progress bar, ticking countdown to next payout, and pause/resume
+  controls
+- `mining/invest.php` — confirmation screen (price, daily return,
+  duration, total return, wallet balance check) before debiting the main
+  wallet and opening the position
+- `cron/mining-payout.php` — CLI cron job that credits every due position
+  via `wallet_credit()`, advances `next_payout_at`, and marks a position
+  `completed` once its cycle ends; safe to run as often as your host
+  allows since it only pays out positions that are actually due
+
+### 🔜 Next: Module 4 — Task Center
+Admin-defined tasks (Facebook/Telegram/Instagram/WhatsApp/TikTok/website/
+custom), user submission with screenshot upload, pending/approved/rejected
+review states, and reward crediting via `wallet_credit()` on approval.
 
 ### Planned after that
-Task center → Watch-to-earn ads → Spin wheel → Daily check-in → Deposits
-(PayVessel + manual) → Withdrawals → Admin management modules (users,
-deposits, withdrawals, mining, tasks, settings) → Branding asset pack (PNG
+Watch-to-earn ads → Spin wheel → Daily check-in → Deposits (PayVessel +
+manual) → Withdrawals → Admin management modules (users, deposits,
+withdrawals, mining, tasks, settings) → Branding asset pack (PNG
 exports, social banner, app icon) → Full documentation set (Admin Guide,
 Cron Guide, PayVessel Integration Guide, API Docs).
 

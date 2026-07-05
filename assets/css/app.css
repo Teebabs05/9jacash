@@ -227,3 +227,64 @@
 .pill-pending { background: rgba(247,144,9,0.12); color: #f79009; }
 .pill-approved { background: rgba(18,183,106,0.12); color: #12b76a; }
 .pill-rejected { background: rgba(240,68,56,0.12); color: #f04438; }
+.pill-active { background: rgba(18,183,106,0.12); color: #12b76a; }
+.pill-paused { background: rgba(247,144,9,0.12); color: #f79009; }
+.pill-completed { background: rgba(46,144,250,0.12); color: #2e90fa; }
+
+/* ---------------------------------------------------------------
+   Mining plan cards
+   --------------------------------------------------------------- */
+.mining-plan-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 26px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mining-plan-card .price {
+    font-size: 1.7rem;
+    font-weight: 800;
+}
+
+.mining-plan-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+    flex-grow: 1;
+}
+
+.mining-plan-card ul li {
+    padding: 6px 0;
+    font-size: .87rem;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.progress-thin {
+    height: 8px;
+    border-radius: 6px;
+    background: var(--surface-alt);
+    overflow: hidden;
+}
+
+.progress-thin > span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(135deg, var(--brand-emerald-light), var(--brand-emerald));
+}
+
+.countdown-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: .78rem;
+    font-weight: 600;
+}

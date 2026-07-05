@@ -30,7 +30,7 @@ if (!function_exists('nav_link')) {
         <?php nav_link('history', $base . '/wallet/history.php', 'bi-clock-history', 'Transaction History', $activeNav); ?>
 
         <div class="nav-section-label">Earn</div>
-        <?php nav_link('mining', $base . '/mining/index.php', 'bi-cpu-fill', 'Mining', $activeNav, false); ?>
+        <?php nav_link('mining', $base . '/mining/index.php', 'bi-cpu-fill', 'Mining', $activeNav); ?>
         <?php nav_link('tasks', $base . '/tasks/index.php', 'bi-list-check', 'Task Center', $activeNav, false); ?>
         <?php nav_link('ads', $base . '/ads/index.php', 'bi-play-btn-fill', 'Watch & Earn', $activeNav, false); ?>
         <?php nav_link('spin', $base . '/spin/index.php', 'bi-disc-fill', 'Spin Wheel', $activeNav, false); ?>

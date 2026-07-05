@@ -45,6 +45,7 @@ require_once BASE_PATH . '/includes/auth.php';
 require_once BASE_PATH . '/includes/admin-auth.php';
 require_once BASE_PATH . '/includes/mailer.php';
 require_once BASE_PATH . '/includes/wallet.php';
+require_once BASE_PATH . '/includes/mining.php';
 
 // ---------------------------------------------------------------
 // Load site settings from the database into a global cache.

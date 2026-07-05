@@ -116,7 +116,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <h5 class="fw-bold mb-3">Quick Access</h5>
             <div class="d-grid gap-2">
                 <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-wallet2 me-2"></i>My Wallet</a>
-                <button class="btn btn-outline-brand btn-sm text-start" disabled><i class="bi bi-cpu-fill me-2"></i>Mining <span class="badge-soon ms-1">Soon</span></button>
+                <a href="<?= e(rtrim(APP_URL, '/')) ?>/mining/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-cpu-fill me-2"></i>Mining</a>
                 <button class="btn btn-outline-brand btn-sm text-start" disabled><i class="bi bi-list-check me-2"></i>Task Center <span class="badge-soon ms-1">Soon</span></button>
                 <button class="btn btn-outline-brand btn-sm text-start" disabled><i class="bi bi-disc-fill me-2"></i>Spin Wheel <span class="badge-soon ms-1">Soon</span></button>
             </div>
