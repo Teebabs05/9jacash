@@ -27,12 +27,12 @@ ini_set('display_errors', $config['app']['debug'] ? '1' : '0');
 ini_set('log_errors', '1');
 ini_set('error_log', STORAGE_PATH . '/logs/php-error.log');
 
-App\Core\Session::start($config['session']['lifetime']);
-
 App\Core\App::setConfig($config);
 
-if (App\Core\App::config('app.env') !== 'installer' && !is_file(BASE_PATH . '/.env')) {
-    if (!str_contains($_SERVER['REQUEST_URI'] ?? '', '/install')) {
+if (PHP_SAPI !== 'cli') {
+    App\Core\Session::start($config['session']['lifetime']);
+
+    if (!is_file(BASE_PATH . '/.env') && !str_contains($_SERVER['REQUEST_URI'] ?? '', '/install')) {
         header('Location: /install/');
         exit;
     }
