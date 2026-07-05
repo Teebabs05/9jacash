@@ -9,8 +9,17 @@ $step = isset($_GET['step']) ? (int) $_GET['step'] : 1;
 $errors = [];
 $success = null;
 
-if (install_is_locked() && $step !== 99) {
+// Step 4 (the completion screen) is shown exactly once, immediately
+// after finishing step 3 in *this* session — otherwise, once locked,
+// every step (including a freshly-completed step=4) falls back to the
+// "already installed" screen so default credentials aren't advertised
+// indefinitely to anyone who revisits /install/ later.
+$justCompleted = $step === 4 && !empty($_SESSION['install_just_completed']);
+if (install_is_locked() && $step !== 99 && !$justCompleted) {
     $step = 99;
+}
+if ($justCompleted) {
+    unset($_SESSION['install_just_completed']);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -76,25 +85,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $siteUrl = rtrim(trim($_POST['site_url'] ?? ''), '/');
         $cronSecret = bin2hex(random_bytes(16));
 
-        install_write_env([
-            'APP_NAME' => '"' . $siteName . '"',
-            'APP_URL' => $siteUrl,
-            'APP_ENV' => 'production',
-            'APP_DEBUG' => 'false',
-            'APP_KEY' => install_generate_key(),
-            'DB_HOST' => $db['host'],
-            'DB_PORT' => $db['port'],
-            'DB_NAME' => $db['name'],
-            'DB_USER' => $db['user'],
-            'DB_PASS' => $db['pass'],
-            'CRON_SECRET' => $cronSecret,
-        ]);
+        try {
+            install_write_env([
+                'APP_NAME' => '"' . $siteName . '"',
+                'APP_URL' => $siteUrl,
+                'APP_ENV' => 'production',
+                'APP_DEBUG' => 'false',
+                'APP_KEY' => install_generate_key(),
+                'DB_HOST' => $db['host'],
+                'DB_PORT' => $db['port'],
+                'DB_NAME' => $db['name'],
+                'DB_USER' => $db['user'],
+                'DB_PASS' => $db['pass'],
+                'CRON_SECRET' => $cronSecret,
+            ]);
 
-        file_put_contents(__DIR__ . '/installed.lock', date('c'));
-        unset($_SESSION['install_db']);
+            if (@file_put_contents(__DIR__ . '/installed.lock', date('c')) === false) {
+                throw new RuntimeException('Could not write install/installed.lock — check folder permissions.');
+            }
 
-        header('Location: ?step=4');
-        exit;
+            unset($_SESSION['install_db']);
+            $_SESSION['install_just_completed'] = true;
+
+            header('Location: ?step=4');
+            exit;
+        } catch (Throwable $e) {
+            $errors[] = 'Could not finish installation: ' . $e->getMessage();
+        }
     }
 }
 
@@ -154,6 +171,24 @@ $storageAllOk = !in_array(false, array_column($storageDiag['paths'], 'writable')
         </ul>
         <?php if (!$requirementsPass): ?>
             <div class="alert alert-danger small">Please resolve the missing requirements above before continuing.</div>
+        <?php endif; ?>
+
+        <?php if ($storageDiag['open_basedir'] && !$storageDiag['base_in_basedir']): ?>
+            <div class="alert alert-danger small">
+                <strong>PHP's <code>open_basedir</code> setting will block installation.</strong>
+                Your project root (<code><?= htmlspecialchars($storageDiag['base_path']) ?></code>) is outside the
+                paths PHP is allowed to access (<code><?= htmlspecialchars($storageDiag['open_basedir']) ?></code>).
+                This means database/schema.sql, database/seed.sql, and the storage folders can never be read no
+                matter how permissions are set. Ask your host (or use cPanel's "MultiPHP INI Editor") to widen
+                <code>open_basedir</code> to include your whole home directory, e.g.
+                <code><?= htmlspecialchars(rtrim($storageDiag['base_path'], '/')) ?>:<?= htmlspecialchars(sys_get_temp_dir()) ?></code> —
+                or move the entire project (not just <code>public/</code>) inside whatever path is currently allowed.
+            </div>
+        <?php elseif ($storageDiag['open_basedir']): ?>
+            <div class="alert alert-info small">
+                <code>open_basedir</code> is set to <code><?= htmlspecialchars($storageDiag['open_basedir']) ?></code>,
+                but your project root is within it, so this shouldn't block anything.
+            </div>
         <?php endif; ?>
 
         <h6 class="fw-bold mb-2 mt-4">Storage &amp; Uploads <span class="fw-normal text-muted small">(optional right now)</span></h6>

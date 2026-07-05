@@ -31,7 +31,7 @@ function install_requirements(): array
         'mbstring Extension' => extension_loaded('mbstring'),
         'fileinfo Extension' => extension_loaded('fileinfo'),
         'openssl Extension' => extension_loaded('openssl'),
-        'Project root is writable (.env)' => is_writable($base),
+        'Project root is writable (.env)' => @is_writable($base),
     ];
 }
 
@@ -55,13 +55,13 @@ function install_storage_diagnostics(): array
 
     $results = [];
     foreach ($paths as $label => $path) {
-        $exists = is_dir($path);
-        $writable = $exists && (is_writable($path) || @chmod($path, 0755) && is_writable($path));
+        $exists = @is_dir($path);
+        $writable = $exists && (@is_writable($path) || @chmod($path, 0755) && @is_writable($path));
 
         $owner = null;
         if ($exists && function_exists('posix_getpwuid') && function_exists('fileowner')) {
-            $info = @posix_getpwuid(fileowner($path));
-            $owner = $info['name'] ?? (string) fileowner($path);
+            $info = @posix_getpwuid(@fileowner($path));
+            $owner = $info['name'] ?? (string) @fileowner($path);
         } elseif ($exists) {
             $owner = (string) @fileowner($path);
         }
@@ -69,7 +69,7 @@ function install_storage_diagnostics(): array
         $results[$label] = [
             'exists' => $exists,
             'writable' => $writable,
-            'perms' => $exists ? substr(sprintf('%o', fileperms($path)), -4) : null,
+            'perms' => $exists ? substr(sprintf('%o', @fileperms($path)), -4) : null,
             'owner' => $owner,
         ];
     }
@@ -80,12 +80,31 @@ function install_storage_diagnostics(): array
         $processUser = $info['name'] ?? (string) posix_geteuid();
     }
 
-    return ['paths' => $results, 'process_user' => $processUser];
+    $openBasedir = ini_get('open_basedir') ?: null;
+    $baseInBasedir = true;
+    if ($openBasedir) {
+        $baseInBasedir = false;
+        foreach (explode(PATH_SEPARATOR, $openBasedir) as $allowed) {
+            $allowed = rtrim($allowed, '/');
+            if ($allowed !== '' && str_starts_with(rtrim($base, '/'), $allowed)) {
+                $baseInBasedir = true;
+                break;
+            }
+        }
+    }
+
+    return [
+        'paths' => $results,
+        'process_user' => $processUser,
+        'open_basedir' => $openBasedir,
+        'base_path' => $base,
+        'base_in_basedir' => $baseInBasedir,
+    ];
 }
 
 function install_is_locked(): bool
 {
-    return is_file(__DIR__ . '/installed.lock');
+    return @is_file(__DIR__ . '/installed.lock');
 }
 
 function install_test_connection(string $host, string $port, string $user, string $pass, ?string &$error = null): ?PDO
@@ -103,9 +122,17 @@ function install_test_connection(string $host, string $port, string $user, strin
 
 function install_run_sql_file(PDO $pdo, string $path): void
 {
-    $sql = file_get_contents($path);
+    if (!@is_file($path)) {
+        $message = install_open_basedir_hint("SQL file not found at: {$path}.", $path);
+        throw new RuntimeException($message . ' Make sure database/schema.sql and database/seed.sql were uploaded alongside app/, storage/, etc.');
+    }
+
+    error_clear_last();
+    $sql = @file_get_contents($path);
     if ($sql === false) {
-        throw new RuntimeException("Could not read SQL file: {$path}");
+        $lastError = error_get_last();
+        $reason = $lastError['message'] ?? 'unknown reason';
+        throw new RuntimeException("Could not read SQL file: {$path} — PHP reported: {$reason}");
     }
 
     // Strip comment-only lines, then split on statement-terminating
@@ -124,10 +151,19 @@ function install_run_sql_file(PDO $pdo, string $path): void
 
 function install_write_env(array $values): void
 {
-    $examplePath = install_base_path() . '/.env.example';
-    $lines = file($examplePath, FILE_IGNORE_NEW_LINES);
-    $output = [];
+    $base = install_base_path();
+    $examplePath = $base . '/.env.example';
 
+    if (!@is_file($examplePath)) {
+        throw new RuntimeException(install_open_basedir_hint("Could not find .env.example at: {$examplePath}.", $base));
+    }
+
+    $lines = @file($examplePath, FILE_IGNORE_NEW_LINES);
+    if ($lines === false) {
+        throw new RuntimeException(install_open_basedir_hint("Could not read .env.example at: {$examplePath}.", $base));
+    }
+
+    $output = [];
     foreach ($lines as $line) {
         $trimmed = trim($line);
         if ($trimmed === '' || str_starts_with($trimmed, '#') || !str_contains($trimmed, '=')) {
@@ -139,7 +175,19 @@ function install_write_env(array $values): void
         $output[] = array_key_exists($key, $values) ? "{$key}={$values[$key]}" : $line;
     }
 
-    file_put_contents(install_base_path() . '/.env', implode("\n", $output) . "\n", LOCK_EX);
+    $written = @file_put_contents($base . '/.env', implode("\n", $output) . "\n", LOCK_EX);
+    if ($written === false) {
+        throw new RuntimeException(install_open_basedir_hint("Could not write .env file to: {$base}/.env.", $base));
+    }
+}
+
+function install_open_basedir_hint(string $message, string $path): string
+{
+    $obd = ini_get('open_basedir');
+    if (!$obd) {
+        return $message;
+    }
+    return $message . " Note: open_basedir is restricted to \"{$obd}\" — if \"{$path}\" falls outside that, PHP cannot see it even if it exists.";
 }
 
 function install_generate_key(): string
