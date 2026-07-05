@@ -162,6 +162,13 @@ if (!function_exists('require_login')) {
             Session::flash('error', 'Please login to continue.');
             redirect('login');
         }
+
+        $user = current_user();
+        $path = current_path();
+        if (!empty($user['force_password_change']) && $path !== 'profile/password' && $path !== 'logout') {
+            Session::flash('info', 'You must change your password before continuing.');
+            redirect('profile/password');
+        }
     }
 }
 
@@ -202,6 +209,35 @@ if (!function_exists('sanitize')) {
     function sanitize(mixed $value): string
     {
         return Security::sanitizeString($value);
+    }
+}
+
+if (!function_exists('current_path')) {
+    function current_path(): string
+    {
+        return trim((string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH), '/');
+    }
+}
+
+if (!function_exists('is_active_path')) {
+    function is_active_path(string $path): string
+    {
+        $current = current_path();
+        $path = trim($path, '/');
+        if ($path === '') {
+            return $current === '' ? 'active' : '';
+        }
+        return ($current === $path || str_starts_with($current, $path . '/')) ? 'active' : '';
+    }
+}
+
+if (!function_exists('user_avatar_url')) {
+    function user_avatar_url(array $user): string
+    {
+        if (!empty($user['avatar'])) {
+            return base_url('files/avatars/' . basename($user['avatar']));
+        }
+        return asset('img/default-avatar.svg');
     }
 }
 
