@@ -159,17 +159,35 @@ day is safe.
   `completed` once its cycle ends; safe to run as often as your host
   allows since it only pays out positions that are actually due
 
-### 🔜 Next: Module 4 — Task Center
-Admin-defined tasks (Facebook/Telegram/Instagram/WhatsApp/TikTok/website/
-custom), user submission with screenshot upload, pending/approved/rejected
-review states, and reward crediting via `wallet_credit()` on approval.
+### ✅ Module 4 — Task Center (+ first Admin panel modules)
+- Shared admin app shell (`includes/partials/admin-*.php`) — sidebar with
+  a live pending-submissions badge, reused by every future admin page
+- `admin/tasks.php` — full CRUD for tasks (Facebook/Telegram/Instagram/
+  WhatsApp/TikTok/website/custom platforms, reward amount, screenshot
+  requirement toggle, active/inactive)
+- `admin/task-submissions.php` — review queue filterable by status;
+  approving credits the reward to the user's **bonus wallet** via
+  `wallet_credit()` and notifies them, rejecting records an optional
+  reason shown to the user
+- `tasks/index.php` — active tasks grouped with the user's own submission
+  status (none/pending/approved/rejected)
+- `tasks/submit.php` — proof submission with optional/required screenshot
+  upload (real MIME-sniffed validation, stored outside script execution)
+- `admin/index.php` rebuilt on the shared shell with live stat tiles
+  (users, pending deposits/withdrawals, active mining positions)
+
+### 🔜 Next: Module 5 — Watch-to-Earn Ads + Spin Wheel + Daily Check-in
+Rewarded ad view flow with a countdown/cooldown and daily cap, the spin
+wheel (weighted-probability draw against `spin_settings`, animated wheel
+UI), and daily check-in with a streak counter and escalating 7/30-day
+rewards — all crediting the bonus wallet the same way tasks do.
 
 ### Planned after that
-Watch-to-earn ads → Spin wheel → Daily check-in → Deposits (PayVessel +
-manual) → Withdrawals → Admin management modules (users, deposits,
-withdrawals, mining, tasks, settings) → Branding asset pack (PNG
-exports, social banner, app icon) → Full documentation set (Admin Guide,
-Cron Guide, PayVessel Integration Guide, API Docs).
+Deposits (PayVessel + manual) → Withdrawals → Remaining admin management
+modules (users, deposits, withdrawals, mining plans, settings) →
+Branding asset pack (PNG exports, social banner, app icon) → Full
+documentation set (Admin Guide, Cron Guide, PayVessel Integration Guide,
+API Docs).
 
 ## License
 
