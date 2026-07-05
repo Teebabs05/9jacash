@@ -104,13 +104,13 @@ require __DIR__ . '/../includes/partials/app-head.php';
     <div class="col-lg-4">
         <div class="card-surface p-4 mb-4">
             <h5 class="fw-bold mb-3">Quick Actions</h5>
-            <button type="button" class="btn btn-brand w-100 mb-2" disabled title="Coming soon">
+            <a href="<?= e(rtrim(APP_URL, '/')) ?>/payments/deposit.php" class="btn btn-brand w-100 mb-2">
                 <i class="bi bi-arrow-down-circle me-1"></i> Deposit Funds
-            </button>
+            </a>
             <button type="button" class="btn btn-outline-brand w-100" disabled title="Coming soon">
                 <i class="bi bi-arrow-up-circle me-1"></i> Withdraw Funds
             </button>
-            <p class="small mt-3 mb-0" style="color:var(--text-muted);">Deposit and withdrawal processing (PayVessel, bank transfer, USDT) are rolling out in the next build phase.</p>
+            <p class="small mt-3 mb-0" style="color:var(--text-muted);">Withdrawal processing is rolling out in the next build phase.</p>
         </div>
 
         <div class="card-surface p-4">

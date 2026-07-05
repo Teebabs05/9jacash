@@ -37,7 +37,7 @@ if (!function_exists('nav_link')) {
         <?php nav_link('checkin', $base . '/checkin/index.php', 'bi-calendar-check-fill', 'Daily Check-in', $activeNav); ?>
 
         <div class="nav-section-label">Funds</div>
-        <?php nav_link('deposit', $base . '/payments/deposit.php', 'bi-arrow-down-circle-fill', 'Deposit', $activeNav, false); ?>
+        <?php nav_link('deposit', $base . '/payments/deposit.php', 'bi-arrow-down-circle-fill', 'Deposit', $activeNav); ?>
         <?php nav_link('withdraw', $base . '/wallet/withdraw.php', 'bi-arrow-up-circle-fill', 'Withdraw', $activeNav, false); ?>
         <?php nav_link('referrals', $base . '/user/referrals.php', 'bi-people-fill', 'Referrals', $activeNav, false); ?>
 

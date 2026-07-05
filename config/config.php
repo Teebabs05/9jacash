@@ -27,7 +27,7 @@ $installLock = BASE_PATH . '/install/installed.lock';
 
 if (!defined('INSTALLER_CONTEXT') && !is_file($installLock)) {
     $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
-    $installUrl = preg_replace('#/(admin|user|api|ajax|wallet|payments|mining|tasks|ads)$#', '', $scriptDir);
+    $installUrl = preg_replace('#/(admin|user|api|ajax|wallet|payments|mining|tasks|ads|spin|checkin)$#', '', $scriptDir);
     redirect(rtrim($installUrl, '/') . '/install/index.php');
 }
 
@@ -58,6 +58,8 @@ require_once BASE_PATH . '/includes/mining.php';
 require_once BASE_PATH . '/includes/ads.php';
 require_once BASE_PATH . '/includes/spin.php';
 require_once BASE_PATH . '/includes/checkin.php';
+require_once BASE_PATH . '/includes/payvessel.php';
+require_once BASE_PATH . '/includes/deposits.php';
 
 // ---------------------------------------------------------------
 // Load site settings from the database into a global cache.

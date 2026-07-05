@@ -211,12 +211,51 @@ session `time_zone` to PHP's active default timezone at connection time
 (`Database::syncTimezone()` in `config/database.php`), with PHP's
 timezone now set *before* the database connects instead of after.
 
+### ✅ Module 6 — Deposits (PayVessel + Manual Bank/USDT)
+- `includes/payvessel.php` — real PayVessel API client built against
+  their documented "Create Virtual Account" and "Payment Notification"
+  services (cross-checked against an open-source reference
+  implementation, not guessed): generates a one-time (`DYNAMIC`) reserved
+  account number per deposit, and verifies inbound webhooks via
+  HMAC-SHA512 over the raw request body against the
+  `Payvessel-Http-Signature` header. PayVessel's documented source IPs
+  are checked as a logged, non-blocking signal (the signature is the
+  real authenticity guarantee — IP alone breaks behind proxies/CDNs)
+- `includes/deposits.php` — shared approve/reject/webhook-handler
+  primitives; approval credits the **main wallet** via `wallet_credit()`
+  and is idempotent (replaying a webhook or re-approving a reviewed
+  deposit is a safe no-op)
+- `payments/deposit.php` — tabbed deposit page: Automatic (PayVessel,
+  only shown once configured+enabled), Manual Bank Transfer, and Manual
+  USDT, each with min/max validation and receipt upload for the manual
+  methods
+- `payments/pending.php` — live-polling screen showing the generated
+  virtual account while waiting for the webhook to confirm payment
+  (`ajax/deposit-status.php`)
+- `payments/history.php` — the user's own deposit history
+- `api/payvessel-webhook.php` — the webhook receiver
+- `admin/deposits.php` — approve/reject queue with receipt preview,
+  filterable by status; `admin/deposit-settings.php` configures deposit
+  limits, manual bank/USDT details, and PayVessel credentials (with the
+  webhook URL to paste into the PayVessel dashboard shown inline)
+
+Verified live against MariaDB: manual bank deposit submitted with a real
+uploaded receipt → admin-approved → main wallet credited with a correct
+ledger entry; a second manual USDT deposit rejected with a reason and no
+wallet change; the PayVessel outbound call fails gracefully with a clear
+user-facing message in this sandboxed network (no live credentials
+available here) — and since PayVessel calls *us*, the webhook receiver
+itself was fully verified by crafting real HMAC-SHA512-signed payloads:
+a bad signature is rejected (400, no credit), a correctly-signed payload
+credits the wallet, replaying the same signed payload is a safe no-op
+(idempotency), and a signed payload for an unknown reference is logged
+and ignored rather than crashing.
+
 ### Planned next
-Deposits (PayVessel + manual) → Withdrawals → Remaining admin management
-modules (users, deposits, withdrawals, mining plans, settings) →
-Branding asset pack (PNG exports, social banner, app icon) → Full
-documentation set (Admin Guide, Cron Guide, PayVessel Integration Guide,
-API Docs).
+Withdrawals (bank + USDT, admin approval) → Remaining admin management
+modules (users, mining plans, general settings) → Branding asset pack
+(PNG exports, social banner, app icon) → Full documentation set (Admin
+Guide, Cron Guide, PayVessel Integration Guide, API Docs).
 
 ## License
 
