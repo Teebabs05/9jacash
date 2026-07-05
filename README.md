@@ -176,13 +176,42 @@ day is safe.
 - `admin/index.php` rebuilt on the shared shell with live stat tiles
   (users, pending deposits/withdrawals, active mining positions)
 
-### 🔜 Next: Module 5 — Watch-to-Earn Ads + Spin Wheel + Daily Check-in
-Rewarded ad view flow with a countdown/cooldown and daily cap, the spin
-wheel (weighted-probability draw against `spin_settings`, animated wheel
-UI), and daily check-in with a streak counter and escalating 7/30-day
-rewards — all crediting the bonus wallet the same way tasks do.
+### ✅ Module 5 — Watch-to-Earn Ads + Spin Wheel + Daily Check-in
+- `includes/ads.php` — rewarded-ad flow enforced server-side: a session
+  token records when the simulated ad started, and the reward can only
+  be claimed once the configured watch duration has actually elapsed,
+  with a daily cap and per-watch cooldown (`ads/index.php`,
+  `ajax/ads-start.php`, `ajax/ads-claim.php`)
+- `includes/spin.php` — weighted-probability draw against active
+  `spin_settings` rows; `spin/index.php` renders a real conic-gradient
+  wheel and animates it to the server-decided segment
+  (`ajax/spin-play.php`); `admin/spin-settings.php` gives admins full
+  CRUD over segments, odds, colors and the daily spin limit
+- `includes/checkin.php` — streak tracking that resets on a missed day
+  and wraps at day 30, with 7-day and 30-day milestone bonus multipliers
+  (`checkin/index.php`)
+- All three credit the **bonus wallet** via the same `wallet_credit()`
+  primitive used since Module 3
 
-### Planned after that
+Verified live: an early ad-reward claim is correctly rejected until the
+watch duration elapses, daily/cooldown limits enforced, a spin wheel play
+credits the wallet and blocks a second spin same-day (and immediately
+allows more once an admin raises the daily limit), and check-in streak
+math verified across a normal day, a day-7 milestone (correct 3x bonus),
+and a missed day correctly resetting the streak to 1.
+
+**Real bug caught and fixed during this verification:** MySQL's session
+defaults to the server's system timezone (UTC in this environment) while
+the app runs in `Africa/Lagos`. Anything that stored a timestamp via SQL
+`NOW()`/`CURDATE()` and later compared it against PHP's `time()` (ad
+cooldown countdowns, "watched today" checks) would silently drift by the
+difference between the two zones — e.g. an ad's cooldown appeared to
+expire immediately instead of after 30 seconds. Fixed by syncing MySQL's
+session `time_zone` to PHP's active default timezone at connection time
+(`Database::syncTimezone()` in `config/database.php`), with PHP's
+timezone now set *before* the database connects instead of after.
+
+### Planned next
 Deposits (PayVessel + manual) → Withdrawals → Remaining admin management
 modules (users, deposits, withdrawals, mining plans, settings) →
 Branding asset pack (PNG exports, social banner, app icon) → Full

@@ -41,6 +41,7 @@ $pendingSubmissions = (int) db()->query("SELECT COUNT(*) AS c FROM task_submissi
         <?php admin_nav_link('mining-plans', $base . '/admin/mining-plans.php', 'bi-cpu-fill', 'Mining Plans', $activeNav, false); ?>
         <?php admin_nav_link('tasks', $base . '/admin/tasks.php', 'bi-list-check', 'Tasks', $activeNav); ?>
         <?php admin_nav_link('task-submissions', $base . '/admin/task-submissions.php', 'bi-inbox-fill', 'Task Submissions', $activeNav, true, $pendingSubmissions ?: null); ?>
+        <?php admin_nav_link('spin-settings', $base . '/admin/spin-settings.php', 'bi-disc-fill', 'Spin Wheel', $activeNav); ?>
 
         <div class="nav-section-label">Platform</div>
         <?php admin_nav_link('settings', $base . '/admin/settings.php', 'bi-gear-fill', 'Settings', $activeNav, false); ?>

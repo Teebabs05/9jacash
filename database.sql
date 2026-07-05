@@ -504,6 +504,7 @@ INSERT INTO `site_settings` (`setting_key`, `setting_value`) VALUES
 ('ad_reward_amount', '10'),
 ('ad_daily_limit', '10'),
 ('ad_cooldown_seconds', '30'),
+('ad_watch_duration_seconds', '15'),
 ('spin_daily_limit', '1'),
 ('checkin_base_reward', '10'),
 ('mail_from_name', '9JACASH'),

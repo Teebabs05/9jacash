@@ -33,6 +33,15 @@ if (!defined('INSTALLER_CONTEXT') && !is_file($installLock)) {
 
 require_once BASE_PATH . '/config.php';
 require_once BASE_PATH . '/config/constants.php';
+
+// PHP's timezone must be fixed *before* the database connects — the DB
+// layer syncs MySQL's session `time_zone` to match this so that a
+// MySQL-generated NOW()/CURDATE() value and PHP's time()/date() always
+// agree on the same wall clock. (Site-settings can override this later
+// once the DB is up; both start from the same .env default so they
+// normally match anyway.)
+date_default_timezone_set(env('APP_TIMEZONE', 'Africa/Lagos'));
+
 require_once BASE_PATH . '/config/database.php';
 
 if (is_file(BASE_PATH . '/vendor/autoload.php')) {
@@ -46,6 +55,9 @@ require_once BASE_PATH . '/includes/admin-auth.php';
 require_once BASE_PATH . '/includes/mailer.php';
 require_once BASE_PATH . '/includes/wallet.php';
 require_once BASE_PATH . '/includes/mining.php';
+require_once BASE_PATH . '/includes/ads.php';
+require_once BASE_PATH . '/includes/spin.php';
+require_once BASE_PATH . '/includes/checkin.php';
 
 // ---------------------------------------------------------------
 // Load site settings from the database into a global cache.
@@ -64,7 +76,11 @@ try {
 // ---------------------------------------------------------------
 // Environment-driven runtime configuration.
 // ---------------------------------------------------------------
-date_default_timezone_set((string) get_setting('timezone', env('APP_TIMEZONE', 'Africa/Lagos')));
+$configuredTimezone = (string) get_setting('timezone', env('APP_TIMEZONE', 'Africa/Lagos'));
+if ($configuredTimezone !== date_default_timezone_get()) {
+    date_default_timezone_set($configuredTimezone);
+    sync_db_timezone();
+}
 
 $debug = defined('APP_DEBUG') && APP_DEBUG === true;
 error_reporting($debug ? E_ALL : E_ALL & ~E_DEPRECATED & ~E_NOTICE);

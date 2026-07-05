@@ -34,6 +34,7 @@ final class Database
 
             try {
                 self::$instance = new PDO($dsn, $user, $pass, $options);
+                self::syncTimezone(self::$instance);
             } catch (PDOException $e) {
                 app_log('error', 'Database connection failed: ' . $e->getMessage());
 
@@ -47,6 +48,20 @@ final class Database
         }
 
         return self::$instance;
+    }
+
+    /**
+     * Make MySQL's session `time_zone` match PHP's currently active
+     * default timezone, so a MySQL-generated NOW()/CURDATE() value and
+     * PHP's time()/date()/strtotime() always agree on the same wall
+     * clock. Without this, comparing a MySQL timestamp against PHP's
+     * time() silently drifts by the difference between the two
+     * timezones (e.g. Africa/Lagos vs. a UTC database server).
+     */
+    public static function syncTimezone(PDO $pdo): void
+    {
+        $offset = (new DateTime('now', new DateTimeZone(date_default_timezone_get())))->format('P');
+        $pdo->exec('SET time_zone = ' . $pdo->quote($offset));
     }
 
     private function __clone(): void
@@ -65,4 +80,14 @@ final class Database
 function db(): PDO
 {
     return Database::getInstance();
+}
+
+/**
+ * Re-sync MySQL's session time_zone to PHP's current default timezone.
+ * Call this after changing PHP's timezone at runtime (e.g. once a
+ * site_settings override has been loaded).
+ */
+function sync_db_timezone(): void
+{
+    Database::syncTimezone(db());
 }

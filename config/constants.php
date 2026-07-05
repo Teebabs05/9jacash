@@ -112,3 +112,10 @@ const REMEMBER_ME_TTL        = 60 * 60 * 24 * 30; // 30 days
 const MAX_LOGIN_ATTEMPTS      = 5;
 const LOGIN_LOCKOUT_SECONDS   = 900; // 15 minutes
 const BCRYPT_COST             = 12;
+
+// ---------------------------------------------------------------
+// Daily check-in
+// ---------------------------------------------------------------
+const CHECKIN_CYCLE_DAYS      = 30;
+const CHECKIN_DAY7_MULTIPLIER = 3;
+const CHECKIN_DAY30_MULTIPLIER = 5;

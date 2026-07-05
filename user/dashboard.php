@@ -118,7 +118,9 @@ require __DIR__ . '/../includes/partials/app-head.php';
                 <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-wallet2 me-2"></i>My Wallet</a>
                 <a href="<?= e(rtrim(APP_URL, '/')) ?>/mining/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-cpu-fill me-2"></i>Mining</a>
                 <a href="<?= e(rtrim(APP_URL, '/')) ?>/tasks/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-list-check me-2"></i>Task Center</a>
-                <button class="btn btn-outline-brand btn-sm text-start" disabled><i class="bi bi-disc-fill me-2"></i>Spin Wheel <span class="badge-soon ms-1">Soon</span></button>
+                <a href="<?= e(rtrim(APP_URL, '/')) ?>/spin/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-disc-fill me-2"></i>Spin Wheel</a>
+                <a href="<?= e(rtrim(APP_URL, '/')) ?>/ads/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-play-btn-fill me-2"></i>Watch &amp; Earn</a>
+                <a href="<?= e(rtrim(APP_URL, '/')) ?>/checkin/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-calendar-check-fill me-2"></i>Daily Check-in</a>
             </div>
         </div>
     </div>
