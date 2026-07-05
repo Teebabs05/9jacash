@@ -6,4 +6,4 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <!-- App JS -->
     <script src="<?= asset('js/app.js') ?>"></script>
-    <?php if (!empty($extraScripts)) { echo $extraScripts; } ?>
+    <?= rendered_scripts() ?>

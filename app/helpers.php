@@ -241,6 +241,21 @@ if (!function_exists('user_avatar_url')) {
     }
 }
 
+if (!function_exists('push_script')) {
+    /** Queue an inline <script> block to render after all CDN libraries load. */
+    function push_script(string $js): void
+    {
+        $GLOBALS['__pushed_scripts'][] = $js;
+    }
+}
+
+if (!function_exists('rendered_scripts')) {
+    function rendered_scripts(): string
+    {
+        return implode("\n", $GLOBALS['__pushed_scripts'] ?? []);
+    }
+}
+
 if (!function_exists('generate_reference')) {
     function generate_reference(string $prefix = 'TXN'): string
     {
