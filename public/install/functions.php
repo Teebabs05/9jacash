@@ -12,6 +12,14 @@ function install_base_path(): string
     return dirname(__DIR__, 2);
 }
 
+/**
+ * Requirements that must pass to run the installer at all — it only
+ * needs to talk to MySQL and write a .env file in the project root.
+ * Storage/upload permissions are checked separately (see
+ * install_storage_diagnostics) and do NOT block installation, since
+ * they only affect avatar/receipt/KYC/task-proof uploads, which can be
+ * fixed any time after the site is up.
+ */
 function install_requirements(): array
 {
     $base = install_base_path();
@@ -23,10 +31,56 @@ function install_requirements(): array
         'mbstring Extension' => extension_loaded('mbstring'),
         'fileinfo Extension' => extension_loaded('fileinfo'),
         'openssl Extension' => extension_loaded('openssl'),
-        'storage/ is writable' => is_writable($base . '/storage') || @chmod($base . '/storage', 0755),
-        'storage/uploads/ is writable' => is_writable($base . '/storage/uploads') || @chmod($base . '/storage/uploads', 0755),
-        'Project root is writable (.env)' => is_writable($base) ,
+        'Project root is writable (.env)' => is_writable($base),
     ];
+}
+
+/**
+ * Diagnostic (non-blocking) info about the folders used for uploads,
+ * so a permission/ownership mismatch can be identified precisely
+ * instead of just reported as "Missing".
+ */
+function install_storage_diagnostics(): array
+{
+    $base = install_base_path();
+    $paths = [
+        'storage/' => $base . '/storage',
+        'storage/logs/' => $base . '/storage/logs',
+        'storage/uploads/' => $base . '/storage/uploads',
+        'storage/uploads/avatars/' => $base . '/storage/uploads/avatars',
+        'storage/uploads/receipts/' => $base . '/storage/uploads/receipts',
+        'storage/uploads/proofs/' => $base . '/storage/uploads/proofs',
+        'storage/uploads/kyc/' => $base . '/storage/uploads/kyc',
+    ];
+
+    $results = [];
+    foreach ($paths as $label => $path) {
+        $exists = is_dir($path);
+        $writable = $exists && (is_writable($path) || @chmod($path, 0755) && is_writable($path));
+
+        $owner = null;
+        if ($exists && function_exists('posix_getpwuid') && function_exists('fileowner')) {
+            $info = @posix_getpwuid(fileowner($path));
+            $owner = $info['name'] ?? (string) fileowner($path);
+        } elseif ($exists) {
+            $owner = (string) @fileowner($path);
+        }
+
+        $results[$label] = [
+            'exists' => $exists,
+            'writable' => $writable,
+            'perms' => $exists ? substr(sprintf('%o', fileperms($path)), -4) : null,
+            'owner' => $owner,
+        ];
+    }
+
+    $processUser = null;
+    if (function_exists('posix_getpwuid') && function_exists('posix_geteuid')) {
+        $info = @posix_getpwuid(posix_geteuid());
+        $processUser = $info['name'] ?? (string) posix_geteuid();
+    }
+
+    return ['paths' => $results, 'process_user' => $processUser];
 }
 
 function install_is_locked(): bool

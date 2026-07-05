@@ -100,6 +100,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $requirements = install_requirements();
 $requirementsPass = !in_array(false, $requirements, true);
+$storageDiag = install_storage_diagnostics();
+$storageAllOk = !in_array(false, array_column($storageDiag['paths'], 'writable'), true);
 ?>
 <!doctype html>
 <html lang="en">
@@ -153,6 +155,46 @@ $requirementsPass = !in_array(false, $requirements, true);
         <?php if (!$requirementsPass): ?>
             <div class="alert alert-danger small">Please resolve the missing requirements above before continuing.</div>
         <?php endif; ?>
+
+        <h6 class="fw-bold mb-2 mt-4">Storage &amp; Uploads <span class="fw-normal text-muted small">(optional right now)</span></h6>
+        <p class="text-muted small">
+            These folders are only used for profile pictures, deposit receipts, task proof and KYC uploads —
+            not for installation itself. You can continue installing even if something below isn't OK yet, and
+            fix it afterward from Admin → Settings or via SSH/File Manager.
+        </p>
+        <div class="table-responsive mb-3">
+            <table class="table table-sm align-middle">
+                <thead><tr><th>Path</th><th>Status</th><th>Permissions</th><th>Owner</th></tr></thead>
+                <tbody>
+                <?php foreach ($storageDiag['paths'] as $label => $info): ?>
+                    <tr>
+                        <td><code><?= htmlspecialchars($label) ?></code></td>
+                        <td>
+                            <?php if (!$info['exists']): ?>
+                                <span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> Missing folder</span>
+                            <?php elseif ($info['writable']): ?>
+                                <span class="text-success"><i class="fa-solid fa-circle-check"></i> Writable</span>
+                            <?php else: ?>
+                                <span class="text-warning"><i class="fa-solid fa-triangle-exclamation"></i> Not writable</span>
+                            <?php endif; ?>
+                        </td>
+                        <td><?= $info['perms'] ? htmlspecialchars($info['perms']) : '—' ?></td>
+                        <td><?= $info['owner'] !== null ? htmlspecialchars($info['owner']) : '—' ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php if (!$storageAllOk): ?>
+            <div class="alert alert-warning small">
+                PHP is currently running as <strong><?= htmlspecialchars($storageDiag['process_user'] ?? 'unknown') ?></strong>.
+                Any row above showing a different <em>Owner</em> than that user is the actual problem — permission bits alone
+                (e.g. <code>chmod 755</code>) can't fix an ownership mismatch; you'd need to <code>chown</code> the folder to
+                match, or ask your host to do it. If the owner already matches, re-run:
+                <code>chmod -R 755 storage</code> (try <code>775</code> if 755 doesn't work) from your project root.
+            </div>
+        <?php endif; ?>
+
         <form method="post">
             <input type="hidden" name="step" value="1">
             <button class="btn btn-primary rounded-pill px-4" type="submit" <?= $requirementsPass ? '' : 'disabled' ?>>Continue</button>
