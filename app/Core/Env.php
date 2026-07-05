@@ -53,4 +53,40 @@ class Env
             default => $value,
         };
     }
+
+    /**
+     * Rewrite specific keys in the .env file in place, preserving
+     * everything else (comments, ordering, unrelated keys).
+     */
+    public static function updateFile(string $path, array $updates): void
+    {
+        $lines = is_file($path) ? file($path, FILE_IGNORE_NEW_LINES) : [];
+        $seen = [];
+
+        foreach ($lines as $i => $line) {
+            $trimmed = trim($line);
+            if ($trimmed === '' || str_starts_with($trimmed, '#') || !str_contains($trimmed, '=')) {
+                continue;
+            }
+            [$name] = explode('=', $trimmed, 2);
+            $name = trim($name);
+            if (array_key_exists($name, $updates)) {
+                $lines[$i] = $name . '=' . self::quoteIfNeeded((string) $updates[$name]);
+                $seen[$name] = true;
+            }
+        }
+
+        foreach ($updates as $name => $value) {
+            if (empty($seen[$name])) {
+                $lines[] = $name . '=' . self::quoteIfNeeded((string) $value);
+            }
+        }
+
+        file_put_contents($path, implode("\n", $lines) . "\n", LOCK_EX);
+    }
+
+    private static function quoteIfNeeded(string $value): string
+    {
+        return preg_match('/\s/', $value) ? '"' . str_replace('"', '\\"', $value) . '"' : $value;
+    }
 }

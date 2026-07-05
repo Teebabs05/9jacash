@@ -86,6 +86,7 @@ $router->group([fn() => require_login()], function ($router) {
     $router->any('kyc', 'User\\KycController@index');
 
     $router->get('files/{type}/{filename}', 'FileController@serve');
+    $router->post('return-to-admin', 'ImpersonationController@returnToAdmin');
 });
 
 // ---------------------------------------------------------------------
