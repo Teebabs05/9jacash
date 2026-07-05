@@ -112,18 +112,38 @@ lets you overwrite these credentials during Step 3.
 - Core wallet ledger primitives (`includes/wallet.php`) used by every future earning module
 - Premium fintech design system (`assets/css/theme.css`) with light/dark mode, self-hosted Poppins + Bootstrap Icons, glassmorphism cards, toasts, skeleton loaders
 
-### 🔜 Next: Module 2 — Wallet Pages + Public Landing Page
-Full wallet dashboard (ledger history, filters), and the marketing landing
-page (hero, features, mining plans preview, referral program, testimonials,
-FAQ, footer) to replace the current placeholder `index.php` redirect.
+### ✅ Module 2 — Wallet System + Public Landing Page
+- Shared authenticated app shell (`includes/partials/app-*.php` +
+  `assets/css/app.css`) — collapsible sidebar, topbar with live unread
+  notification count and user menu — reused by the dashboard and every
+  future user-facing module
+- `wallet/index.php` — balance tiles (main/bonus/referral/mining) + recent
+  transactions + referral link
+- `wallet/history.php` — full ledger with wallet/source/type/date filters
+  and pagination
+- `user/notifications.php` — real notification feed with mark-all-read
+- `user/profile.php` — edit name/phone/avatar, change password
+- Full public landing page (`index.php`) — animated hero, features grid,
+  how-it-works, live mining plans pulled from the database, referral
+  program breakdown (reads live percentages from `site_settings`),
+  animated stats counters (real user/payout counts), testimonials, FAQ
+  accordion, supported payment methods, newsletter signup and contact
+  form (both AJAX, CSRF-protected, backed by `newsletter_subscribers` and
+  `contact_messages` tables)
+- Seeded starter mining plans (Starter/Bronze/Silver/Gold Miner) so the
+  landing page and future Mining module have real data to work with
+
+### 🔜 Next: Module 3 — Mining System
+Mining plan purchase flow, active mining dashboard with countdown to next
+payout, `cron/mining-payout.php` for automatic daily crediting via
+`wallet_credit()`, pause/resume, and mining logs.
 
 ### Planned after that
-Mining system → Task center → Watch-to-earn ads → Spin wheel → Daily
-check-in → Deposits (PayVessel + manual) → Withdrawals → Notifications →
-Admin management modules (users, deposits, withdrawals, mining, tasks,
-settings) → Branding asset pack (PNG exports, social banner, app icon) →
-Full documentation set (Admin Guide, Cron Guide, PayVessel Integration
-Guide, API Docs).
+Task center → Watch-to-earn ads → Spin wheel → Daily check-in → Deposits
+(PayVessel + manual) → Withdrawals → Admin management modules (users,
+deposits, withdrawals, mining, tasks, settings) → Branding asset pack (PNG
+exports, social banner, app icon) → Full documentation set (Admin Guide,
+Cron Guide, PayVessel Integration Guide, API Docs).
 
 ## License
 

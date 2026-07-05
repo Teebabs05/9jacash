@@ -437,6 +437,29 @@ CREATE TABLE IF NOT EXISTS `site_settings` (
     UNIQUE KEY `uniq_settings_key` (`setting_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =====================================================================
+-- PUBLIC LANDING PAGE: NEWSLETTER + CONTACT FORM
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS `newsletter_subscribers` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(150) NOT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_newsletter_email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `contact_messages` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(150) NOT NULL,
+    `email` VARCHAR(150) NOT NULL,
+    `subject` VARCHAR(150) DEFAULT NULL,
+    `message` TEXT NOT NULL,
+    `is_read` TINYINT(1) NOT NULL DEFAULT 0,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_contact_read` (`is_read`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- =====================================================================
@@ -506,3 +529,11 @@ INSERT INTO `spin_settings` (`label`, `amount`, `probability`, `color`, `is_acti
 ('₦1000', 1000.00, 5.00, '#0B2545', 1),
 ('₦50', 50.00, 2.00, '#F2C94C', 1)
 ON DUPLICATE KEY UPDATE `label` = VALUES(`label`);
+
+-- Starter mining plans (shown on the landing page and in the Mining module)
+INSERT INTO `mining_plans` (`name`, `price`, `daily_return`, `duration_days`, `description`, `status`) VALUES
+('Starter Miner', 2000.00, 150.00, 30, 'A low-risk entry plan perfect for first-time miners.', 'active'),
+('Bronze Miner', 5000.00, 400.00, 30, 'Balanced daily returns with a 30-day mining cycle.', 'active'),
+('Silver Miner', 15000.00, 1350.00, 30, 'Our most popular plan for consistent daily earners.', 'active'),
+('Gold Miner', 50000.00, 4750.00, 30, 'Premium returns for serious investors.', 'active')
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
