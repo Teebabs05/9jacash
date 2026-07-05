@@ -100,7 +100,11 @@ class ProfileController extends Controller
             ActivityLog::log($userId, 'password_change', 'Password changed from profile.');
             Auth::refresh();
             Session::flash('success', 'Password updated successfully.');
-            $this->redirect($forced ? 'dashboard' : 'profile/password');
+
+            if ($forced) {
+                $this->redirect(is_admin() ? 'admin' : 'dashboard');
+            }
+            $this->redirect('profile/password');
         }
 
         $this->view('user/change-password', ['title' => 'Change Password', 'forced' => $forced], 'dashboard');

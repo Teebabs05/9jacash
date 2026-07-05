@@ -24,8 +24,8 @@ class User extends Model
     public static function findByLogin(string $login): array|false
     {
         return static::db()->fetch(
-            'SELECT * FROM users WHERE email = :login OR username = :login LIMIT 1',
-            ['login' => $login]
+            'SELECT * FROM users WHERE email = :login1 OR username = :login2 LIMIT 1',
+            ['login1' => $login, 'login2' => $login]
         );
     }
 
@@ -66,14 +66,14 @@ class User extends Model
         $like = '%' . $search . '%';
 
         $rows = static::db()->fetchAll(
-            "SELECT * FROM users WHERE full_name LIKE :s OR username LIKE :s OR email LIKE :s OR phone LIKE :s
+            "SELECT * FROM users WHERE full_name LIKE :s1 OR username LIKE :s2 OR email LIKE :s3 OR phone LIKE :s4
              ORDER BY created_at DESC LIMIT {$perPage} OFFSET {$offset}",
-            ['s' => $like]
+            ['s1' => $like, 's2' => $like, 's3' => $like, 's4' => $like]
         );
 
         $total = static::db()->fetch(
-            'SELECT COUNT(*) c FROM users WHERE full_name LIKE :s OR username LIKE :s OR email LIKE :s OR phone LIKE :s',
-            ['s' => $like]
+            'SELECT COUNT(*) c FROM users WHERE full_name LIKE :s1 OR username LIKE :s2 OR email LIKE :s3 OR phone LIKE :s4',
+            ['s1' => $like, 's2' => $like, 's3' => $like, 's4' => $like]
         );
 
         return ['rows' => $rows, 'total' => (int) ($total['c'] ?? 0)];

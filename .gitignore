@@ -1,0 +1,11 @@
+/.env
+/storage/logs/*.log
+/storage/uploads/*
+!/storage/uploads/.gitkeep
+!/storage/uploads/avatars/.gitkeep
+!/storage/uploads/receipts/.gitkeep
+!/storage/uploads/proofs/.gitkeep
+!/storage/uploads/kyc/.gitkeep
+/public/install/installed.lock
+.DS_Store
+Thumbs.db

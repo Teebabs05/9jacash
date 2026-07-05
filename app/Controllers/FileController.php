@@ -57,7 +57,7 @@ class FileController extends Controller
         $relativePath = "{$type}/{$filename}";
         $owned = match ($type) {
             'receipts' => db()->fetch('SELECT id FROM deposits WHERE receipt_path = :p AND user_id = :u', ['p' => $relativePath, 'u' => $user['id']]) !== false,
-            'kyc' => db()->fetch('SELECT id FROM kyc_submissions WHERE (document_path = :p OR selfie_path = :p) AND user_id = :u', ['p' => $relativePath, 'u' => $user['id']]) !== false,
+            'kyc' => db()->fetch('SELECT id FROM kyc_submissions WHERE (document_path = :p1 OR selfie_path = :p2) AND user_id = :u', ['p1' => $relativePath, 'p2' => $relativePath, 'u' => $user['id']]) !== false,
             'proofs' => db()->fetch('SELECT id FROM task_submissions WHERE proof_file = :p AND user_id = :u', ['p' => $relativePath, 'u' => $user['id']]) !== false,
             default => false,
         };
