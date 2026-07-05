@@ -28,12 +28,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = trim($_POST['db_user'] ?? 'root');
         $pass = (string) ($_POST['db_pass'] ?? '');
 
-        $pdo = install_test_connection($host, $port, $user, $pass);
+        $dbError = null;
+        $pdo = install_test_connection($host, $port, $user, $pass, $dbError);
         if (!$pdo) {
-            $errors[] = 'Could not connect to MySQL with the details provided. Please check host, port, username and password.';
+            $errors[] = 'Could not connect to MySQL: ' . ($dbError ?: 'unknown error') . '. Please check host, port, username and password.';
+            if ($dbError && stripos($dbError, 'Access denied') !== false) {
+                $errors[] = 'On cPanel / shared hosting, database usernames and database names are usually prefixed with your account name (e.g. "cpaneluser_9jacash"), and the database + user must both be created via "MySQL Databases" in cPanel first, with the user explicitly added to that database.';
+            }
         } else {
             try {
-                $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                try {
+                    // Many shared-hosting DB users don't have CREATE privilege —
+                    // that's fine as long as the database already exists (which it
+                    // must, on cPanel, since you create it there before running this).
+                    $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                } catch (PDOException) {
+                    // Ignored — the USE statement below will fail loudly if the
+                    // database genuinely doesn't exist and can't be created.
+                }
+
                 $pdo->exec("USE `{$name}`");
 
                 install_run_sql_file($pdo, install_base_path() . '/database/schema.sql');
@@ -44,6 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             } catch (Throwable $e) {
                 $errors[] = 'Database setup failed: ' . $e->getMessage();
+                $msg = $e->getMessage();
+                if (stripos($msg, 'Unknown database') !== false || (stripos($msg, 'Access denied') !== false && stripos($msg, 'database') !== false)) {
+                    $errors[] = 'This usually means the database doesn\'t exist yet, or this MySQL user hasn\'t been granted access to it. On cPanel, go to "MySQL Databases", create the database and a user (if you haven\'t already), then use "Add User To Database" and grant ALL PRIVILEGES — then enter those exact (prefixed) names here.';
+                }
             }
         }
     }
@@ -142,15 +159,22 @@ $requirementsPass = !in_array(false, $requirements, true);
         </form>
 
     <?php elseif ($step === 2): ?>
+        <?php
+        $dbHostVal = $_POST['db_host'] ?? 'localhost';
+        $dbPortVal = $_POST['db_port'] ?? '3306';
+        $dbNameVal = $_POST['db_name'] ?? '';
+        $dbUserVal = $_POST['db_user'] ?? '';
+        ?>
         <h6 class="fw-bold mb-3">Step 2: Database Configuration</h6>
         <p class="text-muted small">We'll create the database (if it doesn't exist) and import the schema + sample data automatically.</p>
+        <p class="text-muted small">On cPanel / shared hosting: create the database and a database user under <strong>MySQL&reg; Databases</strong> first (both are usually prefixed with your account name, e.g. <code>cpaneluser_9jacash</code>), add the user to the database with full privileges, then enter those exact values below. The host is almost always <code>localhost</code>, not an IP address.</p>
         <form method="post">
             <input type="hidden" name="step" value="2">
             <div class="row g-3">
-                <div class="col-md-8"><label class="form-label small">Database Host</label><input type="text" name="db_host" class="form-control" value="127.0.0.1" required></div>
-                <div class="col-md-4"><label class="form-label small">Port</label><input type="text" name="db_port" class="form-control" value="3306" required></div>
-                <div class="col-md-6"><label class="form-label small">Database Name</label><input type="text" name="db_name" class="form-control" value="9jacash" required></div>
-                <div class="col-md-6"><label class="form-label small">Database User</label><input type="text" name="db_user" class="form-control" value="root" required></div>
+                <div class="col-md-8"><label class="form-label small">Database Host</label><input type="text" name="db_host" class="form-control" value="<?= htmlspecialchars($dbHostVal) ?>" required></div>
+                <div class="col-md-4"><label class="form-label small">Port</label><input type="text" name="db_port" class="form-control" value="<?= htmlspecialchars($dbPortVal) ?>" required></div>
+                <div class="col-md-6"><label class="form-label small">Database Name</label><input type="text" name="db_name" class="form-control" value="<?= htmlspecialchars($dbNameVal) ?>" placeholder="e.g. cpaneluser_9jacash" required></div>
+                <div class="col-md-6"><label class="form-label small">Database User</label><input type="text" name="db_user" class="form-control" value="<?= htmlspecialchars($dbUserVal) ?>" placeholder="e.g. cpaneluser_dbuser" required></div>
                 <div class="col-12"><label class="form-label small">Database Password</label><input type="password" name="db_pass" class="form-control"></div>
             </div>
             <button class="btn btn-primary rounded-pill px-4 mt-4" type="submit">Test Connection &amp; Import Database</button>

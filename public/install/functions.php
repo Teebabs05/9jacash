@@ -34,14 +34,15 @@ function install_is_locked(): bool
     return is_file(__DIR__ . '/installed.lock');
 }
 
-function install_test_connection(string $host, string $port, string $user, string $pass): ?PDO
+function install_test_connection(string $host, string $port, string $user, string $pass, ?string &$error = null): ?PDO
 {
     try {
         return new PDO("mysql:host={$host};port={$port};charset=utf8mb4", $user, $pass, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_TIMEOUT => 5,
         ]);
-    } catch (PDOException) {
+    } catch (PDOException $e) {
+        $error = $e->getMessage();
         return null;
     }
 }
