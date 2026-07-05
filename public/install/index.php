@@ -58,8 +58,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $pdo->exec("USE `{$name}`");
 
-                install_run_sql_file($pdo, install_base_path() . '/database/schema.sql');
-                install_run_sql_file($pdo, install_base_path() . '/database/seed.sql');
+                if (install_database_already_set_up($pdo, $name)) {
+                    // A previous attempt already imported schema+seed into this
+                    // database (e.g. a later step failed and this form got
+                    // resubmitted) — re-running the imports would throw duplicate
+                    // key errors on the seed data, so just reuse what's there.
+                    $_SESSION['install_flash'] = 'Found an existing 9JACASH installation in this database — reusing it instead of re-importing.';
+                } else {
+                    install_run_sql_file($pdo, install_base_path() . '/database/schema.sql');
+                    install_run_sql_file($pdo, install_base_path() . '/database/seed.sql');
+                }
 
                 $_SESSION['install_db'] = compact('host', 'port', 'name', 'user', 'pass');
                 header('Location: ?step=3');
@@ -154,6 +162,11 @@ $storageAllOk = !in_array(false, array_column($storageDiag['paths'], 'writable')
     <?php foreach ($errors as $e): ?>
         <div class="alert alert-danger small"><?= htmlspecialchars($e) ?></div>
     <?php endforeach; ?>
+
+    <?php if (!empty($_SESSION['install_flash'])): ?>
+        <div class="alert alert-info small"><?= htmlspecialchars($_SESSION['install_flash']) ?></div>
+        <?php unset($_SESSION['install_flash']); ?>
+    <?php endif; ?>
 
     <?php if ($step === 99): ?>
         <div class="alert alert-warning">This application has already been installed. Delete <code>install/installed.lock</code> if you intentionally need to run the installer again (only do this on a fresh database).</div>

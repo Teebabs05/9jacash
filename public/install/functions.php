@@ -120,6 +120,26 @@ function install_test_connection(string $host, string $port, string $user, strin
     }
 }
 
+/**
+ * True if this database already has the app's schema + seed data loaded
+ * (e.g. a previous installer attempt succeeded here before a later step
+ * failed). Re-running schema.sql/seed.sql against an already-seeded
+ * database throws duplicate-key errors on the seed INSERTs, so callers
+ * should skip the import entirely when this returns true.
+ */
+function install_database_already_set_up(PDO $pdo, string $dbName): bool
+{
+    $stmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = :db AND table_name = 'users'"
+    );
+    $stmt->execute(['db' => $dbName]);
+    if ((int) $stmt->fetchColumn() === 0) {
+        return false;
+    }
+
+    return (int) $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn() > 0;
+}
+
 function install_run_sql_file(PDO $pdo, string $path): void
 {
     if (!@is_file($path)) {
