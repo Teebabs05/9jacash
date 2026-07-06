@@ -1,6 +1,11 @@
 # Environment
 .env
 
+# Generated at install time by install/index.php - each deployment
+# creates its own; committing one would make a fresh install wrongly
+# think it's already set up.
+install/installed.lock
+
 # Logs
 logs/*.log
 logs/*.txt
