@@ -485,6 +485,24 @@ CREATE TABLE IF NOT EXISTS `support_messages` (
     CONSTRAINT `fk_sm_admin` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =====================================================================
+-- BIOMETRIC LOGIN (WebAuthn/FIDO2 platform authenticators)
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS `webauthn_credentials` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `owner_type` ENUM('user','admin') NOT NULL,
+    `owner_id` INT UNSIGNED NOT NULL,
+    `credential_id` VARCHAR(255) NOT NULL COMMENT 'base64url-encoded authenticator credential ID',
+    `public_key` TEXT NOT NULL COMMENT 'PEM-encoded EC public key reconstructed from the COSE key',
+    `sign_count` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    `device_label` VARCHAR(100) DEFAULT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `last_used_at` DATETIME DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_webauthn_credential_id` (`credential_id`),
+    KEY `idx_webauthn_owner` (`owner_type`, `owner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- =====================================================================

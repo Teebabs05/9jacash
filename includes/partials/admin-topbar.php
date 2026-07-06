@@ -24,6 +24,7 @@ if (!empty($authAdmin['full_name'])) {
                 <span class="small fw-semibold d-none d-sm-inline" style="color:var(--text);"><?= e($authAdmin['full_name'] ?? 'Admin') ?></span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="<?= e(rtrim(APP_URL, '/')) ?>/admin/profile.php"><i class="bi bi-person me-2"></i>My Profile</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item text-danger" href="<?= e(rtrim(APP_URL, '/')) ?>/admin/logout.php"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
             </ul>

@@ -149,6 +149,41 @@ final class Auth
         return ['success' => true, 'message' => 'Welcome back!'];
     }
 
+    /**
+     * Complete a login already authenticated by another factor (biometric
+     * WebAuthn assertion) - same session/notification/logging tail as
+     * attemptLogin(), skipping the password check it doesn't need.
+     */
+    public static function completeBiometricLogin(int $userId): array
+    {
+        $pdo = db();
+        $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ? LIMIT 1');
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            return ['success' => false, 'message' => 'Account not found.'];
+        }
+
+        if ($user['status'] === USER_STATUS_SUSPENDED) {
+            return ['success' => false, 'message' => 'Your account has been suspended. Contact support for assistance.'];
+        }
+
+        if ($user['status'] === USER_STATUS_BANNED) {
+            return ['success' => false, 'message' => 'Your account has been permanently banned.'];
+        }
+
+        self::establishSession($user);
+
+        $pdo->prepare('UPDATE users SET last_login_at = NOW(), last_login_ip = ? WHERE id = ?')
+            ->execute([client_ip(), $user['id']]);
+
+        log_activity((int) $user['id'], null, 'login', 'User logged in with biometrics');
+        Mailer::sendLoginNotificationEmail($user['email'], $user['full_name'], client_ip(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''));
+
+        return ['success' => true, 'message' => 'Welcome back!'];
+    }
+
     private static function establishSession(array $user): void
     {
         session_regenerate_id(true);

@@ -44,6 +44,39 @@ final class AdminAuth
         return ['success' => true, 'message' => 'Welcome back!'];
     }
 
+    /**
+     * Complete a login already authenticated by another factor (biometric
+     * WebAuthn assertion) - same session/notification/logging tail as
+     * attemptLogin(), skipping the password check it doesn't need.
+     */
+    public static function completeBiometricLogin(int $adminId): array
+    {
+        $pdo = db();
+        $stmt = $pdo->prepare('SELECT * FROM admins WHERE id = ? LIMIT 1');
+        $stmt->execute([$adminId]);
+        $admin = $stmt->fetch();
+
+        if (!$admin) {
+            return ['success' => false, 'message' => 'Administrator account not found.'];
+        }
+
+        if ($admin['status'] !== 'active') {
+            return ['success' => false, 'message' => 'This administrator account is disabled.'];
+        }
+
+        session_regenerate_id(true);
+        $_SESSION['admin_id'] = (int) $admin['id'];
+        $_SESSION['admin_username'] = $admin['username'];
+
+        $pdo->prepare('UPDATE admins SET last_login_at = NOW(), last_login_ip = ? WHERE id = ?')
+            ->execute([client_ip(), $admin['id']]);
+
+        log_activity(null, (int) $admin['id'], 'admin_login', 'Administrator logged in with biometrics');
+        Mailer::sendLoginNotificationEmail($admin['email'], $admin['full_name'], client_ip(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''));
+
+        return ['success' => true, 'message' => 'Welcome back!'];
+    }
+
     public static function logout(): void
     {
         if (!empty($_SESSION['admin_id'])) {

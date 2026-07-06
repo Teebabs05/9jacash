@@ -94,10 +94,56 @@ require __DIR__ . '/../includes/partials/auth-head.php';
                 <button type="submit" class="btn btn-brand w-100">Log In</button>
             </form>
 
+            <div id="biometricLoginWrap" class="d-none">
+                <div class="d-flex align-items-center gap-2 my-3">
+                    <hr class="flex-grow-1"><span class="small" style="color:var(--text-muted);">OR</span><hr class="flex-grow-1">
+                </div>
+                <button type="button" id="biometricLoginBtn" class="btn btn-outline-brand w-100"><i class="bi bi-fingerprint me-1"></i> Log In with Biometrics</button>
+            </div>
+
             <p class="text-center small mt-4 mb-0" style="color:var(--text-muted);">
                 Don't have an account? <a href="register.php" style="color:var(--brand-emerald);font-weight:600;">Create one</a>
             </p>
         </div>
     </div>
 </div>
+<script>window.CSRF_TOKEN = <?= json_encode(csrf_token()) ?>;</script>
+<script src="<?= e($assetBase) ?>/js/webauthn.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (!SureCashWebAuthn.supported()) return;
+    document.getElementById('biometricLoginWrap').classList.remove('d-none');
+
+    // Prefetch the login challenge as soon as the button is shown, and
+    // keep the *resolved* value (not just a pending promise) cached, so
+    // the click handler can reach navigator.credentials.get() without
+    // any await in between - even awaiting an already-resolved promise
+    // is enough to burn through the click's user-activation window.
+    let cachedOptions = null;
+    function refreshOptions() {
+        cachedOptions = null;
+        SureCashWebAuthn.fetchLoginOptions().then((res) => { cachedOptions = res; });
+    }
+    refreshOptions();
+
+    document.getElementById('biometricLoginBtn').addEventListener('click', async function () {
+        const btn = this;
+        SureCashMining.setLoading(btn, true);
+        try {
+            const optionsRes = cachedOptions || await SureCashWebAuthn.fetchLoginOptions();
+            const result = await SureCashWebAuthn.login('user', optionsRes);
+            if (result.success) {
+                window.location.href = result.redirect;
+            } else {
+                SureCashMining.toast(result.message || 'Biometric login failed.', 'error');
+                SureCashMining.setLoading(btn, false);
+                refreshOptions();
+            }
+        } catch (e) {
+            SureCashMining.setLoading(btn, false);
+            refreshOptions();
+        }
+    });
+});
+</script>
 <?php require __DIR__ . '/../includes/partials/auth-scripts.php'; ?>
