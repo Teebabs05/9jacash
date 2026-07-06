@@ -57,8 +57,14 @@ $pageTitle = 'Dashboard';
 $activeNav = 'dashboard';
 require __DIR__ . '/../includes/partials/app-head.php';
 ?>
-<h4 class="fw-bold mb-1">Welcome back, <?= e($user['full_name']) ?> 👋</h4>
-<p style="color:var(--text-muted);">Here's what's happening with your account today.</p>
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-2">
+    <div>
+        <h4 class="fw-bold mb-1">Welcome back, <?= e($user['full_name']) ?> 👋</h4>
+        <p style="color:var(--text-muted);" class="mb-0">Here's what's happening with your account today.</p>
+    </div>
+    <?php require __DIR__ . '/../includes/partials/app-download-badges.php'; ?>
+</div>
 
 <div class="row g-4 mt-1">
     <div class="col-xl-3 col-md-6">

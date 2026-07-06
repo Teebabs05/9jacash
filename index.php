@@ -56,6 +56,9 @@ $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
                     <a href="user/register.php" class="btn btn-gold btn-lg px-4">Create Free Account</a>
                     <a href="#how-it-works" class="btn btn-lg px-4" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.3);">See How It Works</a>
                 </div>
+                <div class="mt-3">
+                    <?php require __DIR__ . '/includes/partials/app-download-badges.php'; ?>
+                </div>
             </div>
             <div class="col-lg-5">
                 <div class="hero-card">

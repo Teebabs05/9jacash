@@ -188,6 +188,21 @@ require __DIR__ . '/../includes/partials/admin-head.php';
     </div>
 
     <div class="card-surface p-4 mb-4">
+        <h5 class="fw-bold mb-3">Mobile App Links</h5>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label small">Google Play Store URL</label>
+                <input type="text" class="form-control" name="playstore_url" value="<?= e((string) get_setting('playstore_url', '')) ?>" placeholder="https://play.google.com/store/apps/details?id=...">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label small">Apple App Store URL</label>
+                <input type="text" class="form-control" name="appstore_url" value="<?= e((string) get_setting('appstore_url', '')) ?>" placeholder="https://apps.apple.com/app/...">
+            </div>
+            <div class="form-text">Download badges appear on the homepage and at the top of the user dashboard once set. Leave blank to hide a badge.</div>
+        </div>
+    </div>
+
+    <div class="card-surface p-4 mb-4">
         <h5 class="fw-bold mb-3">Analytics</h5>
         <div class="row g-3">
             <div class="col-md-6">

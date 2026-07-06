@@ -632,10 +632,22 @@ only offer 14/30-day cycles and confirmed the invest page immediately
 reflected only those two options and the server rejected a
 since-disabled 7-day submission.
 
+### ✅ Module 20 — Play Store / App Store Download Links
+Admin-configurable Play Store and App Store URLs (**Admin → Settings
+→ Mobile App Links**), shown as download badges on the homepage hero
+and at the top of the user dashboard. Each badge is independently
+optional — `includes/partials/app-download-badges.php` renders
+nothing at all if neither URL is set, and only the configured badge(s)
+if just one is.
+
+Verified live: confirmed no badges render with both URLs empty
+(the seeded default), and confirmed both badges render with the
+correct `href` on both the homepage and the dashboard once set.
+
 ### Planned next
 Branding asset pack (PNG exports, social banner, app icon) →
-transaction receipts → paid extra spins → Play Store/App Store links →
-a modern visual redesign with conversion-focused landing page
+transaction receipts → paid extra spins → a modern visual redesign
+with conversion-focused landing page
 elements.
 
 ## License
