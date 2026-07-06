@@ -92,6 +92,8 @@ if (!function_exists('deposits_approve')) {
             Mailer::sendDepositEmail($user['email'], $user['full_name'], $amount, 'approved');
         }
 
+        referrals_process_deposit_bonus((int) $deposit['user_id'], $amount);
+
         log_activity((int) $deposit['user_id'], $adminId, 'deposit_approved', "Deposit #{$depositId} approved (" . money($amount) . ')');
 
         return ['success' => true, 'message' => 'Deposit approved and wallet credited.'];

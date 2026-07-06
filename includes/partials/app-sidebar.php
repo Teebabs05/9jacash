@@ -40,7 +40,7 @@ if (!function_exists('nav_link')) {
         <?php nav_link('deposit', $base . '/payments/deposit.php', 'bi-arrow-down-circle-fill', 'Deposit', $activeNav); ?>
         <?php nav_link('withdraw', $base . '/wallet/withdraw.php', 'bi-arrow-up-circle-fill', 'Withdraw', $activeNav); ?>
         <?php nav_link('bank-accounts', $base . '/wallet/bank-accounts.php', 'bi-credit-card-2-front-fill', 'Withdrawal Accounts', $activeNav); ?>
-        <?php nav_link('referrals', $base . '/user/referrals.php', 'bi-people-fill', 'Referrals', $activeNav, false); ?>
+        <?php nav_link('referrals', $base . '/user/referrals.php', 'bi-people-fill', 'Referrals', $activeNav); ?>
 
         <div class="nav-section-label">Account</div>
         <?php nav_link('notifications', $base . '/user/notifications.php', 'bi-bell-fill', 'Notifications', $activeNav); ?>

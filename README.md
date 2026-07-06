@@ -316,10 +316,36 @@ retain access, triggered a password reset email, and permanently deleted
 a user with cascading cleanup confirmed across wallets and mining
 positions.
 
+### ✅ Module 9 — Referral System Completion
+Modules 1-8 already recorded the referral *relationships* at
+registration time, but nothing ever actually paid the bonus out — a real
+gap in the earning loop that this module closes:
+- `includes/referrals.php` — `referrals_process_deposit_bonus()` walks a
+  depositor's upline (from the `referrals` table) and credits each level
+  its configured percentage of the deposit into the **referral wallet**,
+  logging every payout to `referral_earnings`; wired into
+  `deposits_approve()` so it fires automatically whenever a deposit
+  (manual or PayVessel) is approved
+- `Auth::register()` now actually credits `registration_bonus` (another
+  setting that existed but was never applied) to new signups
+- `user/referrals.php` — level 1/2/3 referral counts, total referral
+  earnings, direct referral list, recent earnings log, and a referral
+  leaderboard (top earners platform-wide)
+- `admin/referral-settings.php` — configure per-level percentages, levels
+  tracked, and the registration bonus, plus platform-wide referral stats
+
+Verified live against MariaDB with a real 3-generation chain (A refers B,
+B refers C): confirmed the `referrals` table correctly records A→C as a
+level-2 relationship, all three received the registration bonus on
+signup, and approving a ₦10,000 deposit from C correctly credited B's
+referral wallet 5% (₦500, level 1) and A's referral wallet 2% (₦200,
+level 2) with matching `referral_earnings` rows — and the referrals page
+and leaderboard both rendered the correct numbers and ranking.
+
 ### Planned next
 Branding asset pack (PNG exports, social banner, app icon) → Full
 documentation set (Admin Guide, Cron Guide, PayVessel Integration Guide,
-API Docs) → Deposit/withdrawal CSV export → Referral leaderboard page.
+API Docs) → Deposit/withdrawal CSV export.
 
 ## License
 

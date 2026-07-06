@@ -59,6 +59,15 @@ final class Auth
             return ['success' => false, 'message' => 'Registration failed. Please try again.'];
         }
 
+        $registrationBonus = (float) get_setting('registration_bonus', 0);
+        if ($registrationBonus > 0) {
+            try {
+                wallet_credit($userId, WALLET_BONUS, $registrationBonus, LEDGER_SOURCE_ADMIN_ADJUSTMENT, 'Welcome registration bonus');
+            } catch (Throwable $e) {
+                app_log('error', 'Failed to credit registration bonus: ' . $e->getMessage(), ['user_id' => $userId]);
+            }
+        }
+
         self::sendVerificationEmail($userId, $email, $fullName);
         log_activity($userId, null, 'register', 'New account registered');
 

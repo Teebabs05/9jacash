@@ -114,10 +114,11 @@ require __DIR__ . '/../includes/partials/app-head.php';
 
         <div class="card-surface p-4">
             <h5 class="fw-bold mb-3">Your Referral Link</h5>
-            <div class="input-group">
+            <div class="input-group mb-2">
                 <input type="text" class="form-control form-control-sm" readonly id="refLink" value="<?= e(rtrim(APP_URL, '/')) ?>/user/register.php?ref=<?= e($user['referral_code']) ?>">
                 <button class="btn btn-outline-brand btn-sm" type="button" onclick="navigator.clipboard.writeText(document.getElementById('refLink').value); NineJaCash.toast('Referral link copied!');">Copy</button>
             </div>
+            <a href="<?= e(rtrim(APP_URL, '/')) ?>/user/referrals.php" class="small fw-semibold" style="color:var(--brand-emerald);">View Referral Stats &amp; Leaderboard <i class="bi bi-arrow-right"></i></a>
         </div>
     </div>
 </div>

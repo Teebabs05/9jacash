@@ -34,6 +34,7 @@ $pendingWithdrawals = (int) db()->query("SELECT COUNT(*) AS c FROM withdrawals W
 
         <div class="nav-section-label">Users</div>
         <?php admin_nav_link('users', $base . '/admin/users.php', 'bi-people-fill', 'Manage Users', $activeNav); ?>
+        <?php admin_nav_link('referral-settings', $base . '/admin/referral-settings.php', 'bi-diagram-3-fill', 'Referral Settings', $activeNav); ?>
 
         <div class="nav-section-label">Finance</div>
         <?php admin_nav_link('deposits', $base . '/admin/deposits.php', 'bi-arrow-down-circle-fill', 'Deposits', $activeNav, true, $pendingDeposits ?: null); ?>
