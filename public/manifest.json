@@ -1,0 +1,12 @@
+{
+  "name": "9JACASH",
+  "short_name": "9JACASH",
+  "description": "Earn. Grow. Cash Out.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D47A1",
+  "theme_color": "#0D47A1",
+  "icons": [
+    { "src": "/assets/img/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

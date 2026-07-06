@@ -1,0 +1,7 @@
+# If your hosting control panel lets you set the document root, point it
+# directly at the /public folder instead of relying on this file. This
+# rewrite exists only for shared hosts (e.g. cPanel addon domains) where
+# the document root cannot be changed and must stay at the repo root.
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ /public/$1 [L]
