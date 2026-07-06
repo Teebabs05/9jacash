@@ -20,7 +20,7 @@ if (!function_exists('nav_link')) {
 ?>
 <aside class="app-sidebar">
     <a href="<?= e($base) ?>/user/dashboard.php" class="brand text-decoration-none" style="color:var(--text);">
-        <span class="brand-mark">9</span>
+        <?= brand_mark_html() ?>
         <span>9JACASH</span>
     </a>
     <nav class="app-nav">

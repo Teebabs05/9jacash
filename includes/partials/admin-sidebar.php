@@ -25,7 +25,7 @@ $pendingWithdrawals = (int) db()->query("SELECT COUNT(*) AS c FROM withdrawals W
 ?>
 <aside class="app-sidebar">
     <a href="<?= e($base) ?>/admin/index.php" class="brand text-decoration-none" style="color:var(--text);">
-        <span class="brand-mark">9</span>
+        <?= brand_mark_html() ?>
         <span>9JACASH Admin</span>
     </a>
     <nav class="app-nav">
@@ -33,7 +33,7 @@ $pendingWithdrawals = (int) db()->query("SELECT COUNT(*) AS c FROM withdrawals W
         <?php admin_nav_link('dashboard', $base . '/admin/index.php', 'bi-grid-1x2-fill', 'Dashboard', $activeNav); ?>
 
         <div class="nav-section-label">Users</div>
-        <?php admin_nav_link('users', $base . '/admin/users.php', 'bi-people-fill', 'Manage Users', $activeNav, false); ?>
+        <?php admin_nav_link('users', $base . '/admin/users.php', 'bi-people-fill', 'Manage Users', $activeNav); ?>
 
         <div class="nav-section-label">Finance</div>
         <?php admin_nav_link('deposits', $base . '/admin/deposits.php', 'bi-arrow-down-circle-fill', 'Deposits', $activeNav, true, $pendingDeposits ?: null); ?>
@@ -42,13 +42,13 @@ $pendingWithdrawals = (int) db()->query("SELECT COUNT(*) AS c FROM withdrawals W
         <?php admin_nav_link('withdrawal-settings', $base . '/admin/withdrawal-settings.php', 'bi-sliders', 'Withdrawal Settings', $activeNav); ?>
 
         <div class="nav-section-label">Earning Modules</div>
-        <?php admin_nav_link('mining-plans', $base . '/admin/mining-plans.php', 'bi-cpu-fill', 'Mining Plans', $activeNav, false); ?>
+        <?php admin_nav_link('mining-plans', $base . '/admin/mining-plans.php', 'bi-cpu-fill', 'Mining Plans', $activeNav); ?>
         <?php admin_nav_link('tasks', $base . '/admin/tasks.php', 'bi-list-check', 'Tasks', $activeNav); ?>
         <?php admin_nav_link('task-submissions', $base . '/admin/task-submissions.php', 'bi-inbox-fill', 'Task Submissions', $activeNav, true, $pendingSubmissions ?: null); ?>
         <?php admin_nav_link('spin-settings', $base . '/admin/spin-settings.php', 'bi-disc-fill', 'Spin Wheel', $activeNav); ?>
 
         <div class="nav-section-label">Platform</div>
-        <?php admin_nav_link('settings', $base . '/admin/settings.php', 'bi-gear-fill', 'Settings', $activeNav, false); ?>
+        <?php admin_nav_link('settings', $base . '/admin/settings.php', 'bi-gear-fill', 'Settings', $activeNav); ?>
         <a href="<?= e($base) ?>/admin/logout.php" class="nav-link text-danger"><i class="bi bi-box-arrow-right"></i>Logout</a>
     </nav>
 </aside>

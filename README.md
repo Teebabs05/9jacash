@@ -281,11 +281,45 @@ the daily request limit blocked a further attempt until an admin raised
 it; and a withdrawal exceeding the user's total combined balance was
 rejected up front with zero wallet mutation.
 
+### ✅ Module 8 — Admin User Management, Mining Plan CRUD & General Settings
+- `admin/users.php` — searchable, filterable, paginated user list
+- `admin/user-view.php` — edit profile/KYC status, adjust any wallet
+  type (credit/debit, reason required and logged), activate/suspend/ban,
+  trigger a password reset email, **Login As User** (impersonation), and
+  permanently delete a user (cascades their wallet/history via existing
+  FK constraints)
+- Impersonation banner (`includes/partials/app-head.php`) shown while an
+  admin is viewing as a user, with a **Return to Admin** link
+  (`user/stop-impersonate.php`) that restores the admin session
+- `admin/mining-plans.php` — full CRUD for mining plans (delete is
+  blocked once a plan has real positions — deactivate instead) plus
+  **Assign Plan to User**, gifting an active position with no wallet
+  charge
+- `admin/settings.php` — site name/tagline/logo upload, currency,
+  timezone, contact info, social links, Google Analytics/Facebook Pixel
+  IDs, full SMTP configuration, and maintenance mode; `brand_mark_html()`
+  (`includes/functions.php`) swaps in the uploaded logo across the
+  landing nav and both sidebars the moment it's set, no code changes
+  needed
+
+Verified live against MariaDB: searched/filtered the user list, edited a
+profile and KYC status, credited then debited a wallet with the ledger
+entries showing up correctly, suspended a user and confirmed login is
+blocked, reactivated them, used Login As User and confirmed the
+impersonation banner appears and Return to Admin correctly restores the
+admin session, created a mining plan, gifted it to a user for free
+(position created, wallet untouched), confirmed the delete-guard blocks
+removing a plan with active positions, uploaded a custom logo and
+confirmed it renders on the landing page and both sidebars, toggled
+maintenance mode on/off and confirmed guests are blocked while admins
+retain access, triggered a password reset email, and permanently deleted
+a user with cascading cleanup confirmed across wallets and mining
+positions.
+
 ### Planned next
-Remaining admin management modules (users, mining plans, general
-settings) → Branding asset pack (PNG exports, social banner, app icon)
-→ Full documentation set (Admin Guide, Cron Guide, PayVessel Integration
-Guide, API Docs).
+Branding asset pack (PNG exports, social banner, app icon) → Full
+documentation set (Admin Guide, Cron Guide, PayVessel Integration Guide,
+API Docs) → Deposit/withdrawal CSV export → Referral leaderboard page.
 
 ## License
 

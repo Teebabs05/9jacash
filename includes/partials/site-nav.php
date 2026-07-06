@@ -5,7 +5,7 @@ $loggedIn = Auth::isLoggedIn();
 <nav class="navbar navbar-expand-lg site-nav py-3">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="<?= e($base) ?>/index.php" style="color:var(--text);">
-            <span class="brand-mark">9</span>
+            <?= brand_mark_html() ?>
             <span>9JACASH</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteNavbar">

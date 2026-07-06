@@ -387,3 +387,21 @@ if (!function_exists('clamp')) {
         return max($min, min($max, $value));
     }
 }
+
+/**
+ * Render the brand mark (custom uploaded logo if the admin has set one,
+ * otherwise the default "9" glyph), shared by every nav/sidebar.
+ */
+if (!function_exists('brand_mark_html')) {
+    function brand_mark_html(int $size = 36): string
+    {
+        $logo = (string) get_setting('site_logo', '');
+
+        if ($logo !== '') {
+            $src = e(rtrim(APP_URL, '/')) . '/uploads/' . e($logo);
+            return '<img src="' . $src . '" alt="Logo" class="brand-mark" style="width:' . $size . 'px;height:' . $size . 'px;object-fit:contain;padding:4px;">';
+        }
+
+        return '<span class="brand-mark" style="width:' . $size . 'px;height:' . $size . 'px;">9</span>';
+    }
+}
