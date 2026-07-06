@@ -63,14 +63,22 @@ Add this to your cPanel Cron Jobs (or crontab) once the platform is installed:
 
 Runs hourly and credits any mining position whose `next_payout_at` has
 elapsed — it's idempotent, so running it more or less often than once a
-day is safe.
+day is safe. See `docs/CRON_GUIDE.md` for verification steps and outage
+behavior.
+
+## Documentation
+
+- `docs/ADMIN_GUIDE.md` — running the admin panel day to day
+- `docs/CRON_GUIDE.md` — the mining payout scheduled job
+- `docs/PAYVESSEL_INTEGRATION.md` — setting up automatic bank-transfer deposits
+- `docs/API_DOCS.md` — internal AJAX endpoint + webhook reference
 
 ## Folder Structure
 
 ```
 9jacash/
 ├── admin/              Admin panel (login, dashboard, management modules)
-├── ads/                Watch-to-earn ad reward module (upcoming)
+├── ads/                Watch-to-earn ad reward module
 ├── ajax/                AJAX endpoints shared across modules
 ├── api/                 External/webhook API endpoints (PayVessel, etc.)
 ├── assets/              css/, js/, images/, fonts/ (all self-hosted, no CDN)
@@ -78,16 +86,17 @@ day is safe.
 ├── cron/                Scheduled jobs (mining payouts, etc.)
 ├── database/            Migration/reference SQL snapshots
 ├── database.sql         Full schema + seed data (single source of truth)
+├── docs/                 Admin Guide, Cron Guide, PayVessel Integration Guide, endpoint reference
 ├── includes/            Shared PHP services: Auth, Mailer, Wallet, security
 ├── install/             4-step installation wizard
 ├── logs/                Application + PHP error logs
-├── mining/              Mining plans module (upcoming)
-├── payments/            Deposit gateway integration (upcoming)
-├── tasks/                Task center module (upcoming)
+├── mining/              Mining plans module
+├── payments/            Deposit gateway integration
+├── tasks/                Task center module
 ├── uploads/              KYC docs, receipts, task screenshots, avatars
 ├── user/                 Registration, login, verification, password reset, dashboard
 ├── vendor/               Composer dependencies (PHPMailer only)
-├── wallet/               Wallet/withdrawal pages (upcoming)
+├── wallet/               Wallet/withdrawal pages
 ├── .env.example          Environment variable template
 ├── .htaccess             Apache security + rewrite rules
 ├── composer.json
@@ -411,10 +420,41 @@ re-tested end to end to confirm nothing broke), plus a from-scratch
 Apache install with a real test vhost to confirm `.htaccess` behavior
 under conditions the PHP dev server can't reproduce.
 
+### ✅ Module 11 — Documentation Set
+A full `docs/` folder for anyone running or maintaining the platform:
+- `docs/ADMIN_GUIDE.md` — every admin panel screen (users, deposits,
+  withdrawals, mining plans, tasks, spin wheel, referral settings,
+  general settings), written from what each screen actually does today
+  rather than the original feature list, including things that turned
+  out *not* to exist (there's no in-app "add another admin" screen, and
+  no KYC document upload/review queue — KYC is a manual status flag an
+  admin sets)
+- `docs/CRON_GUIDE.md` — how to schedule `cron/mining-payout.php` on
+  cPanel or plain Linux, how to verify it's running, and how it behaves
+  after an outage (verified against the actual payout code: it only
+  advances `next_payout_at` by one day per run, so a multi-day outage
+  catches up gradually over the next several scheduled runs, not all at
+  once)
+- `docs/PAYVESSEL_INTEGRATION.md` — obtaining credentials, wiring them
+  into Deposit Settings vs `.env`, configuring the webhook URL, the full
+  request/signature-verification flow, and how to test the signature
+  check is actually being enforced
+- `docs/API_DOCS.md` — a reference for the internal `ajax/*.php`
+  endpoints (auth/CSRF/rate-limit conventions, request/response shape
+  per endpoint) and the PayVessel webhook, framed honestly as internal
+  endpoints rather than a public third-party API, since none exists
+
+While writing these, found and fixed a stale leftover on the admin
+dashboard (`admin/index.php`) claiming that user management, deposit/
+withdrawal approval, mining plan management and settings were "being
+rolled out in the next build phases" — all of that has existed since
+Modules 6-8; the banner was dead scaffold text left behind. Also
+corrected several "(upcoming)" folder-structure labels in this README
+for modules that have been complete since Module 3.
+
 ### Planned next
-Branding asset pack (PNG exports, social banner, app icon) → Full
-documentation set (Admin Guide, Cron Guide, PayVessel Integration Guide,
-API Docs) → Deposit/withdrawal CSV export.
+Branding asset pack (PNG exports, social banner, app icon) →
+deposit/withdrawal CSV export.
 
 ## License
 

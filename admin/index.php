@@ -73,8 +73,4 @@ require __DIR__ . '/../includes/partials/admin-head.php';
     </div>
 </div>
 
-<div class="alert alert-info mt-4 small">
-    User management, deposit/withdrawal approval, mining plan management and platform settings are being rolled out in the next build phases.
-</div>
-
 <?php require __DIR__ . '/../includes/partials/admin-scripts.php'; ?>
