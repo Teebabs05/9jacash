@@ -144,7 +144,7 @@ final class Auth
         $stmt->execute([client_ip(), $user['id']]);
 
         log_activity((int) $user['id'], null, 'login', 'User logged in');
-        Mailer::sendLoginNotificationEmail($user['email'], $user['full_name'], client_ip(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''));
+        defer_after_response(fn () => Mailer::sendLoginNotificationEmail($user['email'], $user['full_name'], client_ip(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? '')));
 
         return ['success' => true, 'message' => 'Welcome back!'];
     }
@@ -179,7 +179,7 @@ final class Auth
             ->execute([client_ip(), $user['id']]);
 
         log_activity((int) $user['id'], null, 'login', 'User logged in with biometrics');
-        Mailer::sendLoginNotificationEmail($user['email'], $user['full_name'], client_ip(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''));
+        defer_after_response(fn () => Mailer::sendLoginNotificationEmail($user['email'], $user['full_name'], client_ip(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? '')));
 
         return ['success' => true, 'message' => 'Welcome back!'];
     }

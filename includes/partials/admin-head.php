@@ -16,6 +16,8 @@ $authAdmin = current_admin();
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e($pageTitle) ?> · <?= e($siteName) ?> Admin</title>
 <?= favicon_link_html() ?>
+<link rel="preload" href="<?= e($assetBase) ?>/fonts/poppins/poppins-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="<?= e($assetBase) ?>/fonts/poppins/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap-icons.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/fonts.css">

@@ -19,9 +19,15 @@ if (!function_exists('admin_nav_link')) {
     }
 }
 
-$pendingSubmissions = (int) db()->query("SELECT COUNT(*) AS c FROM task_submissions WHERE status = 'pending'")->fetch()['c'];
-$pendingDeposits = (int) db()->query("SELECT COUNT(*) AS c FROM deposits WHERE status = 'pending'")->fetch()['c'];
-$pendingWithdrawals = (int) db()->query("SELECT COUNT(*) AS c FROM withdrawals WHERE status = 'pending'")->fetch()['c'];
+$pendingCounts = db()->query(
+    "SELECT
+        (SELECT COUNT(*) FROM task_submissions WHERE status = 'pending') AS submissions,
+        (SELECT COUNT(*) FROM deposits WHERE status = 'pending') AS deposits,
+        (SELECT COUNT(*) FROM withdrawals WHERE status = 'pending') AS withdrawals"
+)->fetch();
+$pendingSubmissions = (int) $pendingCounts['submissions'];
+$pendingDeposits = (int) $pendingCounts['deposits'];
+$pendingWithdrawals = (int) $pendingCounts['withdrawals'];
 $unreadMessages = support_unread_total_for_admin();
 ?>
 <aside class="app-sidebar">

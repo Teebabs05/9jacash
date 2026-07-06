@@ -39,7 +39,7 @@ final class AdminAuth
             ->execute([client_ip(), $admin['id']]);
 
         log_activity(null, (int) $admin['id'], 'admin_login', 'Administrator logged in');
-        Mailer::sendLoginNotificationEmail($admin['email'], $admin['full_name'], client_ip(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''));
+        defer_after_response(fn () => Mailer::sendLoginNotificationEmail($admin['email'], $admin['full_name'], client_ip(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? '')));
 
         return ['success' => true, 'message' => 'Welcome back!'];
     }
@@ -72,7 +72,7 @@ final class AdminAuth
             ->execute([client_ip(), $admin['id']]);
 
         log_activity(null, (int) $admin['id'], 'admin_login', 'Administrator logged in with biometrics');
-        Mailer::sendLoginNotificationEmail($admin['email'], $admin['full_name'], client_ip(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''));
+        defer_after_response(fn () => Mailer::sendLoginNotificationEmail($admin['email'], $admin['full_name'], client_ip(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? '')));
 
         return ['success' => true, 'message' => 'Welcome back!'];
     }

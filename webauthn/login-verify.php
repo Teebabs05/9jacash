@@ -56,3 +56,10 @@ $redirectUrl = $context === 'user'
     : rtrim(APP_URL, '/') . '/admin/index.php';
 
 echo json_encode(['success' => true, 'redirect' => $redirectUrl]);
+
+// Flush the response now (if running under PHP-FPM) so the browser can
+// navigate immediately - the login-notification email queued inside
+// completeBiometricLogin() above sends afterward, in the background.
+if (function_exists('fastcgi_finish_request')) {
+    fastcgi_finish_request();
+}

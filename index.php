@@ -53,6 +53,12 @@ $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
 <meta name="description" content="SURECASH MINING is Nigeria's premium online earning platform — mine daily, complete tasks, refer friends and grow your wealth.">
 <title><?= e($pageTitle) ?></title>
 <?= favicon_link_html() ?>
+<link rel="preload" href="<?= e($assetBase) ?>/fonts/poppins/poppins-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="<?= e($assetBase) ?>/fonts/poppins/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<?php $__headSiteBanner = get_setting('site_banner', ''); ?>
+<?php if ($__headSiteBanner): ?>
+<link rel="preload" href="<?= e(rtrim(APP_URL, '/')) ?>/uploads/<?= e($__headSiteBanner) ?>" as="image" fetchpriority="high">
+<?php endif; ?>
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap-icons.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/fonts.css">
@@ -96,7 +102,7 @@ $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
 <?php $siteBanner = get_setting('site_banner', ''); ?>
 <?php if ($siteBanner): ?>
 <section class="container" style="margin-top:-2rem;position:relative;z-index:2;">
-    <img src="<?= e(rtrim(APP_URL, '/')) ?>/uploads/<?= e($siteBanner) ?>" alt="<?= e($siteName) ?>" class="w-100" style="border-radius:16px;object-fit:cover;max-height:340px;box-shadow:0 10px 30px rgba(0,0,0,0.12);">
+    <img src="<?= e(rtrim(APP_URL, '/')) ?>/uploads/<?= e($siteBanner) ?>" alt="<?= e($siteName) ?>" class="w-100" style="border-radius:16px;object-fit:cover;max-height:340px;box-shadow:0 10px 30px rgba(0,0,0,0.12);" fetchpriority="high" decoding="async">
 </section>
 <?php endif; ?>
 

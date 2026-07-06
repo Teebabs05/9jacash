@@ -299,6 +299,7 @@ CREATE TABLE IF NOT EXISTS `task_submissions` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uniq_task_user` (`task_id`, `user_id`),
     KEY `idx_ts_user` (`user_id`),
+    KEY `idx_ts_status` (`status`),
     CONSTRAINT `fk_ts_task` FOREIGN KEY (`task_id`) REFERENCES `tasks` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_ts_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -407,6 +408,7 @@ CREATE TABLE IF NOT EXISTS `notifications` (
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `idx_notifications_user` (`user_id`),
+    KEY `idx_notifications_user_read` (`user_id`, `is_read`),
     CONSTRAINT `fk_notifications_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
