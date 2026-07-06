@@ -37,6 +37,15 @@ final class Mailer
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
 
+        // PHPMailer defaults to a 300-second connection timeout, which
+        // would leave a request (e.g. a user login, which now sends a
+        // notification email on every call) hanging for up to 5 minutes
+        // if SMTP is slow, misconfigured, or unreachable. Bound it low
+        // enough that a real SMTP handshake still completes comfortably,
+        // but a dead/misconfigured host fails fast instead of blocking
+        // the page that triggered the email.
+        $mail->Timeout = 10;
+
         return $mail;
     }
 
@@ -184,5 +193,25 @@ HTML;
         ";
 
         return self::send($email, $name, "Withdrawal {$status} - " . self::siteName(), $body);
+    }
+
+    public static function sendLoginNotificationEmail(string $email, string $name, string $ipAddress, string $userAgent = ''): bool
+    {
+        $safeName = e($name);
+        $safeIp = e($ipAddress);
+        $safeDevice = e($userAgent !== '' ? $userAgent : 'Unknown device');
+        $safeWhen = e(date('F j, Y \a\t g:i A T'));
+        $body = "
+            <h2 style='margin-top:0;color:#0B2545;'>New login to your account</h2>
+            <p>Hi {$safeName},</p>
+            <p>We noticed a login to your account on <strong>{$safeWhen}</strong>.</p>
+            <table role='presentation' cellpadding='0' cellspacing='0' style='width:100%;margin:16px 0;font-size:14px;'>
+              <tr><td style='color:#8a94a6;padding:4px 0;'>IP Address</td><td style='padding:4px 0;'>{$safeIp}</td></tr>
+              <tr><td style='color:#8a94a6;padding:4px 0;'>Device / Browser</td><td style='padding:4px 0;'>{$safeDevice}</td></tr>
+            </table>
+            <p>If this was you, no action is needed. If you don't recognize this login, please change your password immediately and contact support.</p>
+        ";
+
+        return self::send($email, $name, 'New login to your ' . self::siteName() . ' account', $body);
     }
 }
