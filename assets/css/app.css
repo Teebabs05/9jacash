@@ -1,0 +1,360 @@
+/* =====================================================================
+   9JACASH authenticated app shell (dashboard, wallet, and every future
+   user-facing module share this sidebar + topbar layout).
+   ===================================================================== */
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.app-sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1040;
+    transition: transform .25s ease;
+}
+
+.app-sidebar .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 22px 20px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.app-sidebar .brand .brand-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-navy);
+    font-weight: 800;
+}
+
+.app-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 12px;
+}
+
+.app-nav .nav-section-label {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-muted);
+    padding: 14px 12px 6px;
+}
+
+.app-nav a.nav-link, .app-nav span.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: .9rem;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.app-nav a.nav-link:hover {
+    background: var(--surface-alt);
+    color: var(--brand-emerald);
+}
+
+.app-nav a.nav-link.active {
+    background: linear-gradient(135deg, var(--brand-emerald-light), var(--brand-emerald));
+    color: #fff;
+}
+
+.app-nav span.nav-link.disabled {
+    color: var(--text-muted);
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.app-nav .nav-link .bi {
+    font-size: 1.05rem;
+    width: 20px;
+    text-align: center;
+}
+
+.app-nav .badge-soon {
+    margin-left: auto;
+    font-size: .62rem;
+    background: var(--surface-alt);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 20px;
+}
+
+.app-main {
+    margin-left: 260px;
+    flex: 1;
+    min-width: 0;
+}
+
+.app-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.app-topbar .sidebar-toggle {
+    display: none;
+    border: none;
+    background: transparent;
+    font-size: 1.3rem;
+    color: var(--text);
+}
+
+.app-content {
+    padding: 28px;
+}
+
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 1035;
+}
+
+@media (max-width: 991.98px) {
+    .app-sidebar {
+        transform: translateX(-100%);
+    }
+    .app-sidebar.open {
+        transform: translateX(0);
+    }
+    .app-main {
+        margin-left: 0;
+    }
+    .app-topbar .sidebar-toggle {
+        display: inline-flex;
+        align-items: center;
+    }
+    body.sidebar-open .sidebar-backdrop {
+        display: block;
+    }
+}
+
+/* ---------------------------------------------------------------
+   Stat / balance tiles
+   --------------------------------------------------------------- */
+.stat-tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-tile .icon-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 14px;
+}
+
+.stat-tile .label {
+    font-size: .8rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.stat-tile .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------------
+   Ledger table
+   --------------------------------------------------------------- */
+.ledger-table th {
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+}
+
+.ledger-table td {
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    font-size: .9rem;
+}
+
+.pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: .72rem;
+    font-weight: 600;
+}
+
+.pill-credit { background: rgba(18,183,106,0.12); color: #12b76a; }
+.pill-debit { background: rgba(240,68,56,0.12); color: #f04438; }
+.pill-pending { background: rgba(247,144,9,0.12); color: #f79009; }
+.pill-approved { background: rgba(18,183,106,0.12); color: #12b76a; }
+.pill-rejected { background: rgba(240,68,56,0.12); color: #f04438; }
+.pill-active { background: rgba(18,183,106,0.12); color: #12b76a; }
+.pill-paused { background: rgba(247,144,9,0.12); color: #f79009; }
+.pill-completed { background: rgba(46,144,250,0.12); color: #2e90fa; }
+
+/* ---------------------------------------------------------------
+   Mining plan cards
+   --------------------------------------------------------------- */
+.mining-plan-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 26px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mining-plan-card .price {
+    font-size: 1.7rem;
+    font-weight: 800;
+}
+
+.mining-plan-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+    flex-grow: 1;
+}
+
+.mining-plan-card ul li {
+    padding: 6px 0;
+    font-size: .87rem;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.progress-thin {
+    height: 8px;
+    border-radius: 6px;
+    background: var(--surface-alt);
+    overflow: hidden;
+}
+
+.progress-thin > span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(135deg, var(--brand-emerald-light), var(--brand-emerald));
+}
+
+.countdown-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: .78rem;
+    font-weight: 600;
+}
+
+/* ---------------------------------------------------------------
+   Spin wheel
+   --------------------------------------------------------------- */
+.spin-wheel-wrap {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+}
+
+.spin-wheel {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    position: relative;
+    border: 8px solid var(--surface);
+    box-shadow: 0 0 0 4px var(--brand-gold), var(--shadow);
+    transition: transform 4.5s cubic-bezier(0.15, 0.65, 0.1, 1);
+}
+
+.spin-segment-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    text-align: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: .78rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+}
+
+.spin-segment-label span {
+    display: inline-block;
+    transform: translate(-50%, -128px);
+}
+
+.spin-pointer {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 24px solid var(--brand-gold);
+    z-index: 5;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+}
+
+.spin-hub {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 54px;
+    height: 54px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--brand-navy);
+    border: 4px solid var(--brand-gold);
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-gold);
+    font-size: 1.3rem;
+}
