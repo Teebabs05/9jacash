@@ -708,9 +708,39 @@ second, unrelated user gets redirected rather than shown the first
 user's receipt; confirmed the admin can view either receipt directly
 and that both admin list pages link to it correctly.
 
+### ✅ Module 22 — Landing Page & Design System Refresh
+Refined the existing navy/emerald/gold theme rather than replacing it
+(kept the shared CSS variables every page already inherits, so the
+dashboard and admin panel pick up the polish for free), and added two
+new conversion-focused landing sections:
+- **Live activity ticker** — a scrolling strip of real recent earning
+  activity (deposits, mining payouts, task/ad/spin/check-in/referral
+  credits), pulled live from `wallet_ledger`, never fabricated. Names
+  are masked for privacy via a new `mask_name()` helper ("Chidinma
+  Okafor" → "Chi\*\*\*\*a O."). The whole section is simply absent on a
+  fresh install with no activity yet, rather than showing fake numbers
+  to imply otherwise.
+- **Trust strip** — four badges naming security measures the platform
+  actually implements (bcrypt hashing, CSRF protection, encrypted DB
+  access, full transaction history) rather than fabricated
+  certifications the site doesn't hold.
+- Added missing hover-lift/shadow transitions to `.plan-card` and
+  `.testimonial-card` (`.feature-card` already had one; the others were
+  inconsistent).
+- Fixed several more leftover "9JACASH" mentions in CSS comments
+  (`app.css`, `landing.css`, `theme.css`) that earlier rename passes
+  had missed.
+
+Verified live: confirmed the activity ticker is completely absent on a
+database with no ledger activity, then seeded real mining/deposit
+credits and confirmed the ticker displayed them with correctly masked
+names, correct amounts and correct source labels; confirmed the trust
+strip and existing landing sections all still render; smoke-tested
+`terms.php`, `privacy.php` and the auth pages (which share the same
+CSS) to confirm nothing regressed.
+
 ### Planned next
-Branding asset pack (PNG exports, social banner, app icon) → a modern
-visual redesign with conversion-focused landing page elements.
+Branding asset pack (PNG exports, social banner, app icon).
 
 ## License
 

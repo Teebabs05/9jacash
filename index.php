@@ -18,6 +18,27 @@ $refLevel1 = (float) get_setting('referral_level_1_percent', 5);
 $refLevel2 = (float) get_setting('referral_level_2_percent', 2);
 $refLevel3 = (float) get_setting('referral_level_3_percent', 1);
 
+// Real recent earning activity (never fabricated) for the live activity
+// ticker - hidden entirely if the platform has no activity yet.
+$activityLabels = [
+    'deposit' => 'made a deposit of',
+    'mining' => 'earned',
+    'task' => 'earned',
+    'ad' => 'earned',
+    'spin' => 'won',
+    'checkin' => 'earned',
+    'referral' => 'earned',
+];
+$stmt = db()->query(
+    "SELECT wl.amount, wl.source, wl.created_at, u.full_name
+     FROM wallet_ledger wl
+     INNER JOIN users u ON u.id = wl.user_id
+     WHERE wl.type = 'credit' AND wl.source IN ('deposit','mining','task','ad','spin','checkin','referral') AND wl.amount > 0
+     ORDER BY wl.created_at DESC
+     LIMIT 12"
+);
+$liveActivity = $stmt->fetchAll();
+
 $assetBase = rtrim(APP_URL, '/') . '/assets';
 $siteName = get_setting('site_name', 'SURECASH MINING');
 $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
@@ -78,6 +99,37 @@ $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
     <img src="<?= e(rtrim(APP_URL, '/')) ?>/uploads/<?= e($siteBanner) ?>" alt="<?= e($siteName) ?>" class="w-100" style="border-radius:16px;object-fit:cover;max-height:340px;box-shadow:0 10px 30px rgba(0,0,0,0.12);">
 </section>
 <?php endif; ?>
+
+<?php if ($liveActivity): ?>
+<!-- ============================== LIVE ACTIVITY ============================== -->
+<div class="activity-ticker">
+    <div class="activity-ticker-track">
+        <?php for ($pass = 0; $pass < 2; $pass++): ?>
+            <?php foreach ($liveActivity as $a): ?>
+                <span class="activity-ticker-item">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    <strong><?= e(mask_name($a['full_name'])) ?></strong>
+                    <?= e($activityLabels[$a['source']] ?? 'earned') ?>
+                    <strong class="text-success"><?= e(money($a['amount'])) ?></strong>
+                    <span class="activity-ticker-time"><?= e(time_ago($a['created_at'])) ?></span>
+                </span>
+            <?php endforeach; ?>
+        <?php endfor; ?>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- ============================== TRUST STRIP ============================== -->
+<div class="trust-strip">
+    <div class="container">
+        <div class="row g-3 text-center justify-content-center">
+            <div class="col-6 col-md-3 trust-item"><i class="bi bi-shield-lock-fill"></i> Bcrypt Password Hashing</div>
+            <div class="col-6 col-md-3 trust-item"><i class="bi bi-lock-fill"></i> CSRF-Protected Forms</div>
+            <div class="col-6 col-md-3 trust-item"><i class="bi bi-database-fill-lock"></i> Encrypted Database Access</div>
+            <div class="col-6 col-md-3 trust-item"><i class="bi bi-clock-history"></i> Full Transaction History</div>
+        </div>
+    </div>
+</div>
 
 <!-- ============================== FEATURES ============================== -->
 <section class="section" id="features">

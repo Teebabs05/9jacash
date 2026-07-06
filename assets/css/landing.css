@@ -200,6 +200,12 @@
     padding: 28px;
     height: 100%;
     position: relative;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.plan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
 }
 
 .plan-card.featured {
@@ -264,6 +270,12 @@
     border-radius: var(--radius);
     padding: 26px;
     height: 100%;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
 }
 
 .testimonial-card .avatar {
@@ -370,4 +382,73 @@
 .reveal.in-view {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* ---------------------------------------------------------------
+   Live activity ticker (real recent earnings, never fabricated -
+   the section is simply hidden when there's no activity yet)
+   --------------------------------------------------------------- */
+.activity-ticker {
+    background: var(--surface-alt);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 12px 0;
+    position: relative;
+    z-index: 1;
+}
+
+.activity-ticker-track {
+    display: inline-flex;
+    animation: activityTickerScroll 40s linear infinite;
+}
+
+.activity-ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .85rem;
+    color: var(--text);
+    padding: 0 28px;
+    border-right: 1px solid var(--border);
+}
+
+.activity-ticker-item i {
+    color: var(--brand-gold-dark);
+}
+
+.activity-ticker-time {
+    color: var(--text-muted);
+    font-size: .78rem;
+}
+
+@keyframes activityTickerScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .activity-ticker-track {
+        animation: none;
+        overflow-x: auto;
+    }
+}
+
+/* ---------------------------------------------------------------
+   Trust strip
+   --------------------------------------------------------------- */
+.trust-strip {
+    padding: 22px 0;
+}
+
+.trust-item {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.trust-item i {
+    color: var(--brand-emerald);
+    margin-right: 6px;
 }

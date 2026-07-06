@@ -117,6 +117,29 @@ if (!function_exists('money_usd')) {
 }
 
 /**
+ * Mask a full name for public display (e.g. on the landing page's live
+ * activity feed) so real user activity can be shown as social proof
+ * without exposing a real person's full identity: "Chidinma Okafor"
+ * becomes "Chi***a O."
+ */
+if (!function_exists('mask_name')) {
+    function mask_name(string $fullName): string
+    {
+        $parts = preg_split('/\s+/', trim($fullName)) ?: [];
+        $first = $parts[0] ?? '';
+        $lastInitial = isset($parts[1]) ? strtoupper($parts[1][0]) . '.' : '';
+
+        if (mb_strlen($first) <= 3) {
+            $masked = $first;
+        } else {
+            $masked = mb_substr($first, 0, 3) . str_repeat('*', max(mb_strlen($first) - 4, 1)) . mb_substr($first, -1);
+        }
+
+        return trim($masked . ' ' . $lastInitial);
+    }
+}
+
+/**
  * Generate a cryptographically secure random token (hex string).
  */
 if (!function_exists('generate_token')) {
