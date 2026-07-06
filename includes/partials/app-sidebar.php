@@ -7,14 +7,15 @@ $activeNav = $activeNav ?? '';
 $base = rtrim(APP_URL, '/');
 
 if (!function_exists('nav_link')) {
-    function nav_link(string $key, string $href, string $icon, string $label, string $activeNav, bool $built = true): void
+    function nav_link(string $key, string $href, string $icon, string $label, string $activeNav, bool $built = true, ?int $badge = null): void
     {
         $isActive = $key === $activeNav;
         if (!$built) {
             echo '<span class="nav-link disabled"><i class="bi ' . e($icon) . '"></i>' . e($label) . '<span class="badge-soon">Soon</span></span>';
             return;
         }
-        echo '<a href="' . e($href) . '" class="nav-link' . ($isActive ? ' active' : '') . '"><i class="bi ' . e($icon) . '"></i>' . e($label) . '</a>';
+        $badgeHtml = $badge ? '<span class="badge-soon ms-auto" style="background:var(--danger);color:#fff;border-color:var(--danger);">' . (int) $badge . '</span>' : '';
+        echo '<a href="' . e($href) . '" class="nav-link' . ($isActive ? ' active' : '') . '"><i class="bi ' . e($icon) . '"></i>' . e($label) . $badgeHtml . '</a>';
     }
 }
 ?>
@@ -44,6 +45,7 @@ if (!function_exists('nav_link')) {
 
         <div class="nav-section-label">Account</div>
         <?php nav_link('notifications', $base . '/user/notifications.php', 'bi-bell-fill', 'Notifications', $activeNav); ?>
+        <?php nav_link('messages', $base . '/user/messages.php', 'bi-chat-dots-fill', 'Messages', $activeNav, true, support_unread_count_for_user((int) current_user()['id']) ?: null); ?>
         <?php nav_link('profile', $base . '/user/profile.php', 'bi-person-fill', 'Profile', $activeNav); ?>
         <a href="<?= e($base) ?>/user/logout.php" class="nav-link text-danger"><i class="bi bi-box-arrow-right"></i>Logout</a>
     </nav>

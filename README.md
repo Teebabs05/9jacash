@@ -553,12 +553,42 @@ user has an account to withdraw to, and confirmed the existing
 withdrawal charge/net calculation still fires correctly when the
 amount is entered via the USD field.
 
+### ✅ Module 15 — User/Admin Support Messaging Inbox
+A real two-way dashboard-to-dashboard chat, distinct from the existing
+one-way public contact form (`ajax/contact-submit.php`, still intact
+for logged-out visitors):
+- `support_messages` table — one running conversation thread per user,
+  every row scoped by `user_id` regardless of which side sent it, with
+  independent `is_read_by_user`/`is_read_by_admin` flags
+- `includes/support.php` — send/reply/read-tracking/unread-count
+  functions, plus `support_conversation_list_for_admin()` for the inbox
+- `user/messages.php` — a chat-style thread view + reply box; visiting
+  it marks every admin message read
+- `admin/messages.php` — an inbox listing every user who has messaged
+  in, ordered by most recent activity with an unread badge per
+  conversation, click through to view/reply to any thread
+- Unread badges on both the user sidebar ("Messages") and admin
+  sidebar, matching the existing pending-deposits/withdrawals badge
+  style; an admin reply also fires an in-app notification to the user
+
+Found and fixed a real bug while testing the very first live reply:
+`notifications.type` is a MySQL `ENUM` that didn't include `'support'`,
+so the first admin reply saved to `support_messages` correctly but
+then fatally errored on the notification insert
+(`SQLSTATE[01000]: Data truncated for column 'type'`) instead of
+failing gracefully. Added `'support'` to the enum.
+
+Verified live end-to-end: sent a message as a real logged-in user,
+confirmed it appeared unread in the admin inbox with the correct
+sidebar badge count, replied as admin, confirmed the user received an
+in-app notification and saw the reply, and confirmed both sides'
+unread badges correctly cleared after viewing (not before).
+
 ### Planned next
-Branding asset pack (PNG exports, social banner, app icon) →
-user/admin messaging inbox → mining day-cycle selection → dashboard
-earnings chart fix → transaction receipts → paid extra spins → Play
-Store/App Store links → a modern visual redesign with
-conversion-focused landing page elements.
+Branding asset pack (PNG exports, social banner, app icon) → mining
+day-cycle selection → dashboard earnings chart fix → transaction
+receipts → paid extra spins → Play Store/App Store links → a modern
+visual redesign with conversion-focused landing page elements.
 
 ## License
 

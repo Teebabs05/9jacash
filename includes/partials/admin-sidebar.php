@@ -22,6 +22,7 @@ if (!function_exists('admin_nav_link')) {
 $pendingSubmissions = (int) db()->query("SELECT COUNT(*) AS c FROM task_submissions WHERE status = 'pending'")->fetch()['c'];
 $pendingDeposits = (int) db()->query("SELECT COUNT(*) AS c FROM deposits WHERE status = 'pending'")->fetch()['c'];
 $pendingWithdrawals = (int) db()->query("SELECT COUNT(*) AS c FROM withdrawals WHERE status = 'pending'")->fetch()['c'];
+$unreadMessages = support_unread_total_for_admin();
 ?>
 <aside class="app-sidebar">
     <a href="<?= e($base) ?>/admin/index.php" class="brand text-decoration-none" style="color:var(--text);">
@@ -34,6 +35,7 @@ $pendingWithdrawals = (int) db()->query("SELECT COUNT(*) AS c FROM withdrawals W
 
         <div class="nav-section-label">Users</div>
         <?php admin_nav_link('users', $base . '/admin/users.php', 'bi-people-fill', 'Manage Users', $activeNav); ?>
+        <?php admin_nav_link('messages', $base . '/admin/messages.php', 'bi-chat-dots-fill', 'Messages', $activeNav, true, $unreadMessages ?: null); ?>
         <?php admin_nav_link('referral-settings', $base . '/admin/referral-settings.php', 'bi-diagram-3-fill', 'Referral Settings', $activeNav); ?>
 
         <div class="nav-section-label">Finance</div>

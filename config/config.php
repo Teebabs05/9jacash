@@ -62,6 +62,7 @@ require_once BASE_PATH . '/includes/payvessel.php';
 require_once BASE_PATH . '/includes/deposits.php';
 require_once BASE_PATH . '/includes/withdrawals.php';
 require_once BASE_PATH . '/includes/referrals.php';
+require_once BASE_PATH . '/includes/support.php';
 
 // ---------------------------------------------------------------
 // Load site settings from the database into a global cache.

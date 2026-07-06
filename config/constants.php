@@ -98,6 +98,7 @@ const NOTIFY_TYPE_REFERRAL  = 'referral';
 const NOTIFY_TYPE_TASK      = 'task';
 const NOTIFY_TYPE_SYSTEM    = 'system';
 const NOTIFY_TYPE_BROADCAST = 'broadcast';
+const NOTIFY_TYPE_SUPPORT   = 'support';
 
 // ---------------------------------------------------------------
 // Token lifetimes (seconds)

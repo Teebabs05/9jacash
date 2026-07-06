@@ -398,7 +398,7 @@ CREATE TABLE IF NOT EXISTS `notifications` (
     `user_id` INT UNSIGNED DEFAULT NULL COMMENT 'NULL = broadcast to all users',
     `title` VARCHAR(150) NOT NULL,
     `message` TEXT NOT NULL,
-    `type` ENUM('deposit','withdrawal','mining','referral','task','system','broadcast') NOT NULL DEFAULT 'system',
+    `type` ENUM('deposit','withdrawal','mining','referral','task','system','broadcast','support') NOT NULL DEFAULT 'system',
     `is_read` TINYINT(1) NOT NULL DEFAULT 0,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
@@ -458,6 +458,27 @@ CREATE TABLE IF NOT EXISTS `contact_messages` (
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `idx_contact_read` (`is_read`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================================
+-- DASHBOARD-TO-DASHBOARD SUPPORT MESSAGING
+-- One running conversation thread per user; all messages in it are
+-- rows here scoped by user_id regardless of which side sent them.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS `support_messages` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id` INT UNSIGNED NOT NULL,
+    `sender` ENUM('user','admin') NOT NULL,
+    `admin_id` INT UNSIGNED DEFAULT NULL,
+    `message` TEXT NOT NULL,
+    `is_read_by_user` TINYINT(1) NOT NULL DEFAULT 0,
+    `is_read_by_admin` TINYINT(1) NOT NULL DEFAULT 0,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_sm_user` (`user_id`),
+    KEY `idx_sm_created` (`created_at`),
+    CONSTRAINT `fk_sm_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_sm_admin` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
