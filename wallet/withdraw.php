@@ -111,7 +111,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <?php else: ?>
                 <div class="table-responsive">
                     <table class="table ledger-table mb-0">
-                        <thead><tr><th>Amount</th><th>Charge</th><th>Net</th><th>Method</th><th>Status</th><th>Date</th></tr></thead>
+                        <thead><tr><th>Amount</th><th>Charge</th><th>Net</th><th>Method</th><th>Status</th><th>Date</th><th></th></tr></thead>
                         <tbody>
                             <?php foreach ($withdrawals as $w): ?>
                                 <tr>
@@ -121,6 +121,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
                                     <td class="text-uppercase small"><?= e($w['method']) ?></td>
                                     <td><span class="pill pill-<?= e($w['status']) ?>"><?= e(ucfirst($w['status'])) ?></span></td>
                                     <td class="small" style="color:var(--text-muted);"><?= e(time_ago($w['created_at'])) ?></td>
+                                    <td class="text-end"><a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/receipt.php?type=withdrawal&id=<?= (int) $w['id'] ?>" class="btn btn-outline-brand btn-sm">Receipt</a></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

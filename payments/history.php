@@ -27,7 +27,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
     <?php else: ?>
         <div class="table-responsive">
             <table class="table ledger-table mb-0">
-                <thead><tr><th>Reference</th><th>Method</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+                <thead><tr><th>Reference</th><th>Method</th><th>Amount</th><th>Status</th><th>Date</th><th></th></tr></thead>
                 <tbody>
                     <?php foreach ($deposits as $d): ?>
                         <tr>
@@ -36,6 +36,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
                             <td><?= e(money($d['amount'])) ?></td>
                             <td><span class="pill pill-<?= e($d['status']) ?>"><?= e(ucfirst($d['status'])) ?></span></td>
                             <td class="small" style="color:var(--text-muted);"><?= e(time_ago($d['created_at'])) ?></td>
+                            <td class="text-end"><a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/receipt.php?type=deposit&id=<?= (int) $d['id'] ?>" class="btn btn-outline-brand btn-sm">Receipt</a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

@@ -76,7 +76,7 @@ require __DIR__ . '/../includes/partials/admin-head.php';
     <?php else: ?>
         <div class="table-responsive">
             <table class="table ledger-table mb-0">
-                <thead><tr><th>User</th><th>Method</th><th>Account Details</th><th>Amount</th><th>Charge</th><th>Net Payout</th><th>Date</th><th>Status</th><th></th></tr></thead>
+                <thead><tr><th>User</th><th>Method</th><th>Account Details</th><th>Amount</th><th>Charge</th><th>Net Payout</th><th>Date</th><th>Status</th><th></th><th></th></tr></thead>
                 <tbody>
                     <?php foreach ($withdrawals as $w): ?>
                         <tr>
@@ -123,6 +123,7 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                                     <span class="small" style="color:var(--text-muted);"><?= e($w['processed_at'] ? time_ago($w['processed_at']) : '') ?></span>
                                 <?php endif; ?>
                             </td>
+                            <td class="text-end"><a href="receipt.php?type=withdrawal&id=<?= (int) $w['id'] ?>" class="btn btn-outline-brand btn-sm">Receipt</a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

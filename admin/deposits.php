@@ -76,7 +76,7 @@ require __DIR__ . '/../includes/partials/admin-head.php';
     <?php else: ?>
         <div class="table-responsive">
             <table class="table ledger-table mb-0">
-                <thead><tr><th>User</th><th>Method</th><th>Reference</th><th>Amount</th><th>Proof</th><th>Date</th><th>Status</th><th></th></tr></thead>
+                <thead><tr><th>User</th><th>Method</th><th>Reference</th><th>Amount</th><th>Proof</th><th>Date</th><th>Status</th><th></th><th></th></tr></thead>
                 <tbody>
                     <?php foreach ($deposits as $d): ?>
                         <tr>
@@ -127,6 +127,7 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                                     <span class="small" style="color:var(--text-muted);">—</span>
                                 <?php endif; ?>
                             </td>
+                            <td class="text-end"><a href="receipt.php?type=deposit&id=<?= (int) $d['id'] ?>" class="btn btn-outline-brand btn-sm">Receipt</a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

@@ -677,10 +677,40 @@ set the wallet below the price and confirmed the purchase was rejected
 server-side with the wallet balance completely unchanged (no partial
 charge).
 
+### ✅ Module 18 — Transaction Receipts
+View/print/download/share receipts for any deposit or withdrawal, for
+both the owning user and admins:
+- `includes/partials/receipt-content.php` — shared branded receipt
+  layout (receipt number, status pill, amount/charge/net breakdown,
+  USD equivalent, admin note if rejected) used by both sides so the
+  two receipts are visually identical
+- `wallet/receipt.php` — user-facing; strictly scoped to the logged-in
+  user's own deposits/withdrawals (`WHERE id = ? AND user_id = ?`)
+- `admin/receipt.php` — admin-facing; can view any user's receipt,
+  linked from `admin/deposits.php` and `admin/withdrawals.php`
+- **Print/Download** — a single button triggers `window.print()`;
+  intentionally not backed by a new PDF-generation library (the
+  project's only allowed dependency is PHPMailer), so "download" means
+  the browser's own "Save as PDF" print destination rather than a
+  fabricated download that doesn't actually work
+- **Share** — the Web Share API on supporting devices, falling back to
+  copying the receipt URL to the clipboard
+- A `@media print` stylesheet addition (`assets/css/app.css`) hides
+  the sidebar/topbar/toolbar so only the receipt itself prints
+
+Also fixed a few more stray "9JACASH" mentions in CSS comments
+(`assets/css/app.css`, `landing.css`, `theme.css`) left over from
+Module 13's rename pass.
+
+Verified live: viewed both a deposit and a withdrawal receipt as the
+owning user with correct amounts/status/receipt numbers; confirmed a
+second, unrelated user gets redirected rather than shown the first
+user's receipt; confirmed the admin can view either receipt directly
+and that both admin list pages link to it correctly.
+
 ### Planned next
-Branding asset pack (PNG exports, social banner, app icon) →
-transaction receipts → a modern visual redesign with
-conversion-focused landing page elements.
+Branding asset pack (PNG exports, social banner, app icon) → a modern
+visual redesign with conversion-focused landing page elements.
 
 ## License
 

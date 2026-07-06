@@ -1,6 +1,6 @@
 /* =====================================================================
-   9JACASH authenticated app shell (dashboard, wallet, and every future
-   user-facing module share this sidebar + topbar layout).
+   SURECASH MINING authenticated app shell (dashboard, wallet, and every
+   future user-facing module share this sidebar + topbar layout).
    ===================================================================== */
 
 .app-shell {
@@ -357,4 +357,29 @@
     justify-content: center;
     color: var(--brand-gold);
     font-size: 1.3rem;
+}
+
+/* ---------------------------------------------------------------
+   Printable receipts - hide everything except the receipt itself
+   --------------------------------------------------------------- */
+@media print {
+    .app-sidebar,
+    .app-topbar,
+    .sidebar-backdrop,
+    .receipt-toolbar,
+    .whatsapp-float,
+    .toast-stack {
+        display: none !important;
+    }
+
+    .app-main, .app-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    .receipt-print-area .card-surface {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+    }
 }
