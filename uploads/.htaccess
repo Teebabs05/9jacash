@@ -5,8 +5,17 @@
 <FilesMatch "\.(php|php\d?|phtml|phar|pl|py|cgi|sh|svg|svgz|html|htm|xhtml|xml)$">
     Require all denied
 </FilesMatch>
-Options -Indexes -ExecCGI
-AddType text/plain .php .php3 .php4 .php5 .phtml
+Options -Indexes
+
+# Note: an earlier version of this file also set "-ExecCGI" on the
+# Options line and an AddType text/plain fallback for .php files. Both
+# were dropped after a real host (Apache with a restrictive
+# AllowOverride policy) returned a hard 500 for every request under
+# uploads/ - confirmed by testing that the identical Options/Require
+# pattern used in the root .htaccess works fine, while adding -ExecCGI
+# and AddType here did not. The Require-all-denied rule above already
+# blocks direct access to these extensions entirely, so dropping the
+# two secondary/defense-in-depth directives doesn't reduce security.
 
 # Defense-in-depth: even for the allowed image/pdf types, prevent the
 # browser from ever sniffing/rendering an uploaded file as HTML/script,
