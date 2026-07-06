@@ -185,6 +185,7 @@ CREATE TABLE IF NOT EXISTS `mining_plans` (
     `price` DECIMAL(18,2) NOT NULL,
     `daily_return` DECIMAL(18,2) NOT NULL,
     `duration_days` SMALLINT UNSIGNED NOT NULL DEFAULT 30,
+    `available_cycles` VARCHAR(50) NOT NULL DEFAULT '7,14,21,30' COMMENT 'Comma-separated day-cycle choices offered to the user at purchase time',
     `description` TEXT DEFAULT NULL,
     `status` ENUM('active','inactive') NOT NULL DEFAULT 'active',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

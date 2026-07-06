@@ -10,8 +10,26 @@ declare(strict_types=1);
  * Purchase a mining plan for a user: debits the main wallet and opens
  * a new active user_mining position. Returns ['success' => bool, 'message' => string].
  */
+/**
+ * Cycle-day options a plan can offer. mining_plans.available_cycles is
+ * a comma-separated subset of this list (admin-configurable per plan).
+ */
+if (!defined('MINING_CYCLE_OPTIONS')) {
+    define('MINING_CYCLE_OPTIONS', [7, 14, 21, 30]);
+}
+
+if (!function_exists('mining_plan_cycles')) {
+    function mining_plan_cycles(array $plan): array
+    {
+        $cycles = array_filter(array_map('intval', explode(',', (string) ($plan['available_cycles'] ?? ''))));
+        $cycles = array_values(array_intersect(MINING_CYCLE_OPTIONS, $cycles));
+
+        return $cycles ?: [(int) ($plan['duration_days'] ?? 30)];
+    }
+}
+
 if (!function_exists('mining_purchase_plan')) {
-    function mining_purchase_plan(int $userId, int $planId): array
+    function mining_purchase_plan(int $userId, int $planId, int $cycleDays): array
     {
         $pdo = db();
 
@@ -21,6 +39,10 @@ if (!function_exists('mining_purchase_plan')) {
 
         if (!$plan) {
             return ['success' => false, 'message' => 'This mining plan is not available.'];
+        }
+
+        if (!in_array($cycleDays, mining_plan_cycles($plan), true)) {
+            return ['success' => false, 'message' => 'Please choose a valid mining cycle for this plan.'];
         }
 
         $wallet = get_wallet($userId);
@@ -36,13 +58,13 @@ if (!function_exists('mining_purchase_plan')) {
             WALLET_MAIN,
             (float) $plan['price'],
             LEDGER_SOURCE_MINING,
-            'Invested in ' . $plan['name'] . ' mining plan'
+            'Invested in ' . $plan['name'] . ' mining plan (' . $cycleDays . '-day cycle)'
         );
 
         try {
             $startedAt = date('Y-m-d H:i:s');
             $nextPayoutAt = date('Y-m-d H:i:s', strtotime('+1 day'));
-            $endsAt = date('Y-m-d H:i:s', strtotime('+' . (int) $plan['duration_days'] . ' days'));
+            $endsAt = date('Y-m-d H:i:s', strtotime('+' . $cycleDays . ' days'));
 
             $stmt = $pdo->prepare(
                 'INSERT INTO user_mining (user_id, plan_id, amount_invested, total_earned, started_at, next_payout_at, ends_at, status, created_at)
@@ -55,8 +77,8 @@ if (!function_exists('mining_purchase_plan')) {
             return ['success' => false, 'message' => 'Could not process your mining investment. Your wallet has not been charged.'];
         }
 
-        notify_user($userId, 'Mining Plan Activated', "You've successfully invested " . money($plan['price']) . " in the {$plan['name']} plan.", NOTIFY_TYPE_MINING);
-        log_activity($userId, null, 'mining_purchase', "Invested in {$plan['name']} (" . money($plan['price']) . ')');
+        notify_user($userId, 'Mining Plan Activated', "You've successfully invested " . money($plan['price']) . " in the {$plan['name']} plan ({$cycleDays}-day cycle).", NOTIFY_TYPE_MINING);
+        log_activity($userId, null, 'mining_purchase', "Invested in {$plan['name']} (" . money($plan['price']) . ", {$cycleDays}-day cycle)");
 
         return ['success' => true, 'message' => "You've successfully invested in the {$plan['name']} plan!"];
     }

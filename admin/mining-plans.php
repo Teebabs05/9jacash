@@ -23,6 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $description = clean($_POST['description'] ?? '');
         $status = ($_POST['status'] ?? 'active') === 'active' ? 'active' : 'inactive';
 
+        $selectedCycles = array_intersect(MINING_CYCLE_OPTIONS, array_map('intval', (array) ($_POST['available_cycles'] ?? [])));
+        $availableCycles = $selectedCycles ? implode(',', $selectedCycles) : (string) $duration;
+
         if (strlen($name) < 2) {
             $errors[] = 'Please enter a plan name.';
         }
@@ -32,12 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$errors) {
             if ($id > 0) {
-                db()->prepare('UPDATE mining_plans SET name = ?, price = ?, daily_return = ?, duration_days = ?, description = ?, status = ?, updated_at = NOW() WHERE id = ?')
-                    ->execute([$name, $price, $dailyReturn, $duration, $description, $status, $id]);
+                db()->prepare('UPDATE mining_plans SET name = ?, price = ?, daily_return = ?, duration_days = ?, available_cycles = ?, description = ?, status = ?, updated_at = NOW() WHERE id = ?')
+                    ->execute([$name, $price, $dailyReturn, $duration, $availableCycles, $description, $status, $id]);
                 flash('mining_plans', 'Mining plan updated.', 'success');
             } else {
-                db()->prepare('INSERT INTO mining_plans (name, price, daily_return, duration_days, description, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())')
-                    ->execute([$name, $price, $dailyReturn, $duration, $description, $status]);
+                db()->prepare('INSERT INTO mining_plans (name, price, daily_return, duration_days, available_cycles, description, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())')
+                    ->execute([$name, $price, $dailyReturn, $duration, $availableCycles, $description, $status]);
                 flash('mining_plans', 'Mining plan created.', 'success');
             }
             log_activity(null, (int) $admin['id'], 'mining_plan_saved', "Saved mining plan: {$name}");
@@ -144,8 +147,22 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                     <input type="number" step="0.01" min="0.01" class="form-control" name="daily_return" value="<?= e((string) ($editPlan['daily_return'] ?? '')) ?>" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label small">Duration (days)</label>
+                    <label class="form-label small">Reference Duration (days)</label>
                     <input type="number" min="1" class="form-control" name="duration_days" value="<?= e((string) ($editPlan['duration_days'] ?? 30)) ?>" required>
+                    <div class="form-text">Used for admin-assigned (gifted) positions. Users purchasing normally pick one of the cycles below instead.</div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small">Mining Cycles Offered to Users</label>
+                    <?php $formCycles = $editPlan ? mining_plan_cycles($editPlan) : MINING_CYCLE_OPTIONS; ?>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <?php foreach (MINING_CYCLE_OPTIONS as $cycle): ?>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="available_cycles[]" value="<?= (int) $cycle ?>" id="cycle<?= (int) $cycle ?>" <?= in_array($cycle, $formCycles, true) ? 'checked' : '' ?>>
+                                <label class="form-check-label small" for="cycle<?= (int) $cycle ?>"><?= (int) $cycle ?> days</label>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="form-text">Daily return stays the same regardless of cycle chosen &mdash; only the total number of payout days differs.</div>
                 </div>
                 <div class="mb-4">
                     <label class="form-label small">Status</label>
@@ -190,14 +207,14 @@ require __DIR__ . '/../includes/partials/admin-head.php';
             <?php else: ?>
                 <div class="table-responsive">
                     <table class="table ledger-table mb-0">
-                        <thead><tr><th>Name</th><th>Price</th><th>Daily Return</th><th>Duration</th><th>Positions</th><th>Status</th><th></th></tr></thead>
+                        <thead><tr><th>Name</th><th>Price</th><th>Daily Return</th><th>Cycles</th><th>Positions</th><th>Status</th><th></th></tr></thead>
                         <tbody>
                             <?php foreach ($plans as $p): ?>
                                 <tr>
                                     <td class="fw-semibold"><?= e($p['name']) ?></td>
                                     <td><?= e(money($p['price'])) ?></td>
                                     <td><?= e(money($p['daily_return'])) ?></td>
-                                    <td><?= (int) $p['duration_days'] ?> days</td>
+                                    <td><?= e(implode(', ', mining_plan_cycles($p))) ?> days</td>
                                     <td><?= (int) $p['position_count'] ?></td>
                                     <td>
                                         <form method="POST" action="" class="d-inline">

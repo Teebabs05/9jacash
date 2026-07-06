@@ -599,11 +599,44 @@ confirmed Total Earnings showed exactly ₦1,200 (500+300+400, deposit
 correctly excluded) and Today's Earnings showed exactly ₦800 (500+300,
 yesterday's mining correctly excluded too).
 
+### ✅ Module 16 — Mining Day-Cycle Selection
+Users purchasing a mining plan now choose how many days to run it
+(7/14/21/30, admin-configurable per plan) rather than every position
+being locked to the plan's single fixed duration:
+- `mining_plans.available_cycles` — a comma-separated subset of
+  7/14/21/30 the admin enables per plan (`admin/mining-plans.php`
+  checkboxes); the existing `duration_days` column becomes the
+  reference duration used only for admin-gifted positions
+- `includes/mining.php`: `mining_plan_cycles()` reads/validates a
+  plan's enabled cycles; `mining_purchase_plan()` now takes a
+  `$cycleDays` argument, validated server-side against the plan's
+  enabled list before computing `ends_at` — same `daily_return` rate
+  regardless of the cycle chosen (per design), so total earnings simply
+  scale with the number of days picked
+- `mining/invest.php` — radio buttons for each enabled cycle with a
+  live-updating total-return figure
+- Plan cards (mining page + landing page) show "Choose 7, 14, 21, 30
+  days" and an "Up to ₦X total" figure (computed off the longest
+  enabled cycle) instead of a single fixed duration/total, since the
+  real total now depends on what the user picks at purchase time
+
+Mining payouts already drew from the combined withdrawal wallet
+waterfall (`WALLET_MINING` is in `WALLET_WITHDRAW_PRIORITY`), so "let
+daily payout go to wallet balance for withdrawal" was already true —
+verified rather than changed.
+
+Verified live: purchased a 7-day cycle on a plan and confirmed the
+resulting position's `ends_at` was exactly 7 days after `started_at`
+(not the plan's 30-day default); edited a plan's admin settings to
+only offer 14/30-day cycles and confirmed the invest page immediately
+reflected only those two options and the server rejected a
+since-disabled 7-day submission.
+
 ### Planned next
-Branding asset pack (PNG exports, social banner, app icon) → mining
-day-cycle selection → transaction receipts → paid extra spins → Play
-Store/App Store links → a modern visual redesign with
-conversion-focused landing page elements.
+Branding asset pack (PNG exports, social banner, app icon) →
+transaction receipts → paid extra spins → Play Store/App Store links →
+a modern visual redesign with conversion-focused landing page
+elements.
 
 ## License
 

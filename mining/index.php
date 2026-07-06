@@ -57,10 +57,11 @@ require __DIR__ . '/../includes/partials/app-head.php';
                 <div class="price"><?= e(money($plan['price'])) ?></div>
                 <div class="small mb-1" style="color:var(--text-muted);">&asymp; <?= e(money_usd((float) $plan['price'])) ?></div>
                 <div class="small" style="color:var(--text-muted);"><?= e($plan['description']) ?></div>
+                <?php $planCycles = mining_plan_cycles($plan); ?>
                 <ul>
                     <li><i class="bi bi-check-circle-fill text-success"></i> <?= e(money($plan['daily_return'])) ?> / day</li>
-                    <li><i class="bi bi-check-circle-fill text-success"></i> <?= (int) $plan['duration_days'] ?> day cycle</li>
-                    <li><i class="bi bi-check-circle-fill text-success"></i> Total: <?= e(money($plan['daily_return'] * $plan['duration_days'])) ?></li>
+                    <li><i class="bi bi-check-circle-fill text-success"></i> Choose <?= e(implode(', ', $planCycles)) ?> days</li>
+                    <li><i class="bi bi-check-circle-fill text-success"></i> Up to <?= e(money($plan['daily_return'] * max($planCycles))) ?> total</li>
                 </ul>
                 <a href="invest.php?plan=<?= (int) $plan['id'] ?>" class="btn btn-brand w-100">Invest Now</a>
             </div>
