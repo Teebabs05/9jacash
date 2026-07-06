@@ -66,6 +66,15 @@ RewriteRule ^(config|includes|database|logs|vendor)/ - [F,L]
     ExpiresByType font/woff2 "access plus 1 month"
 </IfModule>
 
-php_flag display_errors off
-php_value upload_max_filesize 10M
-php_value post_max_size 12M
+# These only apply under mod_php. Most modern shared hosting (including
+# cPanel) runs PHP via php-fpm/suPHP instead, where an unguarded php_flag/
+# php_value in .htaccess causes Apache to fail the ENTIRE request with a
+# 500 error rather than just being ignored - confirmed by actually testing
+# this file against a real Apache install without mod_php loaded. If your
+# host uses php-fpm, set these via your control panel's PHP settings
+# (e.g. cPanel's "MultiPHP INI Editor") or a local php.ini instead.
+<IfModule mod_php.c>
+    php_flag display_errors off
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+</IfModule>

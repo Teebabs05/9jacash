@@ -156,5 +156,26 @@ if (!function_exists('send_security_headers')) {
         header('Referrer-Policy: strict-origin-when-cross-origin');
         header('X-XSS-Protection: 1; mode=block');
         header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+
+        // Every script/style/font/icon the app uses is self-hosted (no CDN
+        // dependency anywhere), so this is a genuine restriction rather than
+        // a no-op: it blocks a would-be XSS payload from exfiltrating data
+        // to, or loading further script from, any third-party origin.
+        // 'unsafe-inline' is still needed for script/style because the
+        // templates use inline <script> blocks and style="" attributes
+        // throughout; tightening that further would require moving every
+        // inline script to an external file with a nonce, which is a larger
+        // refactor than this pass covers.
+        header(
+            "Content-Security-Policy: default-src 'self'; "
+            . "script-src 'self' 'unsafe-inline'; "
+            . "style-src 'self' 'unsafe-inline'; "
+            . "img-src 'self' data:; "
+            . "font-src 'self'; "
+            . "object-src 'none'; "
+            . "base-uri 'self'; "
+            . "form-action 'self'; "
+            . "frame-ancestors 'self';"
+        );
     }
 }

@@ -45,7 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($action === 'delete') {
         $id = (int) ($_POST['id'] ?? 0);
-        $hasPositions = (int) db()->query('SELECT COUNT(*) AS c FROM user_mining WHERE plan_id = ' . $id)->fetch()['c'];
+        $stmt = db()->prepare('SELECT COUNT(*) AS c FROM user_mining WHERE plan_id = ?');
+        $stmt->execute([$id]);
+        $hasPositions = (int) $stmt->fetch()['c'];
 
         if ($hasPositions > 0) {
             flash('mining_plans', 'Cannot delete a plan that users have already invested in. Deactivate it instead.', 'error');

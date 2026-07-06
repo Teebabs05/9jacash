@@ -42,7 +42,7 @@ $pageTitle = 'Privacy Policy';
     <h5 class="fw-bold mt-4">6. Cookies</h5>
     <p>We use strictly necessary session cookies for authentication and an optional "remember me" cookie to keep you signed in.</p>
 
-    <a href="javascript:history.back()" class="btn btn-outline-brand mt-4">Back</a>
+    <button type="button" onclick="history.back()" class="btn btn-outline-brand mt-4">Back</button>
 </div>
 </body>
 </html>

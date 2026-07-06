@@ -13,24 +13,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_csrf();
 
     if (!empty($_FILES['site_logo']['name'])) {
-        $error = validate_upload($_FILES['site_logo'], ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'], 1 * 1024 * 1024);
+        // SVG is intentionally not accepted here: it can embed <script>,
+        // which would execute if anyone ever navigates directly to the
+        // uploaded file's URL (browsers treat a directly-loaded SVG as an
+        // HTML-like document, not a flat image) - not worth the risk for
+        // a logo when PNG/JPG/WEBP cover the same need.
+        $error = validate_upload($_FILES['site_logo'], ['image/png', 'image/jpeg', 'image/webp'], 1 * 1024 * 1024);
         if ($error) {
             $errors[] = $error;
         } else {
-            $finfo = new finfo(FILEINFO_MIME_TYPE);
-            $mime = $finfo->file($_FILES['site_logo']['tmp_name']);
-
-            if ($mime === 'image/svg+xml') {
-                $filename = 'branding/' . date('YmdHis') . '_' . bin2hex(random_bytes(6)) . '.svg';
-                $target = rtrim(BASE_PATH, '/') . '/uploads/' . $filename;
-                if (!move_uploaded_file($_FILES['site_logo']['tmp_name'], $target)) {
-                    $errors[] = 'Failed to store the uploaded logo.';
-                } else {
-                    set_setting('site_logo', $filename);
-                }
-            } else {
-                set_setting('site_logo', store_upload($_FILES['site_logo'], 'branding'));
-            }
+            set_setting('site_logo', store_upload($_FILES['site_logo'], 'branding'));
         }
     }
 
@@ -87,8 +79,8 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                 <?php endif; ?>
             </div>
             <div class="col">
-                <label class="form-label small">Upload New Logo (PNG, JPG, WEBP or SVG, max 1MB)</label>
-                <input type="file" class="form-control" name="site_logo" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+                <label class="form-label small">Upload New Logo (PNG, JPG or WEBP, max 1MB)</label>
+                <input type="file" class="form-control" name="site_logo" accept="image/png,image/jpeg,image/webp">
             </div>
         </div>
         <div class="row g-3">

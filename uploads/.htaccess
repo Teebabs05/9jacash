@@ -2,8 +2,19 @@
 <IfModule mod_php.c>
     php_flag engine off
 </IfModule>
-<FilesMatch "\.(php|php\d?|phtml|phar|pl|py|cgi|sh)$">
+<FilesMatch "\.(php|php\d?|phtml|phar|pl|py|cgi|sh|svg|svgz|html|htm|xhtml|xml)$">
     Require all denied
 </FilesMatch>
 Options -Indexes -ExecCGI
 AddType text/plain .php .php3 .php4 .php5 .phtml
+
+# Defense-in-depth: even for the allowed image/pdf types, prevent the
+# browser from ever sniffing/rendering an uploaded file as HTML/script,
+# and force a download prompt instead of inline rendering for anything
+# that isn't a plain image.
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    <FilesMatch "\.pdf$">
+        Header set Content-Disposition "attachment"
+    </FilesMatch>
+</IfModule>

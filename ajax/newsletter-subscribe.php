@@ -26,9 +26,16 @@ if (!is_valid_email($email)) {
     exit;
 }
 
+$identifier = 'newsletter:' . client_ip();
+if (is_rate_limited($identifier)) {
+    echo json_encode(['success' => false, 'message' => 'Too many requests. Please try again later.']);
+    exit;
+}
+
 try {
     $stmt = db()->prepare('INSERT INTO newsletter_subscribers (email, created_at) VALUES (?, NOW()) ON DUPLICATE KEY UPDATE email = email');
     $stmt->execute([$email]);
+    register_failed_attempt($identifier); // reused as a throttle counter
 
     echo json_encode(['success' => true, 'message' => 'Thanks for subscribing! You will receive our latest updates.']);
 } catch (Throwable $e) {

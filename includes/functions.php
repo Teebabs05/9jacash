@@ -257,16 +257,27 @@ if (!function_exists('current_admin')) {
 if (!function_exists('client_ip')) {
     function client_ip(): string
     {
-        foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'REMOTE_ADDR'] as $key) {
-            if (!empty($_SERVER[$key])) {
-                $ip = trim(explode(',', $_SERVER[$key])[0]);
-                if (filter_var($ip, FILTER_VALIDATE_IP)) {
-                    return $ip;
+        // Proxy headers (X-Forwarded-For, CF-Connecting-IP, ...) are sent by
+        // the CLIENT and are trivially spoofable — trusting them by default
+        // would let anyone bypass every IP-based rate limit (login lockout,
+        // registration/contact throttling) just by sending a fake header.
+        // Only honour them if this deployment is actually behind a proxy
+        // that strips/overwrites client-supplied values (e.g. Cloudflare),
+        // which the site owner opts into explicitly via TRUST_PROXY_HEADERS.
+        if (env('TRUST_PROXY_HEADERS', false)) {
+            foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP'] as $key) {
+                if (!empty($_SERVER[$key])) {
+                    $ip = trim(explode(',', $_SERVER[$key])[0]);
+                    if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                        return $ip;
+                    }
                 }
             }
         }
 
-        return '0.0.0.0';
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+
+        return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
     }
 }
 

@@ -96,7 +96,6 @@ if (!defined('INSTALLER_CONTEXT')) {
     send_security_headers();
 
     if ((bool) get_setting('maintenance_mode', false) && !AdminAuth::isLoggedIn()) {
-        $current = basename($_SERVER['SCRIPT_NAME'] ?? '');
         if (!str_contains((string) ($_SERVER['REQUEST_URI'] ?? ''), '/admin/')) {
             http_response_code(503);
             $message = (string) get_setting('maintenance_message', 'We are currently performing scheduled maintenance. Please check back shortly.');

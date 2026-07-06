@@ -45,7 +45,7 @@ $pageTitle = 'Terms of Service';
     <h5 class="fw-bold mt-4">7. Changes to Terms</h5>
     <p>These terms may be updated periodically. Continued use of the platform constitutes acceptance of the revised terms.</p>
 
-    <a href="javascript:history.back()" class="btn btn-outline-brand mt-4">Back</a>
+    <button type="button" onclick="history.back()" class="btn btn-outline-brand mt-4">Back</button>
 </div>
 </body>
 </html>

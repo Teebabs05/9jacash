@@ -108,6 +108,17 @@ day is safe.
 - `uploads/` and internal folders (`config`, `includes`, `database`, `logs`) blocked from direct web access via `.htaccess`
 - Activity logging (`activity_logs`) for auth events and admin actions
 - Generic (non-enumerable) responses on forgot-password requests
+- Content-Security-Policy restricting script/style/img/font loading to the
+  app's own origin (every asset is self-hosted, so this is a real
+  restriction, not a no-op)
+- IP-based rate limiting on registration, contact form and newsletter
+  signup (in addition to login/password-reset), using the real TCP
+  connection IP rather than a client-spoofable `X-Forwarded-For` header
+  unless the site owner explicitly opts in via `TRUST_PROXY_HEADERS`
+  (for deployments genuinely behind Cloudflare/a reverse proxy)
+- Uploaded logos are restricted to raster formats (no SVG, which can
+  embed `<script>`); the `uploads/` directory sends `nosniff` and forces
+  download (`Content-Disposition: attachment`) for PDFs
 
 ## Build Status
 
@@ -341,6 +352,64 @@ signup, and approving a ₦10,000 deposit from C correctly credited B's
 referral wallet 5% (₦500, level 1) and A's referral wallet 2% (₦200,
 level 2) with matching `referral_earnings` rows — and the referrals page
 and leaderboard both rendered the correct numbers and ranking.
+
+### ✅ Module 10 — Security Audit
+A full pass across the codebase looking specifically for the kind of
+mistakes that don't show up until someone is actively trying to abuse the
+platform:
+- `includes/functions.php` — `client_ip()` previously trusted
+  `X-Forwarded-For`/`CF-Connecting-IP` headers ahead of `REMOTE_ADDR`,
+  which meant any attacker could bypass every IP-based rate limit (login,
+  registration, password reset) just by sending a fake header. Now those
+  headers are only trusted when the new `TRUST_PROXY_HEADERS` env setting
+  is explicitly turned on (for real Cloudflare/reverse-proxy deployments);
+  the safe default is the raw TCP connection IP, which a client cannot
+  spoof
+- `user/register.php` and `ajax/newsletter-subscribe.php` — added
+  IP-based rate limiting (reusing the existing `is_rate_limited()` /
+  `register_failed_attempt()` mechanism already used for login); verified
+  live that exactly 5 attempts are allowed per IP before the 6th is
+  blocked
+- `includes/security.php` — added a Content-Security-Policy header
+  restricting scripts/styles/images/fonts to the app's own origin; a real
+  restriction rather than a no-op since every asset is already self-hosted
+- `admin/settings.php` — removed SVG from the accepted logo upload
+  formats. An SVG is treated as an HTML-like document if it's ever opened
+  directly in a browser tab, so it can carry an embedded `<script>` —
+  not worth the risk for a logo when PNG/JPG/WEBP cover the same need
+- `uploads/.htaccess` — hardened: execution of `.php`/`.phtml`/`.svg`/
+  `.html` (etc.) inside the upload directory is now blocked outright,
+  `X-Content-Type-Options: nosniff` is sent for everything in the
+  directory, and PDFs are forced to download (`Content-Disposition:
+  attachment`) instead of rendering inline
+- `includes/mailer.php` — every user-supplied value interpolated into an
+  HTML email body (name, link, status, title) is now passed through `e()`
+  before being placed in the template; the unescaped name is still used
+  for PHPMailer's `addAddress()` since that's a MIME header context, not
+  HTML
+- `admin/mining-plans.php` — replaced a string-concatenated `db()->query()`
+  call with a prepared statement (the `$id` was already cast to `int` so
+  this wasn't actually exploitable, but it was an inconsistent pattern
+  worth closing off)
+- `terms.php` / `privacy.php` — replaced `href="javascript:history.back()"`
+  with a real `<button>` + `onclick`
+- **Critical deployability bug, root `.htaccess`**: `php_flag`/
+  `php_value` directives were not wrapped in `<IfModule mod_php.c>`. This
+  is invisible when testing against PHP's built-in dev server (which
+  ignores `.htaccess` entirely), so it was only caught by actually
+  installing Apache in a test environment and enabling mod_rewrite/
+  mod_headers/mod_expires: on any host running PHP via php-fpm/suPHP
+  instead of mod_php (which includes most modern shared/cPanel hosting),
+  an unguarded `php_flag` in `.htaccess` makes Apache fail the **entire
+  request** with a 500 error rather than just ignoring the directive.
+  Wrapped in the `IfModule` guard, with a comment pointing php-fpm hosts
+  at their control panel's PHP settings instead
+
+Verified with a full live regression pass against a fresh MariaDB
+instance (registration, login, deposits, mining, referrals all
+re-tested end to end to confirm nothing broke), plus a from-scratch
+Apache install with a real test vhost to confirm `.htaccess` behavior
+under conditions the PHP dev server can't reproduce.
 
 ### Planned next
 Branding asset pack (PNG exports, social banner, app icon) → Full

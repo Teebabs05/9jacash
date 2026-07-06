@@ -12,6 +12,12 @@ $old = ['full_name' => '', 'username' => '', 'email' => '', 'phone' => '', 'refe
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_csrf();
 
+    $rateLimitKey = 'register:' . client_ip();
+
+    if (is_rate_limited($rateLimitKey)) {
+        $errors[] = 'Too many registration attempts from this location. Please try again in 15 minutes.';
+    }
+
     $old['full_name'] = clean($_POST['full_name'] ?? '');
     $old['username'] = strtolower(clean($_POST['username'] ?? ''));
     $old['email'] = strtolower(clean($_POST['email'] ?? ''));
@@ -50,6 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$errors) {
+        register_failed_attempt($rateLimitKey);
+
         $result = Auth::register(
             $old['full_name'],
             $old['username'],
