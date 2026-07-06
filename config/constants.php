@@ -78,6 +78,32 @@ const MINING_STATUS_PAUSED    = 'paused';
 const MINING_STATUS_COMPLETED = 'completed';
 
 // ---------------------------------------------------------------
+// Mining payout release schedule - controls when accrued daily
+// mining earnings move from the locked "pending" wallet into the
+// withdrawable mining wallet. 'default' on a user means "use the
+// site-wide mining_payout_schedule setting" (see get_setting()).
+// ---------------------------------------------------------------
+const PAYOUT_SCHEDULE_DEFAULT  = 'default';
+const PAYOUT_SCHEDULE_DAILY    = 'daily';
+const PAYOUT_SCHEDULE_WEEKLY   = 'weekly';
+const PAYOUT_SCHEDULE_BIWEEKLY = 'biweekly';
+const PAYOUT_SCHEDULE_CYCLE_END = 'cycle_end';
+
+const PAYOUT_SCHEDULES = [
+    PAYOUT_SCHEDULE_DAILY,
+    PAYOUT_SCHEDULE_WEEKLY,
+    PAYOUT_SCHEDULE_BIWEEKLY,
+    PAYOUT_SCHEDULE_CYCLE_END,
+];
+
+const PAYOUT_SCHEDULE_LABELS = [
+    PAYOUT_SCHEDULE_DAILY     => 'Daily',
+    PAYOUT_SCHEDULE_WEEKLY    => 'Weekly',
+    PAYOUT_SCHEDULE_BIWEEKLY  => 'Every 2 Weeks',
+    PAYOUT_SCHEDULE_CYCLE_END => 'At End of Mining Cycle',
+];
+
+// ---------------------------------------------------------------
 // Tasks
 // ---------------------------------------------------------------
 const TASK_PLATFORM_FACEBOOK  = 'facebook';

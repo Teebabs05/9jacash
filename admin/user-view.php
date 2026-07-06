@@ -79,6 +79,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = $e->getMessage() === 'Insufficient wallet balance.' ? 'Insufficient balance in that wallet for this debit.' : 'Could not process this adjustment.';
             }
         }
+    } elseif ($action === 'update_payout_schedule') {
+        $schedule = $_POST['payout_schedule'] ?? PAYOUT_SCHEDULE_DEFAULT;
+        if ($schedule !== PAYOUT_SCHEDULE_DEFAULT && !in_array($schedule, PAYOUT_SCHEDULES, true)) {
+            $schedule = PAYOUT_SCHEDULE_DEFAULT;
+        }
+        db()->prepare('UPDATE users SET payout_schedule = ? WHERE id = ?')->execute([$schedule, $userId]);
+        log_activity($userId, (int) $admin['id'], 'admin_payout_schedule_changed', "Mining payout schedule set to {$schedule}");
+        flash('users', 'Mining payout schedule updated.', 'success');
+        redirect(rtrim(APP_URL, '/') . '/admin/user-view.php?id=' . $userId);
     } elseif ($action === 'send_reset') {
         Auth::sendPasswordReset($user['email']);
         log_activity($userId, (int) $admin['id'], 'admin_password_reset_sent', 'Admin triggered a password reset email');
@@ -223,7 +232,24 @@ require __DIR__ . '/../includes/partials/admin-head.php';
             <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--border);"><span style="color:var(--text-muted);">Bonus</span><strong><?= e(money($wallet['bonus_balance'])) ?></strong></div>
             <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--border);"><span style="color:var(--text-muted);">Referral</span><strong><?= e(money($wallet['referral_balance'])) ?></strong></div>
             <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--border);"><span style="color:var(--text-muted);">Mining</span><strong><?= e(money($wallet['mining_balance'])) ?></strong></div>
+            <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--border);"><span style="color:var(--text-muted);">Pending (locked mining earnings)</span><strong><?= e(money($wallet['pending_balance'])) ?></strong></div>
             <div class="d-flex justify-content-between py-2"><span style="color:var(--text-muted);">Direct Referrals</span><strong><?= number_format($directReferrals) ?></strong></div>
+        </div>
+
+        <div class="card-surface p-4 mb-4">
+            <h5 class="fw-bold mb-3">Mining Payout Schedule</h5>
+            <p class="small mb-2" style="color:var(--text-muted);">Overrides the site-wide default for this user only.</p>
+            <form method="POST" action="" class="d-flex gap-2 flex-wrap">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="update_payout_schedule">
+                <select class="form-select" name="payout_schedule" style="max-width:220px;">
+                    <option value="default" <?= $user['payout_schedule'] === 'default' ? 'selected' : '' ?>>Site Default (<?= e(PAYOUT_SCHEDULE_LABELS[mining_effective_payout_schedule('default')]) ?>)</option>
+                    <?php foreach (PAYOUT_SCHEDULE_LABELS as $value => $label): ?>
+                        <option value="<?= e($value) ?>" <?= $user['payout_schedule'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <button type="submit" class="btn btn-outline-brand btn-sm">Save</button>
+            </form>
         </div>
 
         <div class="card-surface p-4 mb-4">

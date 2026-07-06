@@ -46,6 +46,7 @@ $stmt->execute([$user['id']]);
 $dailyMiningSummary = $stmt->fetch();
 $dailyMiningTotal = (float) $dailyMiningSummary['daily_total'];
 $activePositionCount = (int) $dailyMiningSummary['active_count'];
+$effectiveSchedule = mining_effective_payout_schedule((string) $user['payout_schedule']);
 
 $pageTitle = 'Mining';
 $activeNav = 'mining';
@@ -66,7 +67,22 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="small" style="color:var(--text-muted);">across <?= $activePositionCount ?> active position<?= $activePositionCount === 1 ? '' : 's' ?></div>
         </div>
     </div>
+    <?php if ((float) $wallet['pending_balance'] > 0): ?>
+    <div class="col-6 col-xl-3">
+        <div class="stat-tile">
+            <div class="icon-badge" style="background:rgba(247,144,9,0.14);color:var(--warning);"><i class="bi bi-hourglass-split"></i></div>
+            <div class="label">Pending Release</div>
+            <div class="value"><?= e(money($wallet['pending_balance'])) ?></div>
+            <div class="small" style="color:var(--text-muted);">Not yet withdrawable</div>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
+<?php if ($effectiveSchedule !== PAYOUT_SCHEDULE_DAILY): ?>
+<div class="alert alert-info py-2 px-3 small mb-4">
+    <i class="bi bi-info-circle me-1"></i> Your mining earnings accrue daily but only become withdrawable <?= e(strtolower(PAYOUT_SCHEDULE_LABELS[$effectiveSchedule])) ?>.
+</div>
+<?php endif; ?>
 <?php endif; ?>
 
 <h5 class="fw-bold mb-3">Available Mining Plans</h5>

@@ -22,13 +22,16 @@ if (PHP_SAPI !== 'cli') {
 require_once __DIR__ . '/../config/config.php';
 
 $summary = mining_process_payouts();
+$releaseSummary = mining_process_releases();
 
 $line = sprintf(
-    '[%s] Mining payout run: %d position(s) paid, %d completed, %s total credited.',
+    '[%s] Mining payout run: %d position(s) paid, %d completed, %s total credited. %d release(s), %s total released to withdrawable wallets.',
     date('Y-m-d H:i:s'),
     $summary['processed'],
     $summary['completed'],
-    money($summary['total_paid'])
+    money($summary['total_paid']),
+    $releaseSummary['released'],
+    money($releaseSummary['total_released'])
 );
 
 echo $line . PHP_EOL;

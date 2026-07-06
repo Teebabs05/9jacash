@@ -43,12 +43,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'playstore_url', 'appstore_url',
             'google_analytics_id', 'facebook_pixel_id',
             'mail_host', 'mail_port', 'mail_encryption', 'mail_username', 'mail_from_name', 'mail_from_address',
+            'mining_payout_schedule',
         ];
 
         foreach ($fields as $field) {
             if (isset($_POST[$field])) {
                 set_setting($field, clean($_POST[$field]));
             }
+        }
+
+        if (isset($_POST['mining_payout_schedule']) && !in_array($_POST['mining_payout_schedule'], PAYOUT_SCHEDULES, true)) {
+            set_setting('mining_payout_schedule', PAYOUT_SCHEDULE_DAILY);
         }
 
         if (!empty($_POST['mail_password'])) {
@@ -251,6 +256,18 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                 <input type="email" class="form-control" name="mail_from_address" value="<?= e((string) get_setting('mail_from_address', '')) ?>">
             </div>
         </div>
+    </div>
+
+    <div class="card-surface p-4 mb-4">
+        <h5 class="fw-bold mb-3">Mining Payout Schedule</h5>
+        <label class="form-label small">When accrued mining earnings become available for withdrawal (site-wide default)</label>
+        <select class="form-select" name="mining_payout_schedule" style="max-width:340px;">
+            <?php $currentSchedule = (string) get_setting('mining_payout_schedule', PAYOUT_SCHEDULE_DAILY); ?>
+            <?php foreach (PAYOUT_SCHEDULE_LABELS as $value => $label): ?>
+                <option value="<?= e($value) ?>" <?= $currentSchedule === $value ? 'selected' : '' ?>><?= e($label) ?></option>
+            <?php endforeach; ?>
+        </select>
+        <div class="form-text">Mining still earns daily regardless of this setting - this only controls when it moves from a locked "pending" balance into the withdrawable wallet. Can be overridden per-user from that user's Manage page.</div>
     </div>
 
     <div class="card-surface p-4 mb-4">

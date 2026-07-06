@@ -63,6 +63,16 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="small" style="color:var(--text-muted);">&asymp; <?= e(money_usd((float) $wallet['mining_balance'])) ?></div>
         </div>
     </div>
+    <?php if ((float) $wallet['pending_balance'] > 0): ?>
+    <div class="col-6 col-xl-3">
+        <div class="stat-tile">
+            <div class="icon-badge" style="background:rgba(247,144,9,0.14);color:var(--warning);"><i class="bi bi-hourglass-split"></i></div>
+            <div class="label">Pending Mining Earnings</div>
+            <div class="value"><?= e(money($wallet['pending_balance'])) ?></div>
+            <div class="small" style="color:var(--text-muted);">Not yet withdrawable</div>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
 
 <div class="row g-4 mt-1">
