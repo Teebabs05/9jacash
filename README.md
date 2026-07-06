@@ -739,8 +739,46 @@ strip and existing landing sections all still render; smoke-tested
 `terms.php`, `privacy.php` and the auth pages (which share the same
 CSS) to confirm nothing regressed.
 
-### Planned next
-Branding asset pack (PNG exports, social banner, app icon).
+### ✅ Module 24 — Branding Asset Pack
+A real, rasterized asset pack in `assets/images/brand-exports/` (not
+loaded by the running app — a delivery pack for app store listings,
+social media and print/email use):
+- **Favicons**: `favicon.ico` (16/32/48/64 multi-res), plus standalone
+  16/32/48/180/192/512px PNGs (Apple touch icon + PWA sizes covered)
+- **App icons**: 512×512 (Google Play requirement) and 1024×1024
+  (Apple App Store requirement) — both fully opaque with no alpha
+  channel, since both stores reject icons with transparency; a new
+  `app-icon.svg` source was created for this (a solid navy-gradient
+  square background behind the existing circular mark, since the
+  original mark is a circle on a transparent square)
+- **Social banner**: a new `social-banner.svg` (full wordmark + tagline
+  on the brand gradient) rasterized to the standard 1200×630 Open
+  Graph/Twitter Card size
+- **Wordmark logo exports**: the existing dark-bg/light-bg wordmark
+  SVGs rasterized at 2x/3x pixel density for documents/presentations
+
+No image-processing library was available in this environment
+(no ImageMagick/librsvg/cairo on the system, no Node image packages) —
+installed `cairosvg` (Python) via pip to do real, correct SVG
+rasterization. This replaced an earlier attempt using headless
+Chromium's `--screenshot` CLI flag, which turned out to have a real
+rendering bug in this environment: it consistently clipped the bottom
+~15-35% of any SVG content regardless of window size (confirmed with
+a plain red/blue test SVG before touching the real assets), while a
+plain solid-color HTML page screenshotted correctly — isolating the
+bug to SVG-in-Chrome specifically rather than the screenshot mechanism
+in general. `cairosvg` doesn't have this problem and renders pixel
+widths/heights exactly as requested.
+
+Verified by actually viewing the rendered PNGs: confirmed the favicon
+badge is fully visible and uncropped at every size, confirmed the app
+icons are fully opaque 512/1024px squares, confirmed the social banner
+renders the full gradient/mark/wordmark/tagline layout correctly, and
+confirmed the dark-bg/light-bg wordmark exports show the right text
+color against their intended background (the dark-bg export's white
+text only looked "wrong" when previewed against a white canvas — a
+viewer artifact, not a file bug, confirmed by re-rendering it with an
+explicit navy backdrop).
 
 ## License
 
