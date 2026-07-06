@@ -51,7 +51,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
         <div class="col-12 text-center py-4" style="color:var(--text-muted);">No mining plans are available right now. Please check back later.</div>
     <?php endif; ?>
     <?php foreach ($plans as $plan): ?>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-6 col-xl-3">
             <div class="mining-plan-card">
                 <h5 class="fw-bold mb-1"><?= e($plan['name']) ?></h5>
                 <div class="price"><?= e(money($plan['price'])) ?></div>

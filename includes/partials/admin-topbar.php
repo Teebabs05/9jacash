@@ -16,7 +16,7 @@ if (!empty($authAdmin['full_name'])) {
     <div class="d-flex align-items-center gap-2">
         <button type="button" class="theme-toggle-btn" style="color:var(--text);border-color:var(--border);" data-theme-toggle data-theme-icon><i class="bi bi-moon-stars"></i></button>
 
-        <a href="<?= e(rtrim(APP_URL, '/')) ?>/index.php" target="_blank" class="theme-toggle-btn" style="color:var(--text);border-color:var(--border);" title="View site"><i class="bi bi-box-arrow-up-right"></i></a>
+        <a href="<?= e(rtrim(APP_URL, '/')) ?>/index.php" target="_blank" class="theme-toggle-btn d-none d-sm-inline-flex" style="color:var(--text);border-color:var(--border);" title="View site"><i class="bi bi-box-arrow-up-right"></i></a>
 
         <div class="dropdown">
             <button class="btn d-flex align-items-center gap-2 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background:var(--surface-alt);border-radius:30px;padding:6px 14px 6px 6px;">

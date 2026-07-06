@@ -67,7 +67,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
 </div>
 
 <div class="row g-4 mt-1">
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-wallet2"></i></div>
             <div class="label">Wallet Balance</div>
@@ -75,21 +75,21 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="small" style="color:var(--text-muted);">&asymp; <?= e(money_usd(wallet_total_balance((int) $user['id']))) ?></div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(242,201,76,0.16);color:var(--brand-gold-dark);"><i class="bi bi-graph-up-arrow"></i></div>
             <div class="label">Total Earnings</div>
             <div class="value"><?= e(money($totalEarnings)) ?></div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(46,144,250,0.14);color:var(--info);"><i class="bi bi-sun-fill"></i></div>
             <div class="label">Today's Earnings</div>
             <div class="value"><?= e(money($todayEarnings)) ?></div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(11,37,69,0.10);color:var(--brand-navy);"><i class="bi bi-people-fill"></i></div>
             <div class="label">Direct Referrals</div>
@@ -153,13 +153,31 @@ require __DIR__ . '/../includes/partials/app-head.php';
 
         <div class="card-surface p-4">
             <h5 class="fw-bold mb-3">Quick Access</h5>
-            <div class="d-grid gap-2">
-                <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-wallet2 me-2"></i>My Wallet</a>
-                <a href="<?= e(rtrim(APP_URL, '/')) ?>/mining/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-cpu-fill me-2"></i>Mining</a>
-                <a href="<?= e(rtrim(APP_URL, '/')) ?>/tasks/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-list-check me-2"></i>Task Center</a>
-                <a href="<?= e(rtrim(APP_URL, '/')) ?>/spin/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-disc-fill me-2"></i>Spin Wheel</a>
-                <a href="<?= e(rtrim(APP_URL, '/')) ?>/ads/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-play-btn-fill me-2"></i>Watch &amp; Earn</a>
-                <a href="<?= e(rtrim(APP_URL, '/')) ?>/checkin/index.php" class="btn btn-outline-brand btn-sm text-start"><i class="bi bi-calendar-check-fill me-2"></i>Daily Check-in</a>
+            <div class="quick-access-grid">
+                <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/index.php" class="quick-access-item">
+                    <span class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-wallet2"></i></span>
+                    <span>My Wallet</span>
+                </a>
+                <a href="<?= e(rtrim(APP_URL, '/')) ?>/mining/index.php" class="quick-access-item">
+                    <span class="icon-badge" style="background:rgba(11,37,69,0.10);color:var(--brand-navy);"><i class="bi bi-cpu-fill"></i></span>
+                    <span>Mining</span>
+                </a>
+                <a href="<?= e(rtrim(APP_URL, '/')) ?>/tasks/index.php" class="quick-access-item">
+                    <span class="icon-badge" style="background:rgba(46,144,250,0.14);color:var(--info);"><i class="bi bi-list-check"></i></span>
+                    <span>Task Center</span>
+                </a>
+                <a href="<?= e(rtrim(APP_URL, '/')) ?>/spin/index.php" class="quick-access-item">
+                    <span class="icon-badge" style="background:rgba(242,201,76,0.16);color:var(--brand-gold-dark);"><i class="bi bi-disc-fill"></i></span>
+                    <span>Spin Wheel</span>
+                </a>
+                <a href="<?= e(rtrim(APP_URL, '/')) ?>/ads/index.php" class="quick-access-item">
+                    <span class="icon-badge" style="background:rgba(240,68,56,0.12);color:var(--danger);"><i class="bi bi-play-btn-fill"></i></span>
+                    <span>Watch &amp; Earn</span>
+                </a>
+                <a href="<?= e(rtrim(APP_URL, '/')) ?>/checkin/index.php" class="quick-access-item">
+                    <span class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-calendar-check-fill"></i></span>
+                    <span>Daily Check-in</span>
+                </a>
             </div>
         </div>
     </div>

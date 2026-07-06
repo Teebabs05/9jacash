@@ -62,28 +62,28 @@ require __DIR__ . '/../includes/partials/app-head.php';
 </div>
 
 <div class="row g-4">
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(46,144,250,0.14);color:var(--info);"><i class="bi bi-people-fill"></i></div>
             <div class="label">Level 1 Referrals</div>
             <div class="value"><?= number_format($levelCounts[1]) ?></div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(11,37,69,0.10);color:var(--brand-navy);"><i class="bi bi-diagram-3-fill"></i></div>
             <div class="label">Level 2 Referrals</div>
             <div class="value"><?= number_format($levelCounts[2]) ?></div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(242,201,76,0.16);color:var(--brand-gold-dark);"><i class="bi bi-share-fill"></i></div>
             <div class="label">Level 3 Referrals</div>
             <div class="value"><?= number_format($levelCounts[3]) ?></div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-cash-stack"></i></div>
             <div class="label">Total Referral Earnings</div>
