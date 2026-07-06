@@ -1,0 +1,429 @@
+/* =====================================================================
+   SURECASH MINING Design System
+   Premium fintech UI — Deep Blue / Emerald Green / Gold
+   Supports light + dark mode via [data-theme] and prefers-color-scheme
+   ===================================================================== */
+
+:root {
+    --brand-navy: #0B2545;
+    --brand-navy-dark: #071a33;
+    --brand-emerald: #0F5132;
+    --brand-emerald-light: #14834a;
+    --brand-gold: #F2C94C;
+    --brand-gold-dark: #d4ad2f;
+
+    --bg: #f4f6fa;
+    --bg-elevated: #ffffff;
+    --surface: #ffffff;
+    --surface-alt: #f8f9fc;
+    --text: #10182c;
+    --text-muted: #5b6478;
+    --border: #e6e9f0;
+    --shadow: 0 10px 30px rgba(11, 37, 69, 0.08);
+    --radius: 16px;
+    --radius-sm: 10px;
+
+    --success: #12b76a;
+    --danger: #f04438;
+    --warning: #f79009;
+    --info: #2e90fa;
+
+    color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg: #070d1a;
+        --bg-elevated: #0d1526;
+        --surface: #101b30;
+        --surface-alt: #0c1526;
+        --text: #eef1f8;
+        --text-muted: #97a2ba;
+        --border: #1e2b45;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        color-scheme: dark;
+    }
+}
+
+:root[data-theme="dark"] {
+    --bg: #070d1a;
+    --bg-elevated: #0d1526;
+    --surface: #101b30;
+    --surface-alt: #0c1526;
+    --text: #eef1f8;
+    --text-muted: #97a2ba;
+    --border: #1e2b45;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background-color .25s ease, color .25s ease;
+}
+
+a { text-decoration: none; }
+
+/* ---------------------------------------------------------------
+   Auth layout (login / register / forgot-password / reset-password)
+   --------------------------------------------------------------- */
+.auth-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: stretch;
+}
+
+.auth-visual {
+    position: relative;
+    flex: 1 1 45%;
+    background: radial-gradient(circle at 20% 20%, rgba(242, 201, 76, 0.18), transparent 45%),
+                linear-gradient(160deg, var(--brand-navy) 0%, var(--brand-navy-dark) 55%, var(--brand-emerald) 130%);
+    color: #fff;
+    padding: 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.auth-visual::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 85% 15%, rgba(255,255,255,0.08) 0, transparent 40%),
+        radial-gradient(circle at 10% 85%, rgba(255,255,255,0.06) 0, transparent 40%);
+    pointer-events: none;
+}
+
+.auth-visual .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: .5px;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-visual .brand .brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-navy);
+    font-weight: 800;
+}
+
+.auth-visual .pitch {
+    position: relative;
+    z-index: 1;
+}
+
+.auth-visual .pitch h1 {
+    font-size: 2.15rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 16px;
+}
+
+.auth-visual .pitch p {
+    color: rgba(255,255,255,0.8);
+    font-size: 1rem;
+    max-width: 420px;
+}
+
+.auth-visual .stat-strip {
+    display: flex;
+    gap: 28px;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-visual .stat-strip .stat b {
+    display: block;
+    font-size: 1.4rem;
+    color: var(--brand-gold);
+}
+
+.auth-visual .stat-strip .stat span {
+    font-size: .8rem;
+    color: rgba(255,255,255,0.7);
+}
+
+.auth-form-side {
+    flex: 1 1 55%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    background: var(--bg);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 40px 36px;
+}
+
+.auth-card h2 {
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.auth-card .sub {
+    color: var(--text-muted);
+    font-size: .92rem;
+    margin-bottom: 28px;
+}
+
+.auth-mobile-brand {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .auth-visual { display: none; }
+    .auth-form-side { flex: 1 1 100%; }
+
+    .auth-mobile-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 20px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text);
+    }
+}
+
+/* ---------------------------------------------------------------
+   Form controls
+   --------------------------------------------------------------- */
+.form-label {
+    font-weight: 600;
+    font-size: .85rem;
+    color: var(--text);
+}
+
+.form-control, .form-select {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: .95rem;
+}
+
+.form-control:focus, .form-select:focus {
+    background: var(--surface-alt);
+    color: var(--text);
+    border-color: var(--brand-emerald);
+    box-shadow: 0 0 0 3px rgba(15, 81, 50, 0.15);
+}
+
+.input-group-text {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+}
+
+.form-check-input:checked {
+    background-color: var(--brand-emerald);
+    border-color: var(--brand-emerald);
+}
+
+/* ---------------------------------------------------------------
+   Buttons
+   --------------------------------------------------------------- */
+.btn {
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    padding: 12px 20px;
+    font-size: .95rem;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.btn:active { transform: translateY(1px); }
+
+.btn-brand {
+    background: linear-gradient(135deg, var(--brand-emerald-light), var(--brand-emerald));
+    border: none;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(15, 81, 50, 0.28);
+}
+
+.btn-brand:hover { color: #fff; box-shadow: 0 10px 24px rgba(15, 81, 50, 0.38); }
+
+.btn-gold {
+    background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-dark));
+    border: none;
+    color: var(--brand-navy);
+    box-shadow: 0 8px 20px rgba(242, 201, 76, 0.3);
+}
+
+.btn-gold:hover { color: var(--brand-navy); }
+
+.btn-outline-brand {
+    border: 1.5px solid var(--brand-emerald);
+    color: var(--brand-emerald);
+    background: transparent;
+}
+
+.btn-outline-brand:hover {
+    background: var(--brand-emerald);
+    color: #fff;
+}
+
+/* ---------------------------------------------------------------
+   Cards / Glassmorphism
+   --------------------------------------------------------------- */
+.card-glass {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: var(--radius);
+}
+
+.card-surface {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+/* ---------------------------------------------------------------
+   Toasts
+   --------------------------------------------------------------- */
+.toast-stack {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1080;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ---------------------------------------------------------------
+   Skeleton loaders
+   --------------------------------------------------------------- */
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-alt);
+    border-radius: var(--radius-sm);
+}
+
+.skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    animation: skeleton-shimmer 1.4s infinite;
+}
+
+@keyframes skeleton-shimmer {
+    100% { transform: translateX(100%); }
+}
+
+/* ---------------------------------------------------------------
+   Password strength meter
+   --------------------------------------------------------------- */
+.pw-strength {
+    height: 5px;
+    border-radius: 3px;
+    background: var(--border);
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.pw-strength > span {
+    display: block;
+    height: 100%;
+    width: 0%;
+    transition: width .25s ease, background-color .25s ease;
+}
+
+/* ---------------------------------------------------------------
+   Utility animations
+   --------------------------------------------------------------- */
+.fade-in-up {
+    animation: fadeInUp .5s ease both;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.theme-toggle-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+::selection {
+    background: var(--brand-gold);
+    color: var(--brand-navy);
+}
+
+/* ---------------------------------------------------------------
+   Floating WhatsApp contact button
+   --------------------------------------------------------------- */
+.whatsapp-float {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #25D366;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
+    z-index: 1050;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.whatsapp-float:hover {
+    color: #ffffff;
+    transform: scale(1.06);
+    box-shadow: 0 8px 26px rgba(37, 211, 102, 0.55);
+}
+
+@media (max-width: 576px) {
+    .whatsapp-float {
+        right: 16px;
+        bottom: 16px;
+        width: 50px;
+        height: 50px;
+        font-size: 1.4rem;
+    }
+}

@@ -1,0 +1,80 @@
+RewriteEngine On
+
+# ---------------------------------------------------------------
+# Force HTTPS (uncomment on production once SSL is installed)
+# ---------------------------------------------------------------
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ---------------------------------------------------------------
+# Block access to sensitive files
+# ---------------------------------------------------------------
+<FilesMatch "\.(env|sql|log|md|lock|json|gitignore)$">
+    Require all denied
+</FilesMatch>
+
+<Files "config.php">
+    <RequireAll>
+        Require all granted
+    </RequireAll>
+</Files>
+
+# Deny direct access to config.php via PHP handler is unnecessary; but block .env explicitly
+<Files ".env">
+    Require all denied
+</Files>
+<Files ".env.example">
+    Require all denied
+</Files>
+
+# ---------------------------------------------------------------
+# Disable directory listing
+# ---------------------------------------------------------------
+Options -Indexes
+
+# ---------------------------------------------------------------
+# Protect sensitive directories from direct web access
+# ---------------------------------------------------------------
+RewriteRule ^(config|includes|database|logs|vendor)/ - [F,L]
+
+# ---------------------------------------------------------------
+# Security headers
+# ---------------------------------------------------------------
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ---------------------------------------------------------------
+# Compression
+# ---------------------------------------------------------------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json
+</IfModule>
+
+# ---------------------------------------------------------------
+# Browser caching for static assets
+# ---------------------------------------------------------------
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType font/woff2 "access plus 1 month"
+</IfModule>
+
+# These only apply under mod_php. Most modern shared hosting (including
+# cPanel) runs PHP via php-fpm/suPHP instead, where an unguarded php_flag/
+# php_value in .htaccess causes Apache to fail the ENTIRE request with a
+# 500 error rather than just being ignored - confirmed by actually testing
+# this file against a real Apache install without mod_php loaded. If your
+# host uses php-fpm, set these via your control panel's PHP settings
+# (e.g. cPanel's "MultiPHP INI Editor") or a local php.ini instead.
+<IfModule mod_php.c>
+    php_flag display_errors off
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+</IfModule>

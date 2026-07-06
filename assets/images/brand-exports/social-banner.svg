@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="SURECASH MINING">
+  <defs>
+    <linearGradient id="bannerBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B2545"/>
+      <stop offset="55%" stop-color="#071a33"/>
+      <stop offset="130%" stop-color="#0F5132"/>
+    </linearGradient>
+    <linearGradient id="bannerGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F7D774"/>
+      <stop offset="100%" stop-color="#D4AD2F"/>
+    </linearGradient>
+    <radialGradient id="orb1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(242,201,76,0.20)"/>
+      <stop offset="100%" stop-color="rgba(242,201,76,0)"/>
+    </radialGradient>
+    <radialGradient id="orb2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(15,81,50,0.35)"/>
+      <stop offset="100%" stop-color="rgba(15,81,50,0)"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="630" fill="url(#bannerBg)"/>
+  <circle cx="1040" cy="120" r="220" fill="url(#orb1)"/>
+  <circle cx="120" cy="560" r="200" fill="url(#orb2)"/>
+
+  <!-- Brand mark -->
+  <g transform="translate(90,225)">
+    <circle cx="90" cy="90" r="88" fill="none" stroke="#0F5132" stroke-width="4"/>
+    <circle cx="90" cy="90" r="86" fill="#0F3160"/>
+    <path d="M90 28a62 62 0 1 0 62 62" fill="none" stroke="#14834a" stroke-width="7" stroke-linecap="round" opacity="0.55"/>
+    <path d="M55 105 L78 78 L96 92 L128 55" fill="none" stroke="url(#bannerGold)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M105 55 L128 55 L128 76" fill="none" stroke="url(#bannerGold)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="55" cy="105" r="8" fill="#F2C94C"/>
+    <circle cx="96" cy="92" r="8" fill="#F2C94C"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="310" y="300" font-family="Poppins, Arial, sans-serif" font-size="72" font-weight="700" fill="#ffffff">SURE<tspan fill="#F2C94C">CASH</tspan></text>
+  <text x="310" y="365" font-family="Poppins, Arial, sans-serif" font-size="72" font-weight="700" fill="#ffffff">MINING</text>
+
+  <!-- Tagline -->
+  <text x="313" y="415" font-family="Poppins, Arial, sans-serif" font-size="26" font-weight="500" fill="rgba(255,255,255,0.82)">Mine. Earn. Grow Your Wealth Daily.</text>
+</svg>

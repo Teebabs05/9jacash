@@ -1,0 +1,454 @@
+/* =====================================================================
+   SURECASH MINING public landing page
+   ===================================================================== */
+
+.site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1050;
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+}
+
+.site-nav .brand-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-dark));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-navy);
+    font-weight: 800;
+}
+
+.site-nav .nav-link {
+    color: var(--text) !important;
+    font-weight: 500;
+    font-size: .92rem;
+}
+
+.site-nav .nav-link:hover { color: var(--brand-emerald) !important; }
+
+/* ---------------------------------------------------------------
+   Hero
+   --------------------------------------------------------------- */
+.hero {
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at 15% 20%, rgba(242,201,76,0.15), transparent 40%),
+                linear-gradient(160deg, var(--brand-navy) 0%, var(--brand-navy-dark) 60%, var(--brand-emerald) 150%);
+    color: #fff;
+    padding: 100px 0 120px;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 88% 10%, rgba(255,255,255,0.08), transparent 40%),
+                       radial-gradient(circle at 5% 90%, rgba(255,255,255,0.06), transparent 40%);
+}
+
+.hero .content { position: relative; z-index: 1; }
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: .8rem;
+    font-weight: 600;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 22px 0;
+}
+
+.hero p.lead {
+    color: rgba(255,255,255,0.82);
+    font-size: 1.1rem;
+    max-width: 560px;
+}
+
+@media (max-width: 767.98px) {
+    .hero h1 { font-size: 2.1rem; }
+}
+
+.hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(2px);
+    opacity: .5;
+    animation: floaty 7s ease-in-out infinite;
+}
+
+@keyframes floaty {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-18px); }
+}
+
+.hero-card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 20px;
+    padding: 26px;
+}
+
+.hero-card .mini-stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.16);
+    font-size: .9rem;
+}
+
+.hero-card .mini-stat:last-child { border-bottom: none; }
+
+/* ---------------------------------------------------------------
+   Section shell
+   --------------------------------------------------------------- */
+.section { padding: 88px 0; }
+.section-alt { background: var(--surface-alt); }
+
+.section-eyebrow {
+    color: var(--brand-emerald);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: .78rem;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 10px 0 14px;
+}
+
+.section-sub {
+    color: var(--text-muted);
+    max-width: 640px;
+}
+
+/* ---------------------------------------------------------------
+   Feature cards
+   --------------------------------------------------------------- */
+.feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    height: 100%;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+
+.feature-card .icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+}
+
+/* ---------------------------------------------------------------
+   How it works
+   --------------------------------------------------------------- */
+.step-card {
+    text-align: center;
+    padding: 10px;
+}
+
+.step-card .step-num {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-emerald-light), var(--brand-emerald));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    margin: 0 auto 16px;
+    font-size: 1.1rem;
+}
+
+/* ---------------------------------------------------------------
+   Mining plan cards
+   --------------------------------------------------------------- */
+.plan-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    height: 100%;
+    position: relative;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.plan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+
+.plan-card.featured {
+    border-color: var(--brand-emerald);
+    box-shadow: 0 14px 34px rgba(15,81,50,0.16);
+}
+
+.plan-card .badge-featured {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-dark));
+    color: var(--brand-navy);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.plan-card .price {
+    font-size: 1.9rem;
+    font-weight: 800;
+}
+
+.plan-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 18px 0;
+}
+
+.plan-card ul li {
+    padding: 7px 0;
+    font-size: .9rem;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* ---------------------------------------------------------------
+   Referral section
+   --------------------------------------------------------------- */
+.referral-level {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    text-align: center;
+}
+
+.referral-level .percent {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--brand-emerald);
+}
+
+/* ---------------------------------------------------------------
+   Testimonials
+   --------------------------------------------------------------- */
+.testimonial-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 26px;
+    height: 100%;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+
+.testimonial-card .avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-emerald-light), var(--brand-emerald));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------------
+   Stats counter strip
+   --------------------------------------------------------------- */
+.stats-strip {
+    background: linear-gradient(135deg, var(--brand-navy), var(--brand-navy-dark));
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 48px 32px;
+}
+
+.stats-strip .stat b {
+    display: block;
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: var(--brand-gold);
+}
+
+.stats-strip .stat span {
+    color: rgba(255,255,255,0.75);
+    font-size: .85rem;
+}
+
+/* ---------------------------------------------------------------
+   Payment methods
+   --------------------------------------------------------------- */
+.payment-tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    text-align: center;
+    font-weight: 600;
+    font-size: .9rem;
+}
+
+.payment-tile i { font-size: 1.6rem; display: block; margin-bottom: 8px; color: var(--brand-emerald); }
+
+/* ---------------------------------------------------------------
+   Footer
+   --------------------------------------------------------------- */
+.site-footer {
+    background: var(--brand-navy-dark);
+    color: rgba(255,255,255,0.75);
+    padding: 64px 0 24px;
+}
+
+.site-footer h6 {
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.site-footer a {
+    color: rgba(255,255,255,0.7);
+    font-size: .9rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.site-footer a:hover { color: var(--brand-gold); }
+
+.site-footer .social-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    margin-right: 8px;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: 36px;
+    padding-top: 20px;
+    font-size: .82rem;
+}
+
+/* ---------------------------------------------------------------
+   Reveal-on-scroll
+   --------------------------------------------------------------- */
+.reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .6s ease, transform .6s ease;
+}
+
+.reveal.in-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ---------------------------------------------------------------
+   Live activity ticker (real recent earnings, never fabricated -
+   the section is simply hidden when there's no activity yet)
+   --------------------------------------------------------------- */
+.activity-ticker {
+    background: var(--surface-alt);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 12px 0;
+    position: relative;
+    z-index: 1;
+}
+
+.activity-ticker-track {
+    display: inline-flex;
+    animation: activityTickerScroll 40s linear infinite;
+}
+
+.activity-ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .85rem;
+    color: var(--text);
+    padding: 0 28px;
+    border-right: 1px solid var(--border);
+}
+
+.activity-ticker-item i {
+    color: var(--brand-gold-dark);
+}
+
+.activity-ticker-time {
+    color: var(--text-muted);
+    font-size: .78rem;
+}
+
+@keyframes activityTickerScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .activity-ticker-track {
+        animation: none;
+        overflow-x: auto;
+    }
+}
+
+/* ---------------------------------------------------------------
+   Trust strip
+   --------------------------------------------------------------- */
+.trust-strip {
+    padding: 22px 0;
+}
+
+.trust-item {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.trust-item i {
+    color: var(--brand-emerald);
+    margin-right: 6px;
+}

@@ -1,0 +1,20 @@
+{
+    "name": "surecash-mining/platform",
+    "description": "SURECASH MINING - Online Earning Platform (Mining, Tasks, Referrals, Wallet)",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.2",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "includes/App/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}

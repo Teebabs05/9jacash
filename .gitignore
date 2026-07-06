@@ -1,0 +1,28 @@
+# Environment
+.env
+
+# Logs
+logs/*.log
+logs/*.txt
+
+# User uploaded content (keep folder structure via .gitkeep)
+uploads/kyc/*
+uploads/receipts/*
+uploads/tasks/*
+uploads/avatars/*
+uploads/branding/*
+!uploads/kyc/.gitkeep
+!uploads/receipts/.gitkeep
+!uploads/tasks/.gitkeep
+!uploads/avatars/.gitkeep
+!uploads/branding/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/
+
+# Composer (kept intentionally for shared hosting deploys without SSH/composer access)
+# vendor/ is committed on purpose - do not ignore.
