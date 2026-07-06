@@ -214,6 +214,16 @@
     font-size: .9rem;
 }
 
+.ledger-table tbody tr[data-href],
+.ledger-table tbody tr[data-ledger-row] {
+    cursor: pointer;
+}
+
+.ledger-table tbody tr[data-href]:hover,
+.ledger-table tbody tr[data-ledger-row]:hover {
+    background: var(--surface-alt);
+}
+
 .pill {
     display: inline-block;
     padding: 3px 10px;
@@ -357,6 +367,34 @@
     justify-content: center;
     color: var(--brand-gold);
     font-size: 1.3rem;
+}
+
+/* ---------------------------------------------------------------
+   Modals - keep header/footer reachable even when a mobile on-screen
+   keyboard shrinks the visual viewport. Bootstrap's default (non
+   -scrollable) modal only scrolls at the outer .modal level, so a
+   tall body can push the footer buttons below the fold; sticking the
+   header/footer to that scrollport keeps them visible at all times.
+   --------------------------------------------------------------- */
+.modal-header, .modal-footer {
+    position: sticky;
+    background: var(--surface);
+    z-index: 2;
+}
+
+.modal-header { top: 0; }
+.modal-footer { bottom: 0; }
+
+@media (max-width: 575.98px) {
+    .modal-dialog {
+        margin: 0.75rem;
+    }
+    .modal-footer {
+        flex-wrap: wrap;
+    }
+    .modal-footer > * {
+        flex: 1 1 auto;
+    }
 }
 
 /* ---------------------------------------------------------------

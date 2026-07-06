@@ -140,9 +140,19 @@ require __DIR__ . '/../includes/partials/app-head.php';
                     <tr><th>Description</th><th>Wallet</th><th>Type</th><th>Amount</th><th>Balance After</th><th>Date</th></tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($rows as $row): ?>
-                        <tr>
-                            <td><?= e($row['description'] ?: ($sourceLabels[$row['source']] ?? ucfirst($row['source']))) ?></td>
+                    <?php foreach ($rows as $row):
+                        $rowDescription = $row['description'] ?: ($sourceLabels[$row['source']] ?? ucfirst($row['source']));
+                    ?>
+                        <tr data-ledger-row
+                            data-ledger-description="<?= e($rowDescription) ?>"
+                            data-ledger-wallet="<?= e($row['wallet_type']) ?>"
+                            data-ledger-type="<?= e(ucfirst($row['type'])) ?>"
+                            data-ledger-amount="<?= e(($row['type'] === 'credit' ? '+' : '-') . money($row['amount'])) ?>"
+                            data-ledger-balance="<?= e(money($row['balance_after'])) ?>"
+                            data-ledger-status="<?= e(ucfirst($row['status'])) ?>"
+                            data-ledger-reference="<?= e($row['reference'] ?: '-') ?>"
+                            data-ledger-date="<?= e(date('M d, Y H:i', strtotime($row['created_at']))) ?>">
+                            <td><?= e($rowDescription) ?></td>
                             <td class="text-capitalize"><?= e($row['wallet_type']) ?></td>
                             <td><span class="pill pill-<?= $row['type'] === 'credit' ? 'credit' : 'debit' ?>"><?= e(ucfirst($row['type'])) ?></span></td>
                             <td class="fw-semibold <?= $row['type'] === 'credit' ? 'text-success' : 'text-danger' ?>">
@@ -169,5 +179,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
         </ul>
     </nav>
 <?php endif; ?>
+
+<?php require __DIR__ . '/../includes/partials/transaction-detail-modal.php'; ?>
 
 <?php require __DIR__ . '/../includes/partials/app-scripts.php'; ?>

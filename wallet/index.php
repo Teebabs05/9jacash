@@ -85,10 +85,20 @@ require __DIR__ . '/../includes/partials/app-head.php';
                             <tr><th>Description</th><th>Wallet</th><th>Amount</th><th>Date</th></tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($recent as $row): ?>
-                                <tr>
+                            <?php foreach ($recent as $row):
+                                $rowDescription = $row['description'] ?: ($sourceLabels[$row['source']] ?? ucfirst($row['source']));
+                            ?>
+                                <tr data-ledger-row
+                                    data-ledger-description="<?= e($rowDescription) ?>"
+                                    data-ledger-wallet="<?= e($row['wallet_type']) ?>"
+                                    data-ledger-type="<?= e(ucfirst($row['type'])) ?>"
+                                    data-ledger-amount="<?= e(($row['type'] === 'credit' ? '+' : '-') . money($row['amount'])) ?>"
+                                    data-ledger-balance="<?= e(money($row['balance_after'])) ?>"
+                                    data-ledger-status="<?= e(ucfirst($row['status'])) ?>"
+                                    data-ledger-reference="<?= e($row['reference'] ?: '-') ?>"
+                                    data-ledger-date="<?= e(date('M d, Y H:i', strtotime($row['created_at']))) ?>">
                                     <td>
-                                        <?= e($row['description'] ?: ($sourceLabels[$row['source']] ?? ucfirst($row['source']))) ?>
+                                        <?= e($rowDescription) ?>
                                         <span class="pill pill-<?= $row['type'] === 'credit' ? 'credit' : 'debit' ?> ms-1"><?= e(ucfirst($row['type'])) ?></span>
                                     </td>
                                     <td class="text-capitalize"><?= e($row['wallet_type']) ?></td>
@@ -126,5 +136,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
         </div>
     </div>
 </div>
+
+<?php require __DIR__ . '/../includes/partials/transaction-detail-modal.php'; ?>
 
 <?php require __DIR__ . '/../includes/partials/app-scripts.php'; ?>

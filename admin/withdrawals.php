@@ -79,7 +79,7 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                 <thead><tr><th>User</th><th>Method</th><th>Account Details</th><th>Amount</th><th>Charge</th><th>Net Payout</th><th>Date</th><th>Status</th><th></th><th></th></tr></thead>
                 <tbody>
                     <?php foreach ($withdrawals as $w): ?>
-                        <tr>
+                        <tr data-href="receipt.php?type=withdrawal&id=<?= (int) $w['id'] ?>">
                             <td><?= e($w['full_name']) ?><div class="small" style="color:var(--text-muted);">@<?= e($w['username']) ?></div></td>
                             <td class="text-uppercase small"><?= e($w['method']) ?></td>
                             <td class="small" style="max-width:220px;"><?= e($w['account_details']) ?></td>
