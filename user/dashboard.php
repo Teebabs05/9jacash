@@ -42,6 +42,17 @@ $stmt = db()->prepare('SELECT COUNT(*) AS c FROM referrals WHERE user_id = ? AND
 $stmt->execute([$user['id']]);
 $directReferrals = (int) $stmt->fetch()['c'];
 
+$stmt = db()->prepare(
+    "SELECT COALESCE(SUM(mp.daily_return), 0) AS daily_total, COUNT(*) AS active_count
+     FROM user_mining um
+     INNER JOIN mining_plans mp ON mp.id = um.plan_id
+     WHERE um.user_id = ? AND um.status = 'active'"
+);
+$stmt->execute([$user['id']]);
+$dailyMiningSummary = $stmt->fetch();
+$dailyMiningTotal = (float) $dailyMiningSummary['daily_total'];
+$activePositionCount = (int) $dailyMiningSummary['active_count'];
+
 $stmt = db()->prepare('SELECT * FROM wallet_ledger WHERE user_id = ? ORDER BY created_at DESC LIMIT 5');
 $stmt->execute([$user['id']]);
 $recent = $stmt->fetchAll();
@@ -94,6 +105,14 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="icon-badge" style="background:rgba(11,37,69,0.10);color:var(--brand-navy);"><i class="bi bi-people-fill"></i></div>
             <div class="label">Direct Referrals</div>
             <div class="value"><?= number_format($directReferrals) ?></div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-tile">
+            <div class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-cpu-fill"></i></div>
+            <div class="label">Daily Mining Earning</div>
+            <div class="value"><?= e(money($dailyMiningTotal)) ?></div>
+            <div class="small" style="color:var(--text-muted);"><?= $activePositionCount ?> active position<?= $activePositionCount === 1 ? '' : 's' ?></div>
         </div>
     </div>
 </div>

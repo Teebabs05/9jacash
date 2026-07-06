@@ -36,6 +36,17 @@ $positions = $stmt->fetchAll();
 
 $wallet = get_wallet((int) $user['id']);
 
+$stmt = db()->prepare(
+    "SELECT COALESCE(SUM(mp.daily_return), 0) AS daily_total, COUNT(*) AS active_count
+     FROM user_mining um
+     INNER JOIN mining_plans mp ON mp.id = um.plan_id
+     WHERE um.user_id = ? AND um.status = 'active'"
+);
+$stmt->execute([$user['id']]);
+$dailyMiningSummary = $stmt->fetch();
+$dailyMiningTotal = (float) $dailyMiningSummary['daily_total'];
+$activePositionCount = (int) $dailyMiningSummary['active_count'];
+
 $pageTitle = 'Mining';
 $activeNav = 'mining';
 require __DIR__ . '/../includes/partials/app-head.php';
@@ -44,6 +55,19 @@ require __DIR__ . '/../includes/partials/app-head.php';
     <p class="mb-0" style="color:var(--text-muted);">Invest in a mining plan and earn automatic daily returns.</p>
     <div class="card-surface px-3 py-2 small">Main Wallet Balance: <strong><?= e(money($wallet['main_balance'])) ?></strong></div>
 </div>
+
+<?php if ($activePositionCount > 0): ?>
+<div class="row g-4 mb-1">
+    <div class="col-6 col-xl-3">
+        <div class="stat-tile">
+            <div class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-graph-up-arrow"></i></div>
+            <div class="label">Total Daily Mining Earning</div>
+            <div class="value"><?= e(money($dailyMiningTotal)) ?></div>
+            <div class="small" style="color:var(--text-muted);">across <?= $activePositionCount ?> active position<?= $activePositionCount === 1 ? '' : 's' ?></div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <h5 class="fw-bold mb-3">Available Mining Plans</h5>
 <div class="row g-4">

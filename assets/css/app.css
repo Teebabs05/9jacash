@@ -367,6 +367,19 @@
     align-items: center;
 }
 
+@media (max-width: 575.98px) {
+    .mining-plan-card {
+        padding: 16px;
+    }
+    .mining-plan-card .price {
+        font-size: 1.25rem;
+        word-break: break-word;
+    }
+    .mining-plan-card ul li {
+        font-size: .8rem;
+    }
+}
+
 .progress-thin {
     height: 8px;
     border-radius: 6px;
