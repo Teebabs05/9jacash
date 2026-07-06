@@ -55,9 +55,9 @@ if (!function_exists('spin_pick_segment')) {
  * which wedge to animate to).
  */
 if (!function_exists('spin_play')) {
-    function spin_play(int $userId): array
+    function spin_play(int $userId, bool $paid = false): array
     {
-        if (!spin_can_play($userId)) {
+        if (!$paid && !spin_can_play($userId)) {
             return ['success' => false, 'message' => 'You have already used your daily spin. Come back tomorrow!'];
         }
 
@@ -87,5 +87,41 @@ if (!function_exists('spin_play')) {
             'segment_count' => count($segments),
             'message' => $amount > 0 ? "Congratulations! You won {$winner['label']}!" : 'Better luck next time!',
         ];
+    }
+}
+
+if (!function_exists('spin_extra_price')) {
+    function spin_extra_price(): float
+    {
+        $price = (float) get_setting('spin_extra_price', 50);
+
+        return $price >= 50 ? $price : 50.0;
+    }
+}
+
+/**
+ * Buy and immediately play one extra spin once the free daily limit is
+ * used up, debiting the price from the user's combined wallet balance.
+ * Refunds automatically if the spin itself can't go ahead (e.g. no
+ * active segments configured) so a user is never charged for nothing.
+ */
+if (!function_exists('spin_buy_extra_and_play')) {
+    function spin_buy_extra_and_play(int $userId): array
+    {
+        $price = spin_extra_price();
+
+        try {
+            wallet_debit_combined($userId, $price, LEDGER_SOURCE_SPIN, 'Purchased an extra spin');
+        } catch (Throwable $e) {
+            return ['success' => false, 'message' => 'Insufficient wallet balance to buy an extra spin.'];
+        }
+
+        $result = spin_play($userId, true);
+
+        if (!$result['success']) {
+            wallet_credit($userId, WALLET_MAIN, $price, LEDGER_SOURCE_SPIN, 'Refund: extra spin could not be played');
+        }
+
+        return $result;
     }
 }

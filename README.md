@@ -644,11 +644,43 @@ Verified live: confirmed no badges render with both URLs empty
 (the seeded default), and confirmed both badges render with the
 correct `href` on both the homepage and the dashboard once set.
 
+### ✅ Module 19 — Spin Wheel Paid Extra Spins
+Once a user exhausts their free daily spin(s), they can now buy
+additional spins from their combined wallet balance:
+- **Admin → Spin Wheel Settings** — an "Extra spin price" field
+  alongside the existing daily-limit setting, server-side clamped to a
+  ₦50 minimum regardless of what's typed in
+- `includes/spin.php`: `spin_play()` takes a `$paid` flag that bypasses
+  the daily-limit check; `spin_buy_extra_and_play()` debits the price
+  via the existing combined-wallet waterfall (`wallet_debit_combined()`
+  — main, then bonus, referral, mining) and immediately plays a spin,
+  refunding automatically if the spin itself can't proceed (e.g. no
+  active segments configured) so a user is never charged for nothing
+- `ajax/spin-buy-extra.php` — mirrors the existing `spin-play.php`
+  endpoint's auth/CSRF conventions
+- `spin/index.php` shows a "Buy Extra Spin (₦X)" button once the free
+  daily spin is used, disabled with a clear reason if the user's
+  combined balance can't cover it; after a paid spin the page reloads
+  so the button re-evaluates against the user's new balance (letting
+  them buy another right away if they can still afford it)
+
+Also fixed several more leftover `NineJaCash` references in inline
+`<script>` blocks (`wallet/index.php`, `payments/pending.php`,
+`spin/index.php`, `ads/index.php`) that Module 13's rebrand pass had
+missed — it only caught the standalone `.js` files, not inline script
+blocks inside PHP templates.
+
+Verified live: used the free daily spin, confirmed the page switched
+to the paid "Buy Extra Spin" button, bought one and confirmed the
+exact price was debited and a second `spin_logs` row was created, then
+set the wallet below the price and confirmed the purchase was rejected
+server-side with the wallet balance completely unchanged (no partial
+charge).
+
 ### Planned next
 Branding asset pack (PNG exports, social banner, app icon) →
-transaction receipts → paid extra spins → a modern visual redesign
-with conversion-focused landing page
-elements.
+transaction receipts → a modern visual redesign with
+conversion-focused landing page elements.
 
 ## License
 

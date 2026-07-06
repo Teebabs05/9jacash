@@ -44,7 +44,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
                     <div class="d-flex justify-content-between py-1"><span style="color:var(--text-muted);">Reference</span><strong><?= e($deposit['reference']) ?></strong></div>
                 </div>
 
-                <button type="button" class="btn btn-outline-brand w-100 mb-2" onclick="navigator.clipboard.writeText(document.getElementById('accNumber').textContent); NineJaCash.toast('Account number copied!');">Copy Account Number</button>
+                <button type="button" class="btn btn-outline-brand w-100 mb-2" onclick="navigator.clipboard.writeText(document.getElementById('accNumber').textContent); SureCashMining.toast('Account number copied!');">Copy Account Number</button>
 
                 <div id="statusMessage" class="alert alert-info small py-2 px-3">
                     <span class="spinner-border spinner-border-sm me-1"></span> Waiting for payment confirmation...

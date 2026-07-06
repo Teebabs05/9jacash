@@ -535,6 +535,7 @@ INSERT INTO `site_settings` (`setting_key`, `setting_value`) VALUES
 ('ad_cooldown_seconds', '30'),
 ('ad_watch_duration_seconds', '15'),
 ('spin_daily_limit', '1'),
+('spin_extra_price', '50'),
 ('checkin_base_reward', '10'),
 ('mail_from_name', 'SURECASH MINING'),
 ('mail_from_address', 'no-reply@surecashmining.com'),

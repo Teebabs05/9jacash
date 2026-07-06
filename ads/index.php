@@ -108,16 +108,16 @@ document.addEventListener('DOMContentLoaded', function () {
     let timer = null;
 
     watchBtn.addEventListener('click', function () {
-        NineJaCash.setLoading(watchBtn, true);
+        SureCashMining.setLoading(watchBtn, true);
         fetch('<?= e(rtrim(APP_URL, '/')) ?>/ajax/ads-start.php', {
             method: 'POST',
             body: new URLSearchParams({ csrf_token: csrfToken }),
         })
             .then(r => r.json())
             .then(data => {
-                NineJaCash.setLoading(watchBtn, false);
+                SureCashMining.setLoading(watchBtn, false);
                 if (!data.success) {
-                    NineJaCash.toast(data.message, 'error');
+                    SureCashMining.toast(data.message, 'error');
                     return;
                 }
                 watchToken = data.token;
@@ -137,11 +137,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }, 1000);
             })
-            .catch(() => { NineJaCash.setLoading(watchBtn, false); NineJaCash.toast('Something went wrong.', 'error'); });
+            .catch(() => { SureCashMining.setLoading(watchBtn, false); SureCashMining.toast('Something went wrong.', 'error'); });
     });
 
     claimBtn.addEventListener('click', function () {
-        NineJaCash.setLoading(claimBtn, true);
+        SureCashMining.setLoading(claimBtn, true);
         fetch('<?= e(rtrim(APP_URL, '/')) ?>/ajax/ads-claim.php', {
             method: 'POST',
             body: new URLSearchParams({ csrf_token: csrfToken, watch_token: watchToken }),
@@ -149,10 +149,10 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(r => r.json())
             .then(data => {
                 modal.hide();
-                NineJaCash.toast(data.message, data.success ? 'success' : 'error');
+                SureCashMining.toast(data.message, data.success ? 'success' : 'error');
                 if (data.success) setTimeout(() => window.location.reload(), 1200);
             })
-            .finally(() => NineJaCash.setLoading(claimBtn, false));
+            .finally(() => SureCashMining.setLoading(claimBtn, false));
     });
 });
 </script>

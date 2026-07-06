@@ -9,6 +9,8 @@ Auth::requireLogin();
 $user = current_user();
 $segments = db()->query('SELECT * FROM spin_settings WHERE is_active = 1 ORDER BY id ASC')->fetchAll();
 $canPlay = spin_can_play((int) $user['id']);
+$extraPrice = spin_extra_price();
+$canAffordExtra = wallet_total_balance((int) $user['id']) >= $extraPrice;
 $segmentCount = count($segments);
 $segmentAngle = $segmentCount > 0 ? 360 / $segmentCount : 0;
 
@@ -50,9 +52,14 @@ require __DIR__ . '/../includes/partials/app-head.php';
             </div>
 
             <?php if ($canPlay): ?>
-                <button type="button" class="btn btn-brand w-100" id="spinBtn">Spin Now</button>
+                <button type="button" class="btn btn-brand w-100" id="spinBtn" data-endpoint="spin-play.php">Spin Now</button>
             <?php else: ?>
-                <button type="button" class="btn btn-outline-brand w-100" disabled>You've used today's spin — come back tomorrow!</button>
+                <div class="alert alert-info small py-2 px-3 mb-3">You've used today's free spin. Buy an extra spin from your wallet balance to keep playing.</div>
+                <?php if ($canAffordExtra): ?>
+                    <button type="button" class="btn btn-brand w-100" id="spinBtn" data-endpoint="spin-buy-extra.php">Buy Extra Spin (<?= e(money($extraPrice)) ?>)</button>
+                <?php else: ?>
+                    <button type="button" class="btn btn-outline-brand w-100" disabled>Insufficient wallet balance for an extra spin (<?= e(money($extraPrice)) ?>)</button>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>
@@ -99,17 +106,20 @@ document.addEventListener('DOMContentLoaded', function () {
     spinBtn.addEventListener('click', function () {
         if (spinning) return;
         spinning = true;
-        NineJaCash.setLoading(spinBtn, true);
+        SureCashMining.setLoading(spinBtn, true);
 
-        fetch('<?= e(rtrim(APP_URL, '/')) ?>/ajax/spin-play.php', {
+        const endpoint = spinBtn.getAttribute('data-endpoint');
+        const isPaid = endpoint === 'spin-buy-extra.php';
+
+        fetch('<?= e(rtrim(APP_URL, '/')) ?>/ajax/' + endpoint, {
             method: 'POST',
             body: new URLSearchParams({ csrf_token: csrfToken }),
         })
             .then(r => r.json())
             .then(data => {
                 if (!data.success) {
-                    NineJaCash.toast(data.message, 'error');
-                    NineJaCash.setLoading(spinBtn, false);
+                    SureCashMining.toast(data.message, 'error');
+                    SureCashMining.setLoading(spinBtn, false);
                     spinning = false;
                     return;
                 }
@@ -122,16 +132,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 wheel.style.transform = `rotate(${cumulativeRotation}deg)`;
 
                 setTimeout(function () {
-                    NineJaCash.toast(data.message, data.amount > 0 ? 'success' : 'info');
-                    NineJaCash.setLoading(spinBtn, false);
+                    SureCashMining.toast(data.message, data.amount > 0 ? 'success' : 'info');
+                    if (isPaid) {
+                        // Reload so the button re-evaluates the (now lower)
+                        // wallet balance against the extra-spin price.
+                        window.location.reload();
+                        return;
+                    }
+                    SureCashMining.setLoading(spinBtn, false);
                     spinBtn.disabled = true;
                     spinBtn.textContent = "You've used today's spin — come back tomorrow!";
                     spinning = false;
                 }, 4600);
             })
             .catch(() => {
-                NineJaCash.toast('Something went wrong.', 'error');
-                NineJaCash.setLoading(spinBtn, false);
+                SureCashMining.toast('Something went wrong.', 'error');
+                SureCashMining.setLoading(spinBtn, false);
                 spinning = false;
             });
     });

@@ -52,8 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect(rtrim(APP_URL, '/') . '/admin/spin-settings.php');
     } elseif ($action === 'update_daily_limit') {
         $limit = max(1, (int) ($_POST['spin_daily_limit'] ?? 1));
+        $extraPrice = max(50, (float) ($_POST['spin_extra_price'] ?? 50));
         set_setting('spin_daily_limit', (string) $limit);
-        flash('spin', 'Daily spin limit updated.', 'success');
+        set_setting('spin_extra_price', (string) $extraPrice);
+        flash('spin', 'Spin settings updated.', 'success');
         redirect(rtrim(APP_URL, '/') . '/admin/spin-settings.php');
     }
 }
@@ -79,15 +81,20 @@ require __DIR__ . '/../includes/partials/admin-head.php';
 <?php endif; ?>
 
 <div class="card-surface p-4 mb-4">
-    <h5 class="fw-bold mb-3">Daily Spin Limit</h5>
+    <h5 class="fw-bold mb-3">Daily Spin Limit &amp; Extra Spins</h5>
     <form method="POST" action="" class="row g-2 align-items-end">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="update_daily_limit">
         <div class="col-auto">
-            <label class="form-label small">Spins allowed per user per day</label>
+            <label class="form-label small">Free spins allowed per user per day</label>
             <input type="number" min="1" class="form-control" name="spin_daily_limit" value="<?= e((string) get_setting('spin_daily_limit', 1)) ?>">
         </div>
+        <div class="col-auto">
+            <label class="form-label small">Extra spin price (₦, min 50)</label>
+            <input type="number" min="50" step="0.01" class="form-control" name="spin_extra_price" value="<?= e((string) get_setting('spin_extra_price', 50)) ?>">
+        </div>
         <div class="col-auto"><button type="submit" class="btn btn-brand">Save</button></div>
+        <div class="form-text w-100">Once a user exhausts their free daily spins, they can buy additional spins from their wallet balance at this price.</div>
     </form>
 </div>
 
