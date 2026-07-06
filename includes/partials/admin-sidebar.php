@@ -35,6 +35,9 @@ $unreadMessages = support_unread_total_for_admin();
 
         <div class="nav-section-label">Users</div>
         <?php admin_nav_link('users', $base . '/admin/users.php', 'bi-people-fill', 'Manage Users', $activeNav); ?>
+        <?php if (($authAdmin['role'] ?? '') === 'super_admin'): ?>
+            <?php admin_nav_link('staff', $base . '/admin/staff.php', 'bi-person-badge-fill', 'Staff Management', $activeNav); ?>
+        <?php endif; ?>
         <?php admin_nav_link('messages', $base . '/admin/messages.php', 'bi-chat-dots-fill', 'Messages', $activeNav, true, $unreadMessages ?: null); ?>
         <?php admin_nav_link('referral-settings', $base . '/admin/referral-settings.php', 'bi-diagram-3-fill', 'Referral Settings', $activeNav); ?>
 

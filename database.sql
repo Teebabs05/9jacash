@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `admins` (
     `password` VARCHAR(255) NOT NULL,
     `full_name` VARCHAR(150) NOT NULL DEFAULT 'Administrator',
     `avatar` VARCHAR(255) DEFAULT NULL,
-    `role` ENUM('super_admin','admin','support') NOT NULL DEFAULT 'admin',
+    `role` ENUM('super_admin','admin','moderator','support') NOT NULL DEFAULT 'admin',
     `status` ENUM('active','disabled') NOT NULL DEFAULT 'active',
     `last_login_at` DATETIME DEFAULT NULL,
     `last_login_ip` VARCHAR(45) DEFAULT NULL,
