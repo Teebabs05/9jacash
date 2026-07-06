@@ -251,11 +251,41 @@ credits the wallet, replaying the same signed payload is a safe no-op
 (idempotency), and a signed payload for an unknown reference is logged
 and ignored rather than crashing.
 
+### ✅ Module 7 — Withdrawals
+- `wallet_debit_combined()` (`includes/wallet.php`) — a withdrawal draws
+  down a user's **combined** balance in priority order (main → bonus →
+  referral → mining), not just the main wallet, since bonus/referral/
+  mining earnings need to be genuinely withdrawable; each partial debit
+  is its own atomic `wallet_debit()` call, with already-debited portions
+  credited back if the sequence can't fully cover the amount
+- `includes/withdrawals.php` — request creation (validates min/max/daily
+  limit/balance, computes the charge, debits immediately at request
+  time) and the approve/reject flow; rejecting refunds the full
+  requested amount back to the main wallet
+- `wallet/bank-accounts.php` — saved bank/USDT withdrawal accounts with
+  a default selection
+- `wallet/withdraw.php` — request form with a live charge/net-payout
+  calculator, plus the user's own withdrawal history
+- `admin/withdrawals.php` — approve ("mark paid" — the actual bank/USDT
+  transfer happens outside the system) / reject-with-refund queue;
+  `admin/withdrawal-settings.php` configures limits, charge percentage
+  and the daily request cap
+
+Verified live against MariaDB: funded a user's main/bonus/referral
+wallets separately, requested a withdrawal larger than any single
+wallet's balance, and confirmed the waterfall correctly drained main
+first then spilled into bonus for the remainder (referral untouched);
+admin-approved it; a second request correctly spilled into referral too
+and was rejected, refunding the exact gross amount into the main wallet;
+the daily request limit blocked a further attempt until an admin raised
+it; and a withdrawal exceeding the user's total combined balance was
+rejected up front with zero wallet mutation.
+
 ### Planned next
-Withdrawals (bank + USDT, admin approval) → Remaining admin management
-modules (users, mining plans, general settings) → Branding asset pack
-(PNG exports, social banner, app icon) → Full documentation set (Admin
-Guide, Cron Guide, PayVessel Integration Guide, API Docs).
+Remaining admin management modules (users, mining plans, general
+settings) → Branding asset pack (PNG exports, social banner, app icon)
+→ Full documentation set (Admin Guide, Cron Guide, PayVessel Integration
+Guide, API Docs).
 
 ## License
 

@@ -21,6 +21,7 @@ if (!function_exists('admin_nav_link')) {
 
 $pendingSubmissions = (int) db()->query("SELECT COUNT(*) AS c FROM task_submissions WHERE status = 'pending'")->fetch()['c'];
 $pendingDeposits = (int) db()->query("SELECT COUNT(*) AS c FROM deposits WHERE status = 'pending'")->fetch()['c'];
+$pendingWithdrawals = (int) db()->query("SELECT COUNT(*) AS c FROM withdrawals WHERE status = 'pending'")->fetch()['c'];
 ?>
 <aside class="app-sidebar">
     <a href="<?= e($base) ?>/admin/index.php" class="brand text-decoration-none" style="color:var(--text);">
@@ -37,7 +38,8 @@ $pendingDeposits = (int) db()->query("SELECT COUNT(*) AS c FROM deposits WHERE s
         <div class="nav-section-label">Finance</div>
         <?php admin_nav_link('deposits', $base . '/admin/deposits.php', 'bi-arrow-down-circle-fill', 'Deposits', $activeNav, true, $pendingDeposits ?: null); ?>
         <?php admin_nav_link('deposit-settings', $base . '/admin/deposit-settings.php', 'bi-credit-card-fill', 'Deposit Settings', $activeNav); ?>
-        <?php admin_nav_link('withdrawals', $base . '/admin/withdrawals.php', 'bi-arrow-up-circle-fill', 'Withdrawals', $activeNav, false); ?>
+        <?php admin_nav_link('withdrawals', $base . '/admin/withdrawals.php', 'bi-arrow-up-circle-fill', 'Withdrawals', $activeNav, true, $pendingWithdrawals ?: null); ?>
+        <?php admin_nav_link('withdrawal-settings', $base . '/admin/withdrawal-settings.php', 'bi-sliders', 'Withdrawal Settings', $activeNav); ?>
 
         <div class="nav-section-label">Earning Modules</div>
         <?php admin_nav_link('mining-plans', $base . '/admin/mining-plans.php', 'bi-cpu-fill', 'Mining Plans', $activeNav, false); ?>

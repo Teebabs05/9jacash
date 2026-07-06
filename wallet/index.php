@@ -107,10 +107,9 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <a href="<?= e(rtrim(APP_URL, '/')) ?>/payments/deposit.php" class="btn btn-brand w-100 mb-2">
                 <i class="bi bi-arrow-down-circle me-1"></i> Deposit Funds
             </a>
-            <button type="button" class="btn btn-outline-brand w-100" disabled title="Coming soon">
+            <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/withdraw.php" class="btn btn-outline-brand w-100">
                 <i class="bi bi-arrow-up-circle me-1"></i> Withdraw Funds
-            </button>
-            <p class="small mt-3 mb-0" style="color:var(--text-muted);">Withdrawal processing is rolling out in the next build phase.</p>
+            </a>
         </div>
 
         <div class="card-surface p-4">

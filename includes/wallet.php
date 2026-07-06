@@ -55,6 +55,64 @@ if (!function_exists('wallet_total_balance')) {
 }
 
 /**
+ * The order wallet_debit_combined() draws down from — deposited/main
+ * funds first, then earned bonus/referral/mining balances.
+ */
+const WALLET_WITHDRAW_PRIORITY = [WALLET_MAIN, WALLET_BONUS, WALLET_REFERRAL, WALLET_MINING];
+
+/**
+ * Debit an amount across multiple wallet types in priority order (main,
+ * then bonus, referral, mining) so a withdrawal can draw on a user's
+ * combined earnings rather than only their main wallet. Each partial
+ * debit is its own atomic wallet_debit() call; if funds run out partway
+ * (a race condition — normal callers should pre-check
+ * wallet_total_balance() first) already-debited portions are credited
+ * back before throwing.
+ *
+ * @return array<string,float> how much was drawn from each wallet type
+ */
+if (!function_exists('wallet_debit_combined')) {
+    function wallet_debit_combined(int $userId, float $amount, string $source, string $description = '', ?string $reference = null): array
+    {
+        if ($amount <= 0) {
+            throw new InvalidArgumentException('Debit amount must be positive.');
+        }
+
+        $remaining = $amount;
+        $debited = [];
+
+        try {
+            foreach (WALLET_WITHDRAW_PRIORITY as $type) {
+                if ($remaining <= 0) {
+                    break;
+                }
+
+                $wallet = get_wallet($userId);
+                $available = (float) $wallet[WALLET_COLUMN_MAP[$type]];
+                $take = min($available, $remaining);
+
+                if ($take > 0) {
+                    wallet_debit($userId, $type, $take, $source, $description, $reference);
+                    $debited[$type] = ($debited[$type] ?? 0) + $take;
+                    $remaining -= $take;
+                }
+            }
+
+            if ($remaining > 0.001) {
+                throw new RuntimeException('Insufficient combined wallet balance.');
+            }
+        } catch (Throwable $e) {
+            foreach ($debited as $type => $amt) {
+                wallet_credit($userId, $type, $amt, $source, 'Reversal: ' . $description, $reference);
+            }
+            throw $e;
+        }
+
+        return $debited;
+    }
+}
+
+/**
  * Credit a wallet type and write a ledger entry. Returns the new balance.
  */
 if (!function_exists('wallet_credit')) {
