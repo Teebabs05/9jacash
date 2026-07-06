@@ -584,11 +584,26 @@ sidebar badge count, replied as admin, confirmed the user received an
 in-app notification and saw the reply, and confirmed both sides'
 unread badges correctly cleared after viewing (not before).
 
+### ✅ Module 17 — Dashboard Earnings Fix
+`user/dashboard.php`'s "Total Earnings" and "Today's Earnings" tiles
+summed *every* credit-type `wallet_ledger` row, which included
+deposits (a deposit is a real wallet credit, but it's not something
+the user *earned*). Restricted both queries to
+`source IN ('mining','task','ad','spin','checkin','referral')`,
+excluding deposits, withdrawal refunds, admin adjustments and internal
+transfers.
+
+Verified live: seeded a user with a ₦50,000 deposit plus ₦500 mining +
+₦300 task earnings today and ₦400 mining earnings from yesterday —
+confirmed Total Earnings showed exactly ₦1,200 (500+300+400, deposit
+correctly excluded) and Today's Earnings showed exactly ₦800 (500+300,
+yesterday's mining correctly excluded too).
+
 ### Planned next
 Branding asset pack (PNG exports, social banner, app icon) → mining
-day-cycle selection → dashboard earnings chart fix → transaction
-receipts → paid extra spins → Play Store/App Store links → a modern
-visual redesign with conversion-focused landing page elements.
+day-cycle selection → transaction receipts → paid extra spins → Play
+Store/App Store links → a modern visual redesign with
+conversion-focused landing page elements.
 
 ## License
 

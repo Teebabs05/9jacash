@@ -9,12 +9,33 @@ Auth::requireLogin();
 $user = current_user();
 $wallet = get_wallet((int) $user['id']);
 
-$stmt = db()->prepare('SELECT COALESCE(SUM(amount), 0) AS total FROM wallet_ledger WHERE user_id = ? AND type = ?');
-$stmt->execute([$user['id'], LEDGER_CREDIT]);
+// "Earnings" means credits actually earned through platform activity -
+// mining payouts, tasks, ads, spin wins, check-ins and referral bonuses.
+// Deposits, withdrawal refunds, admin adjustments and internal
+// transfers are real wallet credits too, but not earnings, so they're
+// deliberately excluded here.
+$earningSources = [
+    LEDGER_SOURCE_MINING,
+    LEDGER_SOURCE_TASK,
+    LEDGER_SOURCE_AD,
+    LEDGER_SOURCE_SPIN,
+    LEDGER_SOURCE_CHECKIN,
+    LEDGER_SOURCE_REFERRAL,
+];
+$sourcePlaceholders = implode(',', array_fill(0, count($earningSources), '?'));
+
+$stmt = db()->prepare(
+    "SELECT COALESCE(SUM(amount), 0) AS total FROM wallet_ledger
+     WHERE user_id = ? AND type = ? AND source IN ({$sourcePlaceholders})"
+);
+$stmt->execute([$user['id'], LEDGER_CREDIT, ...$earningSources]);
 $totalEarnings = (float) $stmt->fetch()['total'];
 
-$stmt = db()->prepare('SELECT COALESCE(SUM(amount), 0) AS total FROM wallet_ledger WHERE user_id = ? AND type = ? AND created_at >= CURDATE()');
-$stmt->execute([$user['id'], LEDGER_CREDIT]);
+$stmt = db()->prepare(
+    "SELECT COALESCE(SUM(amount), 0) AS total FROM wallet_ledger
+     WHERE user_id = ? AND type = ? AND source IN ({$sourcePlaceholders}) AND created_at >= CURDATE()"
+);
+$stmt->execute([$user['id'], LEDGER_CREDIT, ...$earningSources]);
 $todayEarnings = (float) $stmt->fetch()['total'];
 
 $stmt = db()->prepare('SELECT COUNT(*) AS c FROM referrals WHERE user_id = ? AND level = 1');
