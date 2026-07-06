@@ -452,9 +452,38 @@ Modules 6-8; the banner was dead scaffold text left behind. Also
 corrected several "(upcoming)" folder-structure labels in this README
 for modules that have been complete since Module 3.
 
+### ✅ Module 12 — Deposit/Withdrawal CSV Export
+`admin/export-deposits.php` and `admin/export-withdrawals.php` stream a
+CSV of the full matching record set (unlike the on-screen tables, which
+cap at 100 rows) for accounting/reconciliation, honoring the same
+status filter as the on-screen list plus an optional `from`/`to` date
+range. Both are linked from an "Export CSV" control added next to the
+existing status filter buttons on `admin/deposits.php` and
+`admin/withdrawals.php`, and every export is written to
+`activity_logs`.
+
+Building this against a real PHP 8.4 install (rather than just linting)
+caught two real bugs before they shipped:
+- `fputcsv()`'s new `$escape` parameter is deprecated-if-omitted as of
+  PHP 8.4, and with `display_errors` on that deprecation notice is
+  printed as raw HTML *into the CSV response stream itself*, corrupting
+  every row. Fixed by passing the delimiter/enclosure/escape arguments
+  explicitly on every call.
+- Amount columns were originally formatted with `money($amount, false)`,
+  which still applies thousands-separator commas (e.g. `15,000.50`) —
+  technically valid inside a quoted CSV field, but it silently imports
+  as a string rather than a number in Excel/accounting software. Fixed
+  to a plain `sprintf('%.2f', ...)`.
+
+Verified live: seeded deposits/withdrawals spanning multiple statuses
+and dates against a fresh MariaDB instance, confirmed the status and
+date-range filters each return exactly the expected rows, confirmed an
+unauthenticated request to either export URL redirects to
+`admin/login.php` instead of leaking data, and confirmed the resulting
+CSV re-parses cleanly with correct headers and numeric amount columns.
+
 ### Planned next
-Branding asset pack (PNG exports, social banner, app icon) →
-deposit/withdrawal CSV export.
+Branding asset pack (PNG exports, social banner, app icon).
 
 ## License
 

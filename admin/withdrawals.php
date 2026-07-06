@@ -53,10 +53,18 @@ $pageTitle = 'Withdrawal Management';
 $activeNav = 'withdrawals';
 require __DIR__ . '/../includes/partials/admin-head.php';
 ?>
-<div class="d-flex gap-2 mb-4 flex-wrap">
-    <?php foreach (['pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected', 'all' => 'All'] as $key => $label): ?>
-        <a href="?status=<?= e($key) ?>" class="btn btn-sm <?= $statusFilter === $key ? 'btn-brand' : 'btn-outline-brand' ?>"><?= e($label) ?></a>
-    <?php endforeach; ?>
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+    <div class="d-flex gap-2 flex-wrap">
+        <?php foreach (['pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected', 'all' => 'All'] as $key => $label): ?>
+            <a href="?status=<?= e($key) ?>" class="btn btn-sm <?= $statusFilter === $key ? 'btn-brand' : 'btn-outline-brand' ?>"><?= e($label) ?></a>
+        <?php endforeach; ?>
+    </div>
+    <form method="GET" action="export-withdrawals.php" class="d-flex align-items-center gap-2 flex-wrap">
+        <input type="hidden" name="status" value="<?= e($statusFilter) ?>">
+        <input type="date" name="from" class="form-control form-control-sm" style="width:150px;" title="From date (optional)">
+        <input type="date" name="to" class="form-control form-control-sm" style="width:150px;" title="To date (optional)">
+        <button type="submit" class="btn btn-sm btn-outline-brand"><i class="bi bi-download"></i> Export CSV</button>
+    </form>
 </div>
 
 <div class="card-surface p-4">

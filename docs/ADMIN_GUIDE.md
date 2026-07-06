@@ -74,6 +74,11 @@ minimum/maximum deposit amount, manual bank account details shown to
 users, USDT address/network, and the PayVessel credentials (see the
 PayVessel guide for how to obtain and enter these).
 
+**Export CSV** next to the status filter downloads every deposit
+matching the current status (and an optional date range you pick before
+exporting) as a CSV — unlike the on-screen table, the export is not
+capped at 100 rows, so it's suitable for full accounting reconciliation.
+
 ## 4. Withdrawals (`admin/withdrawals.php`)
 
 All withdrawals require manual admin approval — there is no automatic
@@ -89,6 +94,9 @@ payout integration. For each pending request you can:
 Configure withdrawal rules from **Withdrawal Settings**
 (`admin/withdrawal-settings.php`): minimum/maximum withdrawal, daily
 withdrawal limit per user, and the withdrawal charge percentage.
+
+Withdrawals have the same **Export CSV** control (status + optional
+date range, uncapped row count) as Deposits above.
 
 ## 5. Mining Plans (`admin/mining-plans.php`)
 
