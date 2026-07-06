@@ -45,6 +45,10 @@ $siteName = get_setting('site_name', 'SURECASH MINING');
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/theme.css">
 </head>
 <body>
+<div class="auth-mobile-brand">
+    <?= brand_mark_html(40) ?>
+    <span><?= e($siteName) ?> Admin</span>
+</div>
 <div class="auth-shell">
     <div class="auth-visual">
         <div class="brand"><?= brand_mark_html() ?><span><?= e($siteName) ?> ADMIN</span></div>

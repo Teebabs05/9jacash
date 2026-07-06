@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$errors) {
         $fields = [
-            'site_name', 'site_tagline', 'currency', 'currency_symbol', 'timezone',
+            'site_name', 'site_tagline', 'currency', 'currency_symbol', 'timezone', 'usd_exchange_rate',
             'contact_email', 'contact_phone', 'whatsapp_number',
             'facebook_url', 'twitter_url', 'instagram_url', 'telegram_url', 'whatsapp_url',
             'playstore_url', 'appstore_url',
@@ -139,6 +139,11 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                         <option value="<?= e($tz) ?>" <?= get_setting('timezone', 'Africa/Lagos') === $tz ? 'selected' : '' ?>><?= e($tz) ?></option>
                     <?php endforeach; ?>
                 </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small">USD Exchange Rate (₦ per $1)</label>
+                <input type="number" step="0.01" min="1" class="form-control" name="usd_exchange_rate" value="<?= e((string) get_setting('usd_exchange_rate', 1500)) ?>">
+                <div class="form-text">Powers the NGN &harr; USD converter shown next to deposit/withdrawal amounts and mining plan prices. Update this whenever the real rate moves.</div>
             </div>
         </div>
     </div>

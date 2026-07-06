@@ -57,7 +57,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
     <p class="small mb-3" style="color:var(--text-muted);">Earn <?= e((string) $levelPercents[1]) ?>% / <?= e((string) $levelPercents[2]) ?>% / <?= e((string) $levelPercents[3]) ?>% (levels 1/2/3) whenever the people you invite fund their wallet.</p>
     <div class="input-group">
         <input type="text" class="form-control" readonly id="refLink" value="<?= e(rtrim(APP_URL, '/')) ?>/user/register.php?ref=<?= e($user['referral_code']) ?>">
-        <button class="btn btn-outline-brand" type="button" onclick="navigator.clipboard.writeText(document.getElementById('refLink').value); NineJaCash.toast('Referral link copied!');">Copy</button>
+        <button class="btn btn-outline-brand" type="button" onclick="navigator.clipboard.writeText(document.getElementById('refLink').value); SureCashMining.toast('Referral link copied!');">Copy</button>
     </div>
 </div>
 

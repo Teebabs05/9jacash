@@ -36,6 +36,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-wallet2"></i></div>
             <div class="label">Main Wallet</div>
             <div class="value"><?= e(money($wallet['main_balance'])) ?></div>
+            <div class="small" style="color:var(--text-muted);">&asymp; <?= e(money_usd((float) $wallet['main_balance'])) ?></div>
         </div>
     </div>
     <div class="col-xl-3 col-md-6">
@@ -43,6 +44,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="icon-badge" style="background:rgba(242,201,76,0.16);color:var(--brand-gold-dark);"><i class="bi bi-gift-fill"></i></div>
             <div class="label">Bonus Wallet</div>
             <div class="value"><?= e(money($wallet['bonus_balance'])) ?></div>
+            <div class="small" style="color:var(--text-muted);">&asymp; <?= e(money_usd((float) $wallet['bonus_balance'])) ?></div>
         </div>
     </div>
     <div class="col-xl-3 col-md-6">
@@ -50,6 +52,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="icon-badge" style="background:rgba(46,144,250,0.14);color:var(--info);"><i class="bi bi-people-fill"></i></div>
             <div class="label">Referral Wallet</div>
             <div class="value"><?= e(money($wallet['referral_balance'])) ?></div>
+            <div class="small" style="color:var(--text-muted);">&asymp; <?= e(money_usd((float) $wallet['referral_balance'])) ?></div>
         </div>
     </div>
     <div class="col-xl-3 col-md-6">
@@ -57,6 +60,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="icon-badge" style="background:rgba(11,37,69,0.10);color:var(--brand-navy);"><i class="bi bi-cpu-fill"></i></div>
             <div class="label">Mining Wallet</div>
             <div class="value"><?= e(money($wallet['mining_balance'])) ?></div>
+            <div class="small" style="color:var(--text-muted);">&asymp; <?= e(money_usd((float) $wallet['mining_balance'])) ?></div>
         </div>
     </div>
 </div>

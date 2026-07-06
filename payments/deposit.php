@@ -101,9 +101,15 @@ require __DIR__ . '/../includes/partials/app-head.php';
                     <form method="POST" action="" data-loading-submit>
                         <?= csrf_field() ?>
                         <input type="hidden" name="method" value="payvessel">
-                        <div class="mb-4">
-                            <label class="form-label small">Amount (₦)</label>
-                            <input type="number" step="0.01" min="<?= $minDeposit ?>" max="<?= $maxDeposit ?>" class="form-control" name="amount" required>
+                        <div class="row g-2 mb-4">
+                            <div class="col-7">
+                                <label class="form-label small">Amount (₦)</label>
+                                <input type="number" step="0.01" min="<?= $minDeposit ?>" max="<?= $maxDeposit ?>" class="form-control" name="amount" data-currency-group="pv" required>
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label small">&asymp; USD</label>
+                                <input type="number" step="0.01" class="form-control" data-currency-usd="pv" placeholder="0.00">
+                            </div>
                             <div class="form-text">Min <?= e(money($minDeposit)) ?> — Max <?= e(money($maxDeposit)) ?></div>
                         </div>
                         <button type="submit" class="btn btn-brand w-100">Generate Account Number</button>
@@ -127,9 +133,15 @@ require __DIR__ . '/../includes/partials/app-head.php';
                     <form method="POST" action="" enctype="multipart/form-data" data-loading-submit>
                         <?= csrf_field() ?>
                         <input type="hidden" name="method" value="bank">
-                        <div class="mb-3">
-                            <label class="form-label small">Amount Transferred (₦)</label>
-                            <input type="number" step="0.01" min="<?= $minDeposit ?>" max="<?= $maxDeposit ?>" class="form-control" name="amount" required>
+                        <div class="row g-2 mb-3">
+                            <div class="col-7">
+                                <label class="form-label small">Amount Transferred (₦)</label>
+                                <input type="number" step="0.01" min="<?= $minDeposit ?>" max="<?= $maxDeposit ?>" class="form-control" name="amount" data-currency-group="bank" required>
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label small">&asymp; USD</label>
+                                <input type="number" step="0.01" class="form-control" data-currency-usd="bank" placeholder="0.00">
+                            </div>
                         </div>
                         <div class="mb-4">
                             <label class="form-label small">Upload Proof of Payment</label>
@@ -154,9 +166,16 @@ require __DIR__ . '/../includes/partials/app-head.php';
                     <form method="POST" action="" enctype="multipart/form-data" data-loading-submit>
                         <?= csrf_field() ?>
                         <input type="hidden" name="method" value="usdt">
-                        <div class="mb-3">
-                            <label class="form-label small">Naira Equivalent Sent (₦)</label>
-                            <input type="number" step="0.01" min="<?= $minDeposit ?>" max="<?= $maxDeposit ?>" class="form-control" name="amount" required>
+                        <div class="row g-2 mb-3">
+                            <div class="col-5">
+                                <label class="form-label small">USDT Amount Sent</label>
+                                <input type="number" step="0.01" class="form-control" data-currency-usd="usdt" placeholder="0.00">
+                            </div>
+                            <div class="col-7">
+                                <label class="form-label small">Naira Equivalent (₦)</label>
+                                <input type="number" step="0.01" min="<?= $minDeposit ?>" max="<?= $maxDeposit ?>" class="form-control" name="amount" data-currency-group="usdt" required>
+                            </div>
+                            <div class="form-text">Enter either field — the other fills in automatically using today's rate.</div>
                         </div>
                         <div class="mb-4">
                             <label class="form-label small">Upload Transaction Proof</label>

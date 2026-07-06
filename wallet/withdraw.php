@@ -80,9 +80,15 @@ require __DIR__ . '/../includes/partials/app-head.php';
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="mb-2">
-                        <label class="form-label small">Amount (₦)</label>
-                        <input type="number" step="0.01" min="<?= $minWithdrawal ?>" max="<?= min($maxWithdrawal, $availableBalance) ?>" class="form-control" name="amount" id="wdAmount" required>
+                    <div class="row g-2 mb-2">
+                        <div class="col-7">
+                            <label class="form-label small">Amount (₦)</label>
+                            <input type="number" step="0.01" min="<?= $minWithdrawal ?>" max="<?= min($maxWithdrawal, $availableBalance) ?>" class="form-control" name="amount" id="wdAmount" data-currency-group="wd" required>
+                        </div>
+                        <div class="col-5">
+                            <label class="form-label small">&asymp; USD</label>
+                            <input type="number" step="0.01" class="form-control" data-currency-usd="wd" placeholder="0.00">
+                        </div>
                         <div class="form-text">Min <?= e(money($minWithdrawal)) ?> — Max <?= e(money($maxWithdrawal)) ?></div>
                     </div>
 

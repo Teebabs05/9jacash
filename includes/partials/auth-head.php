@@ -26,3 +26,7 @@ $assetBase = rtrim(APP_URL, '/') . '/assets';
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/theme.css">
 </head>
 <body>
+<div class="auth-mobile-brand">
+    <?= brand_mark_html(40) ?>
+    <span><?= e($siteName) ?></span>
+</div>

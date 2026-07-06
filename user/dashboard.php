@@ -45,6 +45,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-wallet2"></i></div>
             <div class="label">Wallet Balance</div>
             <div class="value"><?= e(money(wallet_total_balance((int) $user['id']))) ?></div>
+            <div class="small" style="color:var(--text-muted);">&asymp; <?= e(money_usd(wallet_total_balance((int) $user['id']))) ?></div>
         </div>
     </div>
     <div class="col-xl-3 col-md-6">
@@ -108,7 +109,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <h5 class="fw-bold mb-3">Your Referral Link</h5>
             <div class="input-group mb-2">
                 <input type="text" class="form-control form-control-sm" readonly id="refLink" value="<?= e(rtrim(APP_URL, '/')) ?>/user/register.php?ref=<?= e($user['referral_code']) ?>">
-                <button class="btn btn-outline-brand btn-sm" type="button" onclick="navigator.clipboard.writeText(document.getElementById('refLink').value); NineJaCash.toast('Referral link copied!');">Copy</button>
+                <button class="btn btn-outline-brand btn-sm" type="button" onclick="navigator.clipboard.writeText(document.getElementById('refLink').value); SureCashMining.toast('Referral link copied!');">Copy</button>
             </div>
             <a href="<?= e(rtrim(APP_URL, '/')) ?>/user/referrals.php" class="small fw-semibold" style="color:var(--brand-emerald);">View Referral Stats &amp; Leaderboard <i class="bi bi-arrow-right"></i></a>
         </div>

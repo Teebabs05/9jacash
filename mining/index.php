@@ -55,6 +55,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="mining-plan-card">
                 <h5 class="fw-bold mb-1"><?= e($plan['name']) ?></h5>
                 <div class="price"><?= e(money($plan['price'])) ?></div>
+                <div class="small mb-1" style="color:var(--text-muted);">&asymp; <?= e(money_usd((float) $plan['price'])) ?></div>
                 <div class="small" style="color:var(--text-muted);"><?= e($plan['description']) ?></div>
                 <ul>
                     <li><i class="bi bi-check-circle-fill text-success"></i> <?= e(money($plan['daily_return'])) ?> / day</li>

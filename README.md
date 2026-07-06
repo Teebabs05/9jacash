@@ -525,12 +525,40 @@ responses from the uploaded file paths, and confirmed the floating
 WhatsApp button is absent with no number configured and links to the
 correct `wa.me/<number>` once one is set.
 
+### ✅ Module 14 — Dual NGN/USD Currency Display
+Every wallet balance, deposit, withdrawal and mining plan price stays
+stored and ledgered in NGN (the platform's single source of truth) —
+this module adds a USD *view* on top of it rather than a second
+ledger currency, to avoid the reconciliation headaches of amounts
+that could drift mid-transaction against a live market rate:
+- **Admin → Settings → Regional** — a manually-set "USD Exchange Rate
+  (₦ per $1)" the admin updates whenever they want the displayed
+  conversion to move (`includes/functions.php`: `usd_rate()`,
+  `to_usd()`, `to_ngn()`, `money_usd()`).
+- **Deposit and withdrawal amount fields** now have a linked USD input
+  next to the real NGN one — typing in either fills in the other
+  live, via a small generic `data-currency-group` / `data-currency-usd`
+  pairing helper in `assets/js/main.js`. Only the NGN field is ever
+  submitted with the form, so nothing about how deposits/withdrawals
+  are processed or stored changed.
+- Wallet balance tiles, the dashboard's wallet-balance tile, and mining
+  plan prices (landing page + the mining plans page) all show a
+  "≈ $X.XX" line under the NGN figure.
+
+Verified live: confirmed the rate is read from settings and exposed to
+the page as `window.USD_RATE`, confirmed every USD figure matches
+NGN/rate exactly, confirmed the linked deposit/withdrawal fields exist
+on every method tab and only appear on the withdrawal page once the
+user has an account to withdraw to, and confirmed the existing
+withdrawal charge/net calculation still fires correctly when the
+amount is entered via the USD field.
+
 ### Planned next
-Branding asset pack (PNG exports, social banner, app icon) → dual
-NGN/USD currency support → user/admin messaging inbox → mining
-day-cycle selection → dashboard earnings chart fix → transaction
-receipts → paid extra spins → Play Store/App Store links → a modern
-visual redesign.
+Branding asset pack (PNG exports, social banner, app icon) →
+user/admin messaging inbox → mining day-cycle selection → dashboard
+earnings chart fix → transaction receipts → paid extra spins → Play
+Store/App Store links → a modern visual redesign with
+conversion-focused landing page elements.
 
 ## License
 

@@ -76,6 +76,47 @@ if (!function_exists('money')) {
 }
 
 /**
+ * NGN-per-USD rate, set manually by the admin (Settings -> Regional).
+ * Deliberately not fetched from a live FX API: every wallet balance,
+ * deposit and mining plan price is stored in NGN, so a rate that moves
+ * mid-transaction would be confusing and hard to reconcile. The admin
+ * updates this figure whenever they want the displayed USD conversion
+ * to move.
+ */
+if (!function_exists('usd_rate')) {
+    function usd_rate(): float
+    {
+        $rate = (float) get_setting('usd_exchange_rate', 1500);
+
+        return $rate > 0 ? $rate : 1500.0;
+    }
+}
+
+if (!function_exists('to_usd')) {
+    function to_usd(float $ngnAmount): float
+    {
+        return $ngnAmount / usd_rate();
+    }
+}
+
+if (!function_exists('to_ngn')) {
+    function to_ngn(float $usdAmount): float
+    {
+        return $usdAmount * usd_rate();
+    }
+}
+
+/**
+ * Format a NGN amount as its USD equivalent, e.g. $12.34
+ */
+if (!function_exists('money_usd')) {
+    function money_usd(float $ngnAmount): string
+    {
+        return '$' . number_format(to_usd($ngnAmount), 2);
+    }
+}
+
+/**
  * Generate a cryptographically secure random token (hex string).
  */
 if (!function_exists('generate_token')) {

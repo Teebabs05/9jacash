@@ -74,7 +74,7 @@
             newsletterForm.addEventListener('submit', function (e) {
                 e.preventDefault();
                 const btn = newsletterForm.querySelector('button[type="submit"]');
-                NineJaCash.setLoading(btn, true);
+                SureCashMining.setLoading(btn, true);
 
                 fetch(newsletterForm.action, {
                     method: 'POST',
@@ -83,13 +83,13 @@
                 })
                     .then(function (r) { return r.json(); })
                     .then(function (data) {
-                        NineJaCash.toast(data.message, data.success ? 'success' : 'error');
+                        SureCashMining.toast(data.message, data.success ? 'success' : 'error');
                         if (data.success) newsletterForm.reset();
                     })
                     .catch(function () {
-                        NineJaCash.toast('Something went wrong. Please try again.', 'error');
+                        SureCashMining.toast('Something went wrong. Please try again.', 'error');
                     })
-                    .finally(function () { NineJaCash.setLoading(btn, false); });
+                    .finally(function () { SureCashMining.setLoading(btn, false); });
             });
         }
 
@@ -99,7 +99,7 @@
             contactForm.addEventListener('submit', function (e) {
                 e.preventDefault();
                 const btn = contactForm.querySelector('button[type="submit"]');
-                NineJaCash.setLoading(btn, true);
+                SureCashMining.setLoading(btn, true);
 
                 fetch(contactForm.action, {
                     method: 'POST',
@@ -108,13 +108,13 @@
                 })
                     .then(function (r) { return r.json(); })
                     .then(function (data) {
-                        NineJaCash.toast(data.message, data.success ? 'success' : 'error');
+                        SureCashMining.toast(data.message, data.success ? 'success' : 'error');
                         if (data.success) contactForm.reset();
                     })
                     .catch(function () {
-                        NineJaCash.toast('Something went wrong. Please try again.', 'error');
+                        SureCashMining.toast('Something went wrong. Please try again.', 'error');
                     })
-                    .finally(function () { NineJaCash.setLoading(btn, false); });
+                    .finally(function () { SureCashMining.setLoading(btn, false); });
             });
         }
     });

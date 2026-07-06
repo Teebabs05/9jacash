@@ -488,6 +488,7 @@ INSERT INTO `site_settings` (`setting_key`, `setting_value`) VALUES
 ('currency', 'NGN'),
 ('currency_symbol', '₦'),
 ('timezone', 'Africa/Lagos'),
+('usd_exchange_rate', '1500'),
 ('maintenance_mode', '0'),
 ('maintenance_message', 'We are currently performing scheduled maintenance. Please check back shortly.'),
 ('registration_bonus', '0'),

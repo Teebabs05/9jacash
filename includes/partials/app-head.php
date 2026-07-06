@@ -12,6 +12,7 @@ $authUser = current_user();
 <html lang="en">
 <head>
 <script>(function(){var t=localStorage.getItem('surecash_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
+<script>window.USD_RATE = <?= (float) usd_rate() ?>;</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e($pageTitle) ?> · <?= e($siteName) ?></title>

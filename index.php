@@ -26,6 +26,7 @@ $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
 <html lang="en">
 <head>
 <script>(function(){var t=localStorage.getItem('surecash_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
+<script>window.USD_RATE = <?= (float) usd_rate() ?>;</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="SURECASH MINING is Nigeria's premium online earning platform — mine daily, complete tasks, refer friends and grow your wealth.">
@@ -158,6 +159,7 @@ $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
                         <?php if ($i === 2): ?><span class="badge-featured">Most Popular</span><?php endif; ?>
                         <h5 class="fw-bold"><?= e($plan['name']) ?></h5>
                         <div class="price mt-2"><?= e(money($plan['price'])) ?></div>
+                        <div class="small mb-1" style="color:var(--text-muted);">&asymp; <?= e(money_usd((float) $plan['price'])) ?></div>
                         <div class="small" style="color:var(--text-muted);">One-time investment</div>
                         <ul>
                             <li><i class="bi bi-check-circle-fill text-success"></i> <?= e(money($plan['daily_return'])) ?> daily return</li>
