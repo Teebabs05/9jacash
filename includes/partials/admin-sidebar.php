@@ -26,7 +26,7 @@ $pendingWithdrawals = (int) db()->query("SELECT COUNT(*) AS c FROM withdrawals W
 <aside class="app-sidebar">
     <a href="<?= e($base) ?>/admin/index.php" class="brand text-decoration-none" style="color:var(--text);">
         <?= brand_mark_html() ?>
-        <span>9JACASH Admin</span>
+        <span><?= e($siteName ?? get_setting('site_name', 'SURECASH MINING')) ?> Admin</span>
     </a>
     <nav class="app-nav">
         <div class="nav-section-label">Overview</div>

@@ -21,7 +21,7 @@ if (!function_exists('nav_link')) {
 <aside class="app-sidebar">
     <a href="<?= e($base) ?>/user/dashboard.php" class="brand text-decoration-none" style="color:var(--text);">
         <?= brand_mark_html() ?>
-        <span>9JACASH</span>
+        <span><?= e($siteName ?? get_setting('site_name', 'SURECASH MINING')) ?></span>
     </a>
     <nav class="app-nav">
         <div class="nav-section-label">Main</div>

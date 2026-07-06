@@ -15,7 +15,7 @@ if ($token === '' || $userId <= 0) {
 
 $pageTitle = 'Verify Email';
 $visualTitle = 'Almost there.';
-$visualText = 'Verify your email address to unlock deposits, withdrawals and every earning feature on 9JACASH.';
+$visualText = 'Verify your email address to unlock deposits, withdrawals and every earning feature on SURECASH MINING.';
 require __DIR__ . '/../includes/partials/auth-head.php';
 ?>
 <div class="auth-shell">

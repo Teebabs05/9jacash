@@ -88,7 +88,7 @@ require __DIR__ . '/../includes/partials/auth-head.php';
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <h2>Create your account</h2>
-                    <p class="sub">Join 9JACASH and start earning today.</p>
+                    <p class="sub">Join SURECASH MINING and start earning today.</p>
                 </div>
                 <button type="button" class="theme-toggle-btn" style="color:var(--text);border-color:var(--border);" data-theme-toggle data-theme-icon><i class="bi bi-moon-stars"></i></button>
             </div>

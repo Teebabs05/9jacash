@@ -1,5 +1,5 @@
 -- =====================================================================
--- 9JACASH - Complete Production Database Schema
+-- SURECASH MINING - Complete Production Database Schema
 -- Engine: InnoDB | Charset: utf8mb4 | Collation: utf8mb4_unicode_ci
 -- =====================================================================
 
@@ -471,7 +471,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 INSERT INTO `admins` (`username`, `email`, `password`, `full_name`, `role`, `status`, `created_at`, `updated_at`)
 VALUES (
     'admin',
-    'admin@9jacash.com',
+    'admin@surecashmining.com',
     '$2y$12$qMnLsJXAlXds3rTkRIarQOc7hvzKxuY02YU3HxNSSwGG/pCRKjLfa',
     'Super Administrator',
     'super_admin',
@@ -483,7 +483,7 @@ ON DUPLICATE KEY UPDATE `username` = `username`;
 
 -- Default site settings
 INSERT INTO `site_settings` (`setting_key`, `setting_value`) VALUES
-('site_name', '9JACASH'),
+('site_name', 'SURECASH MINING'),
 ('site_tagline', 'Mine. Earn. Grow Wealth.'),
 ('currency', 'NGN'),
 ('currency_symbol', '₦'),
@@ -513,15 +513,18 @@ INSERT INTO `site_settings` (`setting_key`, `setting_value`) VALUES
 ('ad_watch_duration_seconds', '15'),
 ('spin_daily_limit', '1'),
 ('checkin_base_reward', '10'),
-('mail_from_name', '9JACASH'),
-('mail_from_address', 'no-reply@9jacash.com'),
-('contact_email', 'support@9jacash.com'),
+('mail_from_name', 'SURECASH MINING'),
+('mail_from_address', 'no-reply@surecashmining.com'),
+('contact_email', 'support@surecashmining.com'),
 ('contact_phone', '+2348000000000'),
+('whatsapp_number', ''),
 ('facebook_url', ''),
 ('twitter_url', ''),
 ('instagram_url', ''),
 ('telegram_url', ''),
 ('whatsapp_url', ''),
+('playstore_url', ''),
+('appstore_url', ''),
 ('google_analytics_id', ''),
 ('facebook_pixel_id', '')
 ON DUPLICATE KEY UPDATE `setting_key` = `setting_key`;

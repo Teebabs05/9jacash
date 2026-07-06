@@ -4,7 +4,7 @@
  * Expects an optional $pageTitle variable to be set before include.
  */
 $pageTitle = $pageTitle ?? 'Welcome';
-$siteName = get_setting('site_name', '9JACASH');
+$siteName = get_setting('site_name', 'SURECASH MINING');
 $assetBase = rtrim(APP_URL, '/') . '/assets';
 ?>
 <!DOCTYPE html>
@@ -12,14 +12,14 @@ $assetBase = rtrim(APP_URL, '/') . '/assets';
 <head>
 <script>
 (function(){
-    var t = localStorage.getItem('9jacash_theme');
+    var t = localStorage.getItem('surecash_theme');
     if (t) document.documentElement.setAttribute('data-theme', t);
 })();
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e($pageTitle) ?> · <?= e($siteName) ?></title>
-<link rel="icon" href="<?= e($assetBase) ?>/images/favicon.svg" type="image/svg+xml">
+<?= favicon_link_html() ?>
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap-icons.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/fonts.css">

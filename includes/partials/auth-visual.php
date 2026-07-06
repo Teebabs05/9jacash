@@ -8,8 +8,8 @@ $visualText = $visualText ?? 'Join thousands of Nigerians earning daily through 
 ?>
 <div class="auth-visual">
     <div class="brand">
-        <span class="brand-mark">9</span>
-        <span>9JACASH</span>
+        <?= brand_mark_html() ?>
+        <span><?= e($siteName ?? get_setting('site_name', 'SURECASH MINING')) ?></span>
     </div>
     <div class="pitch">
         <h1><?= e($visualTitle) ?></h1>

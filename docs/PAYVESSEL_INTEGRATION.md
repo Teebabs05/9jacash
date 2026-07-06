@@ -1,4 +1,4 @@
-# 9JACASH — PayVessel Integration Guide
+# SURECASH MINING — PayVessel Integration Guide
 
 PayVessel is the automatic bank-transfer deposit option: a user requests
 a deposit, the platform asks PayVessel for a one-time ("DYNAMIC")

@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $pageTitle = 'Resend Verification';
 $visualTitle = 'Check your inbox.';
-$visualText = 'We will send you a fresh verification link so you can activate your 9JACASH account.';
+$visualText = 'We will send you a fresh verification link so you can activate your SURECASH MINING account.';
 require __DIR__ . '/../includes/partials/auth-head.php';
 ?>
 <div class="auth-shell">

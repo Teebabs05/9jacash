@@ -1,9 +1,9 @@
 /**
- * Dark / Light theme toggle. Persists choice in localStorage under "9jacash_theme".
+ * Dark / Light theme toggle. Persists choice in localStorage under "surecash_theme".
  * Falls back to the OS preference when the user hasn't chosen explicitly.
  */
 (function () {
-    const STORAGE_KEY = '9jacash_theme';
+    const STORAGE_KEY = 'surecash_theme';
     const root = document.documentElement;
 
     function applyTheme(theme) {

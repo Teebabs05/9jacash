@@ -1,6 +1,6 @@
-# 9JACASH — Internal Endpoint Reference
+# SURECASH MINING — Internal Endpoint Reference
 
-9JACASH does not expose a public developer API for third-party
+SURECASH MINING does not expose a public developer API for third-party
 integrations. This document describes the two kinds of HTTP endpoints
 that exist internally, for anyone maintaining or extending the codebase:
 

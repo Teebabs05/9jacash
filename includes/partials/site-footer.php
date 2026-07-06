@@ -13,8 +13,8 @@ $socials = [
         <div class="row g-4">
             <div class="col-lg-4">
                 <div class="d-flex align-items-center gap-2 mb-3">
-                    <span class="brand-mark">9</span>
-                    <span class="fw-bold fs-5 text-white">9JACASH</span>
+                    <?= brand_mark_html(28) ?>
+                    <span class="fw-bold fs-5 text-white"><?= e($siteName ?? get_setting('site_name', 'SURECASH MINING')) ?></span>
                 </div>
                 <p class="small">Mine, complete tasks, refer friends and grow your wealth daily on Nigeria's premium earning platform.</p>
                 <div class="mt-3">
@@ -43,12 +43,12 @@ $socials = [
             </div>
             <div class="col-lg-2 col-6">
                 <h6>Contact</h6>
-                <a href="mailto:<?= e(get_setting('contact_email', 'support@9jacash.com')) ?>"><i class="bi bi-envelope me-1"></i><?= e(get_setting('contact_email', 'support@9jacash.com')) ?></a>
+                <a href="mailto:<?= e(get_setting('contact_email', 'support@surecashmining.com')) ?>"><i class="bi bi-envelope me-1"></i><?= e(get_setting('contact_email', 'support@surecashmining.com')) ?></a>
                 <a href="tel:<?= e(get_setting('contact_phone', '')) ?>"><i class="bi bi-telephone me-1"></i><?= e(get_setting('contact_phone', '+234 800 000 0000')) ?></a>
             </div>
         </div>
         <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
-            <span>&copy; <?= date('Y') ?> <?= e(get_setting('site_name', '9JACASH')) ?>. All rights reserved.</span>
+            <span>&copy; <?= date('Y') ?> <?= e(get_setting('site_name', 'SURECASH MINING')) ?>. All rights reserved.</span>
             <span>Built for Nigerians, by Nigerians. 🇳🇬</span>
         </div>
     </div>

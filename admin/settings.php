@@ -26,11 +26,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if (!empty($_FILES['site_banner']['name'])) {
+        $error = validate_upload($_FILES['site_banner'], ['image/png', 'image/jpeg', 'image/webp'], 3 * 1024 * 1024);
+        if ($error) {
+            $errors[] = $error;
+        } else {
+            set_setting('site_banner', store_upload($_FILES['site_banner'], 'branding'));
+        }
+    }
+
     if (!$errors) {
         $fields = [
             'site_name', 'site_tagline', 'currency', 'currency_symbol', 'timezone',
-            'contact_email', 'contact_phone',
+            'contact_email', 'contact_phone', 'whatsapp_number',
             'facebook_url', 'twitter_url', 'instagram_url', 'telegram_url', 'whatsapp_url',
+            'playstore_url', 'appstore_url',
             'google_analytics_id', 'facebook_pixel_id',
             'mail_host', 'mail_port', 'mail_encryption', 'mail_username', 'mail_from_name', 'mail_from_address',
         ];
@@ -75,18 +85,34 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                 <?php if ($logo): ?>
                     <img src="<?= e(rtrim(APP_URL, '/')) ?>/uploads/<?= e($logo) ?>" alt="Logo" style="width:56px;height:56px;object-fit:contain;border-radius:12px;background:var(--surface-alt);padding:6px;">
                 <?php else: ?>
-                    <span class="brand-mark" style="width:56px;height:56px;font-size:1.4rem;">9</span>
+                    <?= brand_mark_html(56) ?>
                 <?php endif; ?>
             </div>
             <div class="col">
                 <label class="form-label small">Upload New Logo (PNG, JPG or WEBP, max 1MB)</label>
                 <input type="file" class="form-control" name="site_logo" accept="image/png,image/jpeg,image/webp">
+                <div class="form-text">Also used as the site favicon (browser tab icon).</div>
+            </div>
+        </div>
+        <div class="row g-3 align-items-center mb-3">
+            <div class="col-auto">
+                <?php $banner = get_setting('site_banner', ''); ?>
+                <?php if ($banner): ?>
+                    <img src="<?= e(rtrim(APP_URL, '/')) ?>/uploads/<?= e($banner) ?>" alt="Banner" style="width:140px;height:56px;object-fit:cover;border-radius:12px;background:var(--surface-alt);">
+                <?php else: ?>
+                    <div style="width:140px;height:56px;border-radius:12px;background:var(--surface-alt);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.75rem;">No banner</div>
+                <?php endif; ?>
+            </div>
+            <div class="col">
+                <label class="form-label small">Upload Website Banner (PNG, JPG or WEBP, max 3MB)</label>
+                <input type="file" class="form-control" name="site_banner" accept="image/png,image/jpeg,image/webp">
+                <div class="form-text">Shown on the homepage hero section. Recommended widescreen image, e.g. 1600&times;600.</div>
             </div>
         </div>
         <div class="row g-3">
             <div class="col-md-6">
                 <label class="form-label small">Site Name</label>
-                <input type="text" class="form-control" name="site_name" value="<?= e((string) get_setting('site_name', '9JACASH')) ?>">
+                <input type="text" class="form-control" name="site_name" value="<?= e((string) get_setting('site_name', 'SURECASH MINING')) ?>">
             </div>
             <div class="col-md-6">
                 <label class="form-label small">Tagline</label>
@@ -127,6 +153,11 @@ require __DIR__ . '/../includes/partials/admin-head.php';
             <div class="col-md-6">
                 <label class="form-label small">Contact Phone</label>
                 <input type="text" class="form-control" name="contact_phone" value="<?= e((string) get_setting('contact_phone', '')) ?>">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label small">WhatsApp Support Number</label>
+                <input type="text" class="form-control" name="whatsapp_number" value="<?= e((string) get_setting('whatsapp_number', '')) ?>" placeholder="e.g. 2348012345678">
+                <div class="form-text">Full international number, digits only (no + or leading 0). Powers the floating WhatsApp button shown across the site.</div>
             </div>
             <div class="col-md-6">
                 <label class="form-label small">Facebook URL</label>
@@ -193,7 +224,7 @@ require __DIR__ . '/../includes/partials/admin-head.php';
             </div>
             <div class="col-md-6">
                 <label class="form-label small">From Name</label>
-                <input type="text" class="form-control" name="mail_from_name" value="<?= e((string) get_setting('mail_from_name', '9JACASH')) ?>">
+                <input type="text" class="form-control" name="mail_from_name" value="<?= e((string) get_setting('mail_from_name', 'SURECASH MINING')) ?>">
             </div>
             <div class="col-md-6">
                 <label class="form-label small">From Address</label>

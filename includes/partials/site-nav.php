@@ -6,7 +6,7 @@ $loggedIn = Auth::isLoggedIn();
     <div class="container">
         <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="<?= e($base) ?>/index.php" style="color:var(--text);">
             <?= brand_mark_html() ?>
-            <span>9JACASH</span>
+            <span><?= e($siteName ?? get_setting('site_name', 'SURECASH MINING')) ?></span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteNavbar">
             <span class="navbar-toggler-icon"></span>

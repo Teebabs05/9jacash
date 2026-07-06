@@ -29,15 +29,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $assetBase = rtrim(APP_URL, '/') . '/assets';
 $pageTitle = 'Admin Login';
+$siteName = get_setting('site_name', 'SURECASH MINING');
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>(function(){var t=localStorage.getItem('9jacash_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
+<script>(function(){var t=localStorage.getItem('surecash_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><?= e($pageTitle) ?> · <?= e(get_setting('site_name', '9JACASH')) ?></title>
-<link rel="icon" href="<?= e($assetBase) ?>/images/favicon.svg" type="image/svg+xml">
+<title><?= e($pageTitle) ?> · <?= e($siteName) ?></title>
+<?= favicon_link_html() ?>
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap-icons.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/fonts.css">
@@ -46,7 +47,7 @@ $pageTitle = 'Admin Login';
 <body>
 <div class="auth-shell">
     <div class="auth-visual">
-        <div class="brand"><span class="brand-mark">9</span><span>9JACASH ADMIN</span></div>
+        <div class="brand"><?= brand_mark_html() ?><span><?= e($siteName) ?> ADMIN</span></div>
         <div class="pitch">
             <h1>Full control over your platform.</h1>
             <p>Manage users, deposits, withdrawals, mining plans, tasks and every setting from one secure dashboard.</p>

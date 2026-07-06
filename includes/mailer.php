@@ -11,6 +11,11 @@ use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 final class Mailer
 {
+    private static function siteName(): string
+    {
+        return (string) get_setting('site_name', 'SURECASH MINING');
+    }
+
     private static function build(): PHPMailer
     {
         $mail = new PHPMailer(true);
@@ -25,8 +30,8 @@ final class Mailer
         $mail->Port       = (int) get_setting('mail_port', env('MAIL_PORT', 587));
 
         $mail->setFrom(
-            (string) get_setting('mail_from_address', env('MAIL_FROM_ADDRESS', 'no-reply@9jacash.com')),
-            (string) get_setting('mail_from_name', env('MAIL_FROM_NAME', '9JACASH'))
+            (string) get_setting('mail_from_address', env('MAIL_FROM_ADDRESS', 'no-reply@surecashmining.com')),
+            (string) get_setting('mail_from_name', env('MAIL_FROM_NAME', self::siteName()))
         );
 
         $mail->isHTML(true);
@@ -54,7 +59,7 @@ final class Mailer
 
     private static function wrapTemplate(string $title, string $content): string
     {
-        $siteName = e((string) get_setting('site_name', '9JACASH'));
+        $siteName = e(self::siteName());
         $safeTitle = e($title);
         $year = date('Y');
 
@@ -69,7 +74,7 @@ final class Mailer
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);">
           <tr>
             <td style="background:linear-gradient(135deg,#0B2545 0%,#0F5132 100%);padding:28px 32px;">
-              <span style="font-size:22px;font-weight:700;color:#F2C94C;letter-spacing:1px;">9JACASH</span>
+              <span style="font-size:22px;font-weight:700;color:#F2C94C;letter-spacing:1px;">{$siteName}</span>
             </td>
           </tr>
           <tr>
@@ -96,10 +101,11 @@ HTML;
     {
         $safeName = e($name);
         $safeLink = e($link);
+        $safeSiteName = e(self::siteName());
         $body = "
             <h2 style='margin-top:0;color:#0B2545;'>Verify your email address</h2>
             <p>Hi {$safeName},</p>
-            <p>Thanks for joining 9JACASH! Please confirm this is your email address by clicking the button below.</p>
+            <p>Thanks for joining {$safeSiteName}! Please confirm this is your email address by clicking the button below.</p>
             <p style='text-align:center;margin:28px 0;'>
               <a href='{$safeLink}' style='background:#0F5132;color:#ffffff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;'>Verify Email Address</a>
             </p>
@@ -107,28 +113,30 @@ HTML;
             <p>This link expires in 24 hours. If you did not create this account, you can safely ignore this email.</p>
         ";
 
-        return self::send($email, $name, 'Verify your 9JACASH email address', $body);
+        return self::send($email, $name, 'Verify your ' . self::siteName() . ' email address', $body);
     }
 
     public static function sendWelcomeEmail(string $email, string $name): bool
     {
         $safeName = e($name);
+        $safeSiteName = e(self::siteName());
         $body = "
-            <h2 style='margin-top:0;color:#0B2545;'>Welcome to 9JACASH, {$safeName}!</h2>
+            <h2 style='margin-top:0;color:#0B2545;'>Welcome to {$safeSiteName}, {$safeName}!</h2>
             <p>Your account has been verified and is now fully active. Start mining, completing tasks, and earning today.</p>
         ";
 
-        return self::send($email, $name, 'Welcome to 9JACASH', $body);
+        return self::send($email, $name, 'Welcome to ' . self::siteName(), $body);
     }
 
     public static function sendPasswordResetEmail(string $email, string $name, string $link): bool
     {
         $safeName = e($name);
         $safeLink = e($link);
+        $safeSiteName = e(self::siteName());
         $body = "
             <h2 style='margin-top:0;color:#0B2545;'>Reset your password</h2>
             <p>Hi {$safeName},</p>
-            <p>We received a request to reset your 9JACASH password. Click the button below to choose a new one.</p>
+            <p>We received a request to reset your {$safeSiteName} password. Click the button below to choose a new one.</p>
             <p style='text-align:center;margin:28px 0;'>
               <a href='{$safeLink}' style='background:#0F5132;color:#ffffff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;'>Reset Password</a>
             </p>
@@ -136,19 +144,20 @@ HTML;
             <p>This link expires in 1 hour. If you did not request a password reset, please ignore this email — your password will remain unchanged.</p>
         ";
 
-        return self::send($email, $name, 'Reset your 9JACASH password', $body);
+        return self::send($email, $name, 'Reset your ' . self::siteName() . ' password', $body);
     }
 
     public static function sendPasswordChangedEmail(string $email, string $name): bool
     {
         $safeName = e($name);
+        $safeSiteName = e(self::siteName());
         $body = "
             <h2 style='margin-top:0;color:#0B2545;'>Your password was changed</h2>
             <p>Hi {$safeName},</p>
-            <p>This is a confirmation that your 9JACASH account password was just changed. If this wasn't you, please contact support immediately.</p>
+            <p>This is a confirmation that your {$safeSiteName} account password was just changed. If this wasn't you, please contact support immediately.</p>
         ";
 
-        return self::send($email, $name, 'Your 9JACASH password was changed', $body);
+        return self::send($email, $name, 'Your ' . self::siteName() . ' password was changed', $body);
     }
 
     public static function sendDepositEmail(string $email, string $name, float $amount, string $status): bool
@@ -161,7 +170,7 @@ HTML;
             <p>Your deposit of <strong>" . money($amount) . "</strong> has been <strong>{$safeStatus}</strong>.</p>
         ";
 
-        return self::send($email, $name, "Deposit {$status} - 9JACASH", $body);
+        return self::send($email, $name, "Deposit {$status} - " . self::siteName(), $body);
     }
 
     public static function sendWithdrawalEmail(string $email, string $name, float $amount, string $status): bool
@@ -174,6 +183,6 @@ HTML;
             <p>Your withdrawal request of <strong>" . money($amount) . "</strong> has been <strong>{$safeStatus}</strong>.</p>
         ";
 
-        return self::send($email, $name, "Withdrawal {$status} - 9JACASH", $body);
+        return self::send($email, $name, "Withdrawal {$status} - " . self::siteName(), $body);
     }
 }

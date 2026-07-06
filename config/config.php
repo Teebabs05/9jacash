@@ -1,6 +1,6 @@
 <?php
 /**
- * 9JACASH master application bootstrap.
+ * SURECASH MINING master application bootstrap.
  *
  * Every public entry point (index.php, user/*, admin/*, api/*, ajax/*, cron/*)
  * must require this file before doing anything else. It wires together

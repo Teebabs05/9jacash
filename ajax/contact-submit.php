@@ -57,7 +57,7 @@ try {
     register_failed_attempt($identifier); // reuse as a throttle counter
 
     Mailer::send(
-        (string) get_setting('contact_email', 'support@9jacash.com'),
+        (string) get_setting('contact_email', 'support@surecashmining.com'),
         'Support Team',
         'New Contact Message: ' . ($subject ?: 'General Inquiry'),
         "<p><strong>From:</strong> " . e($name) . " (" . e($email) . ")</p><p>" . nl2br(e($message)) . "</p>"

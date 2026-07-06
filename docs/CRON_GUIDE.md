@@ -1,4 +1,4 @@
-# 9JACASH — Cron Job Guide
+# SURECASH MINING — Cron Job Guide
 
 The platform has exactly one scheduled job. Everything else (referral
 bonuses, task/ad/spin/check-in rewards) is credited synchronously the
@@ -42,7 +42,7 @@ doesn't match what you configured for the web-facing site.
 **Plain Linux server (`crontab -e`):**
 
 ```
-0 * * * * /usr/bin/php /var/www/9jacash/cron/mining-payout.php >> /var/www/9jacash/logs/cron.log 2>&1
+0 * * * * /usr/bin/php /var/www/surecash-mining/cron/mining-payout.php >> /var/www/surecash-mining/logs/cron.log 2>&1
 ```
 
 ### Verifying it's working

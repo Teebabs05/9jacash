@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$errors) {
 
 $pageTitle = 'Reset Password';
 $visualTitle = 'Choose a new, strong password.';
-$visualText = 'Keep your 9JACASH account secure with a strong, unique password.';
+$visualText = 'Keep your SURECASH MINING account secure with a strong, unique password.';
 require __DIR__ . '/../includes/partials/auth-head.php';
 ?>
 <div class="auth-shell">

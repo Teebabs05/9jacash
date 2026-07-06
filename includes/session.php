@@ -18,7 +18,7 @@ if (session_status() === PHP_SESSION_NONE) {
         'samesite' => 'Lax',
     ]);
 
-    session_name('9JACASHSESSID');
+    session_name('SURECASHSESSID');
     session_start();
 }
 

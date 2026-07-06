@@ -1,4 +1,4 @@
-# 9JACASH
+# SURECASH MINING
 
 A production-grade online earning platform (mining, tasks, referrals, ads,
 spin wheel, daily check-in, wallet, deposits/withdrawals) built entirely in
@@ -76,7 +76,7 @@ behavior.
 ## Folder Structure
 
 ```
-9jacash/
+surecash-mining/
 ├── admin/              Admin panel (login, dashboard, management modules)
 ├── ads/                Watch-to-earn ad reward module
 ├── ajax/                AJAX endpoints shared across modules
@@ -482,8 +482,55 @@ unauthenticated request to either export URL redirects to
 `admin/login.php` instead of leaking data, and confirmed the resulting
 CSV re-parses cleanly with correct headers and numeric amount columns.
 
+### ✅ Module 13 — Rebrand to SURECASH MINING
+Renamed the platform's default brand throughout the codebase (settings
+defaults, email templates, install wizard, session/cookie name,
+composer package name, default logo/favicon SVGs), and closed a few
+real gaps found while doing it:
+- `includes/mailer.php` previously hardcoded "9JACASH" in every email
+  subject/body instead of reading the configured site name — meant
+  renaming the site in Settings never actually changed the emails.
+  Added a `Mailer::siteName()` helper and wired every template to it.
+- Several partials (`app-sidebar.php`, `admin-sidebar.php`,
+  `site-nav.php`, `site-footer.php`, `auth-visual.php`,
+  `admin/login.php`) hardcoded the brand name as literal text instead
+  of reading the `site_name` setting; switched them to the dynamic
+  value so a future rename actually takes effect everywhere.
+- `brand_mark_html()`'s fallback glyph (shown when no logo is
+  uploaded) was a hardcoded "9"; now derives the first letter of the
+  configured site name.
+- **Found via live testing, not just linting**: the `<link rel="icon">`
+  favicon tag on every single page pointed at
+  `assets/images/favicon.svg`, but the actual file has always lived at
+  `assets/images/logo/favicon.svg` — a pre-existing 404 since Module 1
+  that nothing ever surfaced because a missing favicon just fails
+  silently in the browser. Fixed as part of adding
+  `favicon_link_html()`, which now also serves the admin's uploaded
+  logo as the favicon when one is set.
+- Added a sitewide floating WhatsApp contact button
+  (`includes/partials/whatsapp-widget.php`) shown on the landing page,
+  auth pages and the authenticated app shell — hidden entirely unless
+  an admin sets a WhatsApp number in **Admin → Settings**.
+
+### ✅ Module 21 — Website Banner Upload
+Added a **Site Banner** upload to Admin → Settings alongside the
+existing logo upload (same MIME-sniffed raster-only validation, 3MB
+limit), displayed as a full-width strip on the homepage hero when set.
+
+Both modules verified live: registered/logged in a real user, uploaded
+a real PNG through the actual admin form (not a direct DB write) for
+both the logo and the banner, confirmed the resulting favicon,
+sidebar/nav brand mark and homepage banner all serve real 200
+responses from the uploaded file paths, and confirmed the floating
+WhatsApp button is absent with no number configured and links to the
+correct `wa.me/<number>` once one is set.
+
 ### Planned next
-Branding asset pack (PNG exports, social banner, app icon).
+Branding asset pack (PNG exports, social banner, app icon) → dual
+NGN/USD currency support → user/admin messaging inbox → mining
+day-cycle selection → dashboard earnings chart fix → transaction
+receipts → paid extra spins → Play Store/App Store links → a modern
+visual redesign.
 
 ## License
 

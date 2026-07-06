@@ -1,6 +1,6 @@
 {
-    "name": "9jacash/platform",
-    "description": "9JACASH - Online Earning Platform (Mining, Tasks, Referrals, Wallet)",
+    "name": "surecash-mining/platform",
+    "description": "SURECASH MINING - Online Earning Platform (Mining, Tasks, Referrals, Wallet)",
     "type": "project",
     "license": "proprietary",
     "require": {

@@ -1,4 +1,4 @@
-# 9JACASH — Admin Guide
+# SURECASH MINING — Admin Guide
 
 This guide covers everything an administrator needs to operate the
 platform day to day: logging in, approving money movements, managing

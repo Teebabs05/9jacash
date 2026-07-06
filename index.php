@@ -19,18 +19,18 @@ $refLevel2 = (float) get_setting('referral_level_2_percent', 2);
 $refLevel3 = (float) get_setting('referral_level_3_percent', 1);
 
 $assetBase = rtrim(APP_URL, '/') . '/assets';
-$siteName = get_setting('site_name', '9JACASH');
+$siteName = get_setting('site_name', 'SURECASH MINING');
 $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>(function(){var t=localStorage.getItem('9jacash_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
+<script>(function(){var t=localStorage.getItem('surecash_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="9JACASH is Nigeria's premium online earning platform — mine daily, complete tasks, refer friends and grow your wealth.">
+<meta name="description" content="SURECASH MINING is Nigeria's premium online earning platform — mine daily, complete tasks, refer friends and grow your wealth.">
 <title><?= e($pageTitle) ?></title>
-<link rel="icon" href="<?= e($assetBase) ?>/images/favicon.svg" type="image/svg+xml">
+<?= favicon_link_html() ?>
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap-icons.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/fonts.css">
@@ -50,7 +50,7 @@ $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
             <div class="col-lg-7">
                 <span class="hero-badge"><i class="bi bi-shield-check"></i> Trusted by <?= number_format(max($totalUsers, 12500)) ?>+ Nigerians</span>
                 <h1>Mine. Earn. <br>Grow Your Wealth Daily.</h1>
-                <p class="lead">9JACASH lets you earn from mining plans, simple social tasks, watching ads, daily check-ins and a powerful multi-level referral program — all from one secure dashboard.</p>
+                <p class="lead">SURECASH MINING lets you earn from mining plans, simple social tasks, watching ads, daily check-ins and a powerful multi-level referral program — all from one secure dashboard.</p>
                 <div class="d-flex flex-wrap gap-3 mt-4">
                     <a href="user/register.php" class="btn btn-gold btn-lg px-4">Create Free Account</a>
                     <a href="#how-it-works" class="btn btn-lg px-4" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.3);">See How It Works</a>
@@ -68,11 +68,18 @@ $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
     </div>
 </section>
 
+<?php $siteBanner = get_setting('site_banner', ''); ?>
+<?php if ($siteBanner): ?>
+<section class="container" style="margin-top:-2rem;position:relative;z-index:2;">
+    <img src="<?= e(rtrim(APP_URL, '/')) ?>/uploads/<?= e($siteBanner) ?>" alt="<?= e($siteName) ?>" class="w-100" style="border-radius:16px;object-fit:cover;max-height:340px;box-shadow:0 10px 30px rgba(0,0,0,0.12);">
+</section>
+<?php endif; ?>
+
 <!-- ============================== FEATURES ============================== -->
 <section class="section" id="features">
     <div class="container">
         <div class="text-center mx-auto reveal" style="max-width:640px;">
-            <span class="section-eyebrow">Why 9JACASH</span>
+            <span class="section-eyebrow">Why SURECASH MINING</span>
             <h2 class="section-title">Everything you need to earn, in one place</h2>
             <p class="section-sub mx-auto">A complete suite of earning tools designed for real, sustainable income.</p>
         </div>
@@ -274,7 +281,7 @@ $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
                 <div class="accordion reveal" id="faqAccordion">
                     <?php
                     $faqs = [
-                        ['Is 9JACASH free to join?', 'Yes, creating an account is completely free. You only need funds in your wallet if you want to invest in a mining plan.'],
+                        ['Is SURECASH MINING free to join?', 'Yes, creating an account is completely free. You only need funds in your wallet if you want to invest in a mining plan.'],
                         ['How do withdrawals work?', 'Withdrawals are processed to your linked bank account or USDT wallet, subject to the minimum/maximum limits and charges shown in your dashboard.'],
                         ['How many levels does the referral program pay?', 'You earn commissions up to 3 levels deep whenever the people in your referral chain fund their wallets.'],
                         ['Is my data and money safe?', 'We use bank-grade security: encrypted passwords, CSRF protection, brute-force lockout, and full activity logging on every account.'],
@@ -342,7 +349,7 @@ $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
                 <h2 class="section-title">We're here to help</h2>
                 <p class="section-sub">Have a question about deposits, withdrawals or your account? Send us a message and our support team will respond promptly.</p>
                 <div class="mt-4">
-                    <p class="mb-2"><i class="bi bi-envelope-fill me-2" style="color:var(--brand-emerald);"></i><?= e(get_setting('contact_email', 'support@9jacash.com')) ?></p>
+                    <p class="mb-2"><i class="bi bi-envelope-fill me-2" style="color:var(--brand-emerald);"></i><?= e(get_setting('contact_email', 'support@surecashmining.com')) ?></p>
                     <p class="mb-0"><i class="bi bi-telephone-fill me-2" style="color:var(--brand-emerald);"></i><?= e(get_setting('contact_phone', '+234 800 000 0000')) ?></p>
                 </div>
             </div>
@@ -377,6 +384,7 @@ $pageTitle = $siteName . ' — Mine. Earn. Grow Your Wealth.';
 </section>
 
 <?php require __DIR__ . '/includes/partials/site-footer.php'; ?>
+<?php require __DIR__ . '/includes/partials/whatsapp-widget.php'; ?>
 
 <script src="<?= e($assetBase) ?>/js/vendor/bootstrap.bundle.min.js"></script>
 <script src="<?= e($assetBase) ?>/js/theme.js"></script>

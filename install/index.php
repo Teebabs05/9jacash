@@ -16,7 +16,7 @@ if ($locked && !($step === 4 && $justFinished)) {
     ?>
     <div class="install-card text-center">
         <div class="mb-3" style="font-size:3rem;color:var(--warning);"><i class="bi bi-shield-lock-fill"></i></div>
-        <h2>9JACASH is already installed</h2>
+        <h2>SURECASH MINING is already installed</h2>
         <p class="sub">The installation wizard has already been completed on this server. Delete <code>install/installed.lock</code> if you intentionally need to reinstall.</p>
         <a href="<?= e(rtrim(APP_URL, '/')) ?>/user/login.php" class="btn btn-brand w-100 mb-2">Go to Login</a>
         <a href="<?= e(rtrim(APP_URL, '/')) ?>/admin/login.php" class="btn btn-outline-brand w-100">Admin Login</a>
@@ -34,7 +34,7 @@ $errors = [];
 $dbDefaults = $_SESSION['install']['db'] ?? [
     'host' => 'localhost',
     'port' => '3306',
-    'name' => '9jacash',
+    'name' => 'surecash_mining',
     'user' => 'root',
     'pass' => '',
 ];
@@ -73,16 +73,16 @@ if ($step === 3) {
     }
 
     $siteDefaults = [
-        'site_name' => '9JACASH',
+        'site_name' => 'SURECASH MINING',
         'site_url' => APP_URL,
         'admin_username' => 'admin',
-        'admin_email' => 'admin@9jacash.com',
+        'admin_email' => 'admin@surecashmining.com',
     ];
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         require_csrf();
 
-        $siteDefaults['site_name'] = clean($_POST['site_name'] ?? '9JACASH');
+        $siteDefaults['site_name'] = clean($_POST['site_name'] ?? 'SURECASH MINING');
         $siteDefaults['site_url'] = rtrim(clean($_POST['site_url'] ?? APP_URL), '/');
         $siteDefaults['admin_username'] = strtolower(clean($_POST['admin_username'] ?? 'admin'));
         $siteDefaults['admin_email'] = strtolower(clean($_POST['admin_email'] ?? ''));
@@ -158,12 +158,12 @@ $requirementChecks = installer_check_requirements();
 $requirementsPassed = installer_requirements_passed($requirementChecks);
 $assetBase = rtrim(APP_URL, '/') . '/assets';
 
-installer_render_head('Install 9JACASH', $assetBase);
+installer_render_head('Install SURECASH MINING', $assetBase);
 ?>
 <div class="install-card">
     <div class="d-flex align-items-center gap-2 mb-4">
         <span class="brand-mark-sm">9</span>
-        <strong>9JACASH Installation Wizard</strong>
+        <strong>SURECASH MINING Installation Wizard</strong>
     </div>
 
     <div class="step-nav mb-4">
@@ -268,14 +268,14 @@ installer_render_head('Install 9JACASH', $assetBase);
                     <input type="password" class="form-control" name="admin_password_confirmation" required minlength="8">
                 </div>
             </div>
-            <button type="submit" class="btn btn-brand w-100 mt-4">Install 9JACASH</button>
+            <button type="submit" class="btn btn-brand w-100 mt-4">Install SURECASH MINING</button>
         </form>
 
     <?php elseif ($step === 4): ?>
         <div class="text-center">
             <div class="mb-3" style="font-size:3rem;color:var(--success);"><i class="bi bi-check-circle-fill"></i></div>
             <h4 class="fw-bold">Installation Complete!</h4>
-            <p class="sub">9JACASH has been installed successfully. For security, please delete or restrict access to the <code>/install</code> directory now.</p>
+            <p class="sub">SURECASH MINING has been installed successfully. For security, please delete or restrict access to the <code>/install</code> directory now.</p>
             <a href="<?= e(rtrim(APP_URL, '/')) ?>/user/login.php" class="btn btn-brand w-100 mb-2">Go to Login</a>
             <a href="<?= e(rtrim(APP_URL, '/')) ?>/admin/login.php" class="btn btn-outline-brand w-100">Admin Login</a>
         </div>

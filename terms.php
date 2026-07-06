@@ -5,7 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/config/config.php';
 
 $assetBase = rtrim(APP_URL, '/') . '/assets';
-$siteName = get_setting('site_name', '9JACASH');
+$siteName = get_setting('site_name', 'SURECASH MINING');
 $pageTitle = 'Terms of Service';
 ?>
 <!DOCTYPE html>
@@ -14,12 +14,14 @@ $pageTitle = 'Terms of Service';
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e($pageTitle) ?> · <?= e($siteName) ?></title>
-<link rel="icon" href="<?= e($assetBase) ?>/images/favicon.svg" type="image/svg+xml">
+<?= favicon_link_html() ?>
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap.min.css">
+<link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap-icons.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/fonts.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/theme.css">
 </head>
 <body>
+<?php require __DIR__ . '/includes/partials/whatsapp-widget.php'; ?>
 <div class="container py-5" style="max-width:820px;">
     <h1 class="fw-bold mb-4"><?= e($siteName) ?> — Terms of Service</h1>
     <p style="color:var(--text-muted);">Last updated: <?= date('F Y') ?></p>

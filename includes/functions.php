@@ -401,7 +401,7 @@ if (!function_exists('clamp')) {
 
 /**
  * Render the brand mark (custom uploaded logo if the admin has set one,
- * otherwise the default "9" glyph), shared by every nav/sidebar.
+ * otherwise the site name's initial letter), shared by every nav/sidebar.
  */
 if (!function_exists('brand_mark_html')) {
     function brand_mark_html(int $size = 36): string
@@ -413,6 +413,37 @@ if (!function_exists('brand_mark_html')) {
             return '<img src="' . $src . '" alt="Logo" class="brand-mark" style="width:' . $size . 'px;height:' . $size . 'px;object-fit:contain;padding:4px;">';
         }
 
-        return '<span class="brand-mark" style="width:' . $size . 'px;height:' . $size . 'px;">9</span>';
+        $initial = strtoupper(substr((string) get_setting('site_name', 'SURECASH MINING'), 0, 1)) ?: 'S';
+
+        return '<span class="brand-mark" style="width:' . $size . 'px;height:' . $size . 'px;">' . e($initial) . '</span>';
+    }
+}
+
+/**
+ * Render the <link rel="icon"> tag: the admin-uploaded logo if one has
+ * been set (so a re-branded site gets its own favicon for free),
+ * otherwise the bundled default favicon.svg.
+ */
+if (!function_exists('favicon_link_html')) {
+    function favicon_link_html(): string
+    {
+        $logo = (string) get_setting('site_logo', '');
+        $assetBase = e(rtrim(APP_URL, '/')) . '/assets';
+
+        if ($logo === '') {
+            return '<link rel="icon" href="' . $assetBase . '/images/logo/favicon.svg" type="image/svg+xml">';
+        }
+
+        $mimeByExt = [
+            'png'  => 'image/png',
+            'jpg'  => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'webp' => 'image/webp',
+        ];
+        $ext = strtolower(pathinfo($logo, PATHINFO_EXTENSION));
+        $type = $mimeByExt[$ext] ?? 'image/png';
+        $src = e(rtrim(APP_URL, '/')) . '/uploads/' . e($logo);
+
+        return '<link rel="icon" href="' . $src . '" type="' . $type . '">';
     }
 }
