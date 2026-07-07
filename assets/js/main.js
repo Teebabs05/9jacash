@@ -160,4 +160,18 @@ if (new URLSearchParams(window.location.search).has('debugjs')) {
             20000
         );
     });
+
+    window.addEventListener('unhandledrejection', function (e) {
+        SureCashMining.toast('Unhandled promise rejection: ' + (e.reason && e.reason.message || e.reason), 'error', 20000);
+    });
+
+    // Bootstrap's own modal lifecycle events, so we can see exactly how far
+    // a modal.show() call actually gets even when nothing throws: does it
+    // fire show.bs.modal (JS started) but never shown.bs.modal (the dialog
+    // never actually finished appearing)?
+    ['show.bs.modal', 'shown.bs.modal', 'hide.bs.modal', 'hidden.bs.modal'].forEach(function (evtName) {
+        document.addEventListener(evtName, function () {
+            SureCashMining.toast(evtName + ' fired', 'info', 20000);
+        });
+    });
 }
