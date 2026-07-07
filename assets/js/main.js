@@ -146,3 +146,18 @@ const SureCashMining = (function () {
 
     return { toast, setLoading };
 })();
+
+// Temporary on-screen error reporter for tracking down a mobile-only bug
+// (Bootstrap modal backdrop shows but the dialog itself never appears) that
+// can't be reproduced with devtools. Only active when ?debugjs=1 is in the
+// URL, so it stays invisible to normal visitors. Remove once the bug that
+// prompted it is confirmed fixed.
+if (new URLSearchParams(window.location.search).has('debugjs')) {
+    window.addEventListener('error', function (e) {
+        SureCashMining.toast(
+            'JS error: ' + e.message + ' @ ' + (e.filename || '').split('/').pop() + ':' + e.lineno,
+            'error',
+            20000
+        );
+    });
+}
