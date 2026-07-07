@@ -121,27 +121,6 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                                         <button type="submit" class="btn btn-brand btn-sm">Approve</button>
                                     </form>
                                     <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal<?= (int) $s['id'] ?>">Reject</button>
-
-                                    <div class="modal fade" id="rejectModal<?= (int) $s['id'] ?>" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content" style="background:var(--surface);color:var(--text);">
-                                                <form method="POST" action="">
-                                                    <?= csrf_field() ?>
-                                                    <input type="hidden" name="action" value="reject">
-                                                    <input type="hidden" name="id" value="<?= (int) $s['id'] ?>">
-                                                    <div class="modal-header"><h6 class="modal-title">Reject Submission</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                                                    <div class="modal-body">
-                                                        <label class="form-label small">Reason (optional, shown to the user)</label>
-                                                        <textarea class="form-control" name="admin_note" rows="3"></textarea>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-outline-brand btn-sm" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-outline-danger btn-sm">Reject Submission</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
                                 <?php else: ?>
                                     <span class="small" style="color:var(--text-muted);"><?= e($s['reviewed_at'] ? 'Reviewed ' . time_ago($s['reviewed_at']) : '') ?></span>
                                 <?php endif; ?>
@@ -153,5 +132,28 @@ require __DIR__ . '/../includes/partials/admin-head.php';
         </div>
     <?php endif; ?>
 </div>
+
+<?php foreach ($submissions as $s): if ($s['status'] !== STATUS_PENDING) continue; ?>
+    <div class="modal fade" id="rejectModal<?= (int) $s['id'] ?>" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background:var(--surface);color:var(--text);">
+                <form method="POST" action="">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="reject">
+                    <input type="hidden" name="id" value="<?= (int) $s['id'] ?>">
+                    <div class="modal-header"><h6 class="modal-title">Reject Submission</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                    <div class="modal-body">
+                        <label class="form-label small">Reason (optional, shown to the user)</label>
+                        <textarea class="form-control" name="admin_note" rows="3"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-brand btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Reject Submission</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>
 
 <?php require __DIR__ . '/../includes/partials/admin-scripts.php'; ?>

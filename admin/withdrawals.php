@@ -97,28 +97,6 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                                         <button type="submit" class="btn btn-brand btn-sm">Mark Paid</button>
                                     </form>
                                     <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectWd<?= (int) $w['id'] ?>">Reject</button>
-
-                                    <div class="modal fade" id="rejectWd<?= (int) $w['id'] ?>" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content" style="background:var(--surface);color:var(--text);">
-                                                <form method="POST" action="?status=<?= e($statusFilter) ?>">
-                                                    <?= csrf_field() ?>
-                                                    <input type="hidden" name="action" value="reject">
-                                                    <input type="hidden" name="id" value="<?= (int) $w['id'] ?>">
-                                                    <div class="modal-header"><h6 class="modal-title">Reject Withdrawal</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                                                    <div class="modal-body">
-                                                        <p class="small">This will refund <?= e(money($w['amount'])) ?> to the user's main wallet.</p>
-                                                        <label class="form-label small">Reason (optional, shown to the user)</label>
-                                                        <textarea class="form-control" name="admin_note" rows="3"></textarea>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-outline-brand btn-sm" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-outline-danger btn-sm">Reject &amp; Refund</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
                                 <?php else: ?>
                                     <span class="small" style="color:var(--text-muted);"><?= e($w['processed_at'] ? time_ago($w['processed_at']) : '') ?></span>
                                 <?php endif; ?>
@@ -131,5 +109,29 @@ require __DIR__ . '/../includes/partials/admin-head.php';
         </div>
     <?php endif; ?>
 </div>
+
+<?php foreach ($withdrawals as $w): if ($w['status'] !== STATUS_PENDING) continue; ?>
+    <div class="modal fade" id="rejectWd<?= (int) $w['id'] ?>" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background:var(--surface);color:var(--text);">
+                <form method="POST" action="?status=<?= e($statusFilter) ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="reject">
+                    <input type="hidden" name="id" value="<?= (int) $w['id'] ?>">
+                    <div class="modal-header"><h6 class="modal-title">Reject Withdrawal</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                    <div class="modal-body">
+                        <p class="small">This will refund <?= e(money($w['amount'])) ?> to the user's main wallet.</p>
+                        <label class="form-label small">Reason (optional, shown to the user)</label>
+                        <textarea class="form-control" name="admin_note" rows="3"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-brand btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Reject &amp; Refund</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>
 
 <?php require __DIR__ . '/../includes/partials/admin-scripts.php'; ?>

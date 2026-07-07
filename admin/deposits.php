@@ -102,27 +102,6 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                                         <button type="submit" class="btn btn-brand btn-sm">Approve</button>
                                     </form>
                                     <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectDep<?= (int) $d['id'] ?>">Reject</button>
-
-                                    <div class="modal fade" id="rejectDep<?= (int) $d['id'] ?>" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content" style="background:var(--surface);color:var(--text);">
-                                                <form method="POST" action="?status=<?= e($statusFilter) ?>">
-                                                    <?= csrf_field() ?>
-                                                    <input type="hidden" name="action" value="reject">
-                                                    <input type="hidden" name="id" value="<?= (int) $d['id'] ?>">
-                                                    <div class="modal-header"><h6 class="modal-title">Reject Deposit</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                                                    <div class="modal-body">
-                                                        <label class="form-label small">Reason (optional, shown to the user)</label>
-                                                        <textarea class="form-control" name="admin_note" rows="3"></textarea>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-outline-brand btn-sm" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-outline-danger btn-sm">Reject Deposit</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
                                 <?php else: ?>
                                     <span class="small" style="color:var(--text-muted);">—</span>
                                 <?php endif; ?>
@@ -135,5 +114,28 @@ require __DIR__ . '/../includes/partials/admin-head.php';
         </div>
     <?php endif; ?>
 </div>
+
+<?php foreach ($deposits as $d): if ($d['status'] !== STATUS_PENDING) continue; ?>
+    <div class="modal fade" id="rejectDep<?= (int) $d['id'] ?>" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background:var(--surface);color:var(--text);">
+                <form method="POST" action="?status=<?= e($statusFilter) ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="reject">
+                    <input type="hidden" name="id" value="<?= (int) $d['id'] ?>">
+                    <div class="modal-header"><h6 class="modal-title">Reject Deposit</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                    <div class="modal-body">
+                        <label class="form-label small">Reason (optional, shown to the user)</label>
+                        <textarea class="form-control" name="admin_note" rows="3"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-brand btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Reject Deposit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>
 
 <?php require __DIR__ . '/../includes/partials/admin-scripts.php'; ?>
