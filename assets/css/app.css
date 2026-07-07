@@ -505,8 +505,6 @@
    --------------------------------------------------------------- */
 .modal-dialog {
     height: calc(var(--vvh, 100dvh) - (var(--bs-modal-margin, 0.5rem) * 2));
-    display: flex;
-    align-items: center;
 }
 
 .modal-content {
