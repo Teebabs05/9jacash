@@ -21,8 +21,8 @@ $authAdmin = current_admin();
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap-icons.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/fonts.css">
-<link rel="stylesheet" href="<?= e($assetBase) ?>/css/theme.css">
-<link rel="stylesheet" href="<?= e($assetBase) ?>/css/app.css">
+<link rel="stylesheet" href="<?= e(asset_url('css/theme.css')) ?>">
+<link rel="stylesheet" href="<?= e(asset_url('css/app.css')) ?>">
 </head>
 <body>
 <div class="app-shell">
