@@ -76,6 +76,23 @@ if (!function_exists('e')) {
 }
 
 /**
+ * Build a URL for a file under /assets with a ?v= cache-busting query
+ * string tied to that file's actual last-modified time, so updating a
+ * CSS/JS file always forces browsers (and host-side caches) to fetch
+ * the new version instead of serving a stale cached copy.
+ */
+if (!function_exists('asset_url')) {
+    function asset_url(string $relativePath): string
+    {
+        $relativePath = ltrim($relativePath, '/');
+        $diskPath = dirname(__DIR__) . '/assets/' . $relativePath;
+        $version = is_file($diskPath) ? filemtime($diskPath) : time();
+
+        return rtrim(APP_URL, '/') . '/assets/' . $relativePath . '?v=' . $version;
+    }
+}
+
+/**
  * Sanitize a plain text input (trim + strip tags).
  */
 if (!function_exists('clean')) {
