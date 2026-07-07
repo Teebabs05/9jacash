@@ -131,5 +131,18 @@ const SureCashMining = (function () {
         new bootstrap.Modal(modalEl).show();
     });
 
+    // Track the *actual* visible viewport height as --vvh (assets/css/app.css
+    // uses it to cap modal height). window.innerHeight/100vh don't shrink when
+    // an on-screen keyboard opens on iOS Safari - it just overlays on top of
+    // the page - but visualViewport.height does, on both iOS and Android,
+    // which is what lets the modal fix know how much space is really visible.
+    if (window.visualViewport) {
+        const setVvh = function () {
+            document.documentElement.style.setProperty('--vvh', window.visualViewport.height + 'px');
+        };
+        window.visualViewport.addEventListener('resize', setVvh);
+        setVvh();
+    }
+
     return { toast, setLoading };
 })();

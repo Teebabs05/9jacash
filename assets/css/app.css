@@ -477,15 +477,38 @@
 
 /* ---------------------------------------------------------------
    Modals - keep header/footer reachable even when a mobile on-screen
-   keyboard shrinks the visual viewport. Bootstrap's default (non
-   -scrollable) modal only scrolls at the outer .modal level, so a
-   tall body can push the footer buttons below the fold; sticking the
-   header/footer to that scrollport keeps them visible at all times.
+   keyboard covers part of the screen.
+
+   Android/desktop browsers actually shrink window.innerHeight when
+   the keyboard opens, so sticky positioning alone is enough there.
+   iOS Safari does NOT: it overlays the keyboard on top of the page
+   without resizing the layout viewport at all, so CSS has no way to
+   know part of the screen is now covered. --vvh is set by JS
+   (assets/js/main.js) from window.visualViewport.height, which DOES
+   report the real visible area on iOS - capping .modal-dialog to
+   that height forces .modal-body to be the only scrolling region,
+   so the header and footer (pinned via sticky) always stay inside
+   whatever space is actually visible, on every platform.
    --------------------------------------------------------------- */
+.modal-dialog {
+    max-height: calc(var(--vvh, 100dvh) - 1.5rem);
+    display: flex;
+}
+
+.modal-content {
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.modal-body {
+    overflow-y: auto;
+}
+
 .modal-header, .modal-footer {
     position: sticky;
     background: var(--surface);
     z-index: 2;
+    flex-shrink: 0;
 }
 
 .modal-header { top: 0; }
@@ -494,6 +517,7 @@
 @media (max-width: 575.98px) {
     .modal-dialog {
         margin: 0.75rem;
+        max-height: calc(var(--vvh, 100dvh) - 1rem);
     }
     .modal-footer {
         flex-wrap: wrap;
