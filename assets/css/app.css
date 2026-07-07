@@ -485,14 +485,17 @@
    without resizing the layout viewport at all, so CSS has no way to
    know part of the screen is now covered. --vvh is set by JS
    (assets/js/main.js) from window.visualViewport.height, which DOES
-   report the real visible area on iOS - capping .modal-dialog to
-   that height forces .modal-body to be the only scrolling region,
-   so the header and footer (pinned via sticky) always stay inside
-   whatever space is actually visible, on every platform.
+   report the real visible area on iOS.
+
+   This mirrors Bootstrap's own .modal-dialog-scrollable pattern
+   exactly (an explicit height, not max-height, on .modal-dialog) -
+   a percentage height on a descendant (.modal-content's max-height:
+   100%) only reliably resolves against a *definite* ancestor height,
+   not an auto height that merely happens to be capped, which is why
+   an earlier max-height-only version of this rendered inconsistently.
    --------------------------------------------------------------- */
 .modal-dialog {
-    max-height: calc(var(--vvh, 100dvh) - 1.5rem);
-    display: flex;
+    height: calc(var(--vvh, 100dvh) - 1.5rem);
 }
 
 .modal-content {
@@ -517,7 +520,7 @@
 @media (max-width: 575.98px) {
     .modal-dialog {
         margin: 0.75rem;
-        max-height: calc(var(--vvh, 100dvh) - 1rem);
+        height: calc(var(--vvh, 100dvh) - 1rem);
     }
     .modal-footer {
         flex-wrap: wrap;
