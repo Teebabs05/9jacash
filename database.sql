@@ -553,6 +553,7 @@ INSERT INTO `site_settings` (`setting_key`, `setting_value`) VALUES
 ('max_withdrawal', '500000'),
 ('withdrawal_charge_percent', '2'),
 ('daily_withdrawal_limit', '1'),
+('ad_link', ''),
 ('ad_reward_amount', '10'),
 ('ad_daily_limit', '10'),
 ('ad_cooldown_seconds', '30'),

@@ -15,11 +15,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'update_settings') {
+        $adLink = trim((string) ($_POST['ad_link'] ?? ''));
         $rewardAmount = (float) ($_POST['ad_reward_amount'] ?? 0);
         $dailyLimit = (int) ($_POST['ad_daily_limit'] ?? 0);
         $cooldownSeconds = (int) ($_POST['ad_cooldown_seconds'] ?? 0);
         $watchDuration = (int) ($_POST['ad_watch_duration_seconds'] ?? 0);
 
+        if ($adLink !== '' && !filter_var($adLink, FILTER_VALIDATE_URL)) {
+            $errors[] = 'Advert link must be a valid URL (e.g. https://example.com/ad).';
+        }
         if ($rewardAmount <= 0) {
             $errors[] = 'Reward per ad must be greater than zero.';
         }
@@ -34,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (!$errors) {
+            set_setting('ad_link', $adLink);
             set_setting('ad_reward_amount', (string) $rewardAmount);
             set_setting('ad_daily_limit', (string) $dailyLimit);
             set_setting('ad_cooldown_seconds', (string) $cooldownSeconds);
@@ -89,6 +94,11 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="update_settings">
 
+                <div class="mb-3">
+                    <label class="form-label small">Advert Link (URL)</label>
+                    <input type="url" class="form-control" name="ad_link" placeholder="https://example.com/your-advert" value="<?= e((string) get_setting('ad_link', '')) ?>">
+                    <div class="form-text">Opened in a new tab when a user clicks "Watch Ad Now". Leave blank to just run the countdown with no external link.</div>
+                </div>
                 <div class="mb-3">
                     <label class="form-label small">Reward per ad (₦)</label>
                     <input type="number" step="0.01" min="0.01" class="form-control" name="ad_reward_amount" value="<?= e((string) get_setting('ad_reward_amount', 10)) ?>" required>
