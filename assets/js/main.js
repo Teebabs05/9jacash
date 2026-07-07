@@ -174,4 +174,21 @@ if (new URLSearchParams(window.location.search).has('debugjs')) {
             SureCashMining.toast(evtName + ' fired', 'info', 20000);
         });
     });
+
+    // shown.bs.modal firing with nothing visible on screen points at the
+    // dialog being rendered but positioned/scrolled out of view rather than
+    // not displayed at all - report its actual computed box and scroll
+    // position so that distinction is visible without devtools.
+    document.addEventListener('shown.bs.modal', function (e) {
+        const dialog = e.target.querySelector('.modal-dialog');
+        if (!dialog) return;
+        const rect = dialog.getBoundingClientRect();
+        SureCashMining.toast(
+            'dialog rect: top=' + Math.round(rect.top) + ' bottom=' + Math.round(rect.bottom)
+                + ' h=' + Math.round(rect.height) + ' | modal.scrollTop=' + e.target.scrollTop
+                + ' | vvh=' + getComputedStyle(document.documentElement).getPropertyValue('--vvh'),
+            'info',
+            20000
+        );
+    });
 }
