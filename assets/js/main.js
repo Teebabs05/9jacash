@@ -180,43 +180,34 @@ if (new URLSearchParams(window.location.search).has('debugjs')) {
     // not displayed at all - report its actual computed box and scroll
     // position so that distinction is visible without devtools.
     document.addEventListener('shown.bs.modal', function (e) {
-        const dialog = e.target.querySelector('.modal-dialog');
-        if (!dialog) return;
-        const rect = dialog.getBoundingClientRect();
-        SureCashMining.toast(
-            'dialog rect: top=' + Math.round(rect.top) + ' bottom=' + Math.round(rect.bottom)
-                + ' h=' + Math.round(rect.height) + ' | modal.scrollTop=' + e.target.scrollTop
-                + ' | vvh=' + getComputedStyle(document.documentElement).getPropertyValue('--vvh'),
-            'info',
-            20000
-        );
-
         const content = e.target.querySelector('.modal-content');
-        if (content) {
-            const cs = getComputedStyle(content);
-            const crect = content.getBoundingClientRect();
-            SureCashMining.toast(
-                'content: opacity=' + cs.opacity + ' visibility=' + cs.visibility + ' display=' + cs.display
-                    + ' bg=' + cs.backgroundColor + ' color=' + cs.color + ' z=' + cs.zIndex
-                    + ' transform=' + cs.transform + ' w=' + Math.round(crect.width) + ' h=' + Math.round(crect.height),
-                'info',
-                20000
+        if (!content) {
+            alert('shown.bs.modal fired but no .modal-content found in DOM at all.');
+            return;
+        }
+
+        // Walk every ancestor from .modal-content up to <html>, since a
+        // property on .modal-content itself can read back as perfectly
+        // normal (opacity:1, visible, correctly colored) while an ANCESTOR
+        // still visually hides the whole subtree - opacity compounds, and
+        // clip-path/mask/filter/overflow on a parent can clip a child to
+        // nothing even when the child's own computed style looks fine.
+        const lines = [];
+        let el = content;
+        let depth = 0;
+        while (el && depth < 12) {
+            const cs = getComputedStyle(el);
+            const r = el.getBoundingClientRect();
+            lines.push(
+                (el.className ? '.' + String(el.className).split(' ').join('.') : el.tagName)
+                + ' | op=' + cs.opacity + ' vis=' + cs.visibility + ' disp=' + cs.display
+                + ' ovf=' + cs.overflow + ' clip=' + cs.clipPath + ' filter=' + cs.filter
+                + ' transform=' + cs.transform + ' w=' + Math.round(r.width) + ' h=' + Math.round(r.height)
             );
+            el = el.parentElement;
+            depth++;
         }
 
-        const modalCs = getComputedStyle(e.target);
-        SureCashMining.toast(
-            'modal el: display=' + modalCs.display + ' opacity=' + modalCs.opacity + ' z=' + modalCs.zIndex,
-            'info',
-            20000
-        );
-
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) {
-            const bcs = getComputedStyle(backdrop);
-            SureCashMining.toast('backdrop: opacity=' + bcs.opacity + ' bg=' + bcs.backgroundColor + ' z=' + bcs.zIndex, 'info', 20000);
-        } else {
-            SureCashMining.toast('backdrop: NOT FOUND IN DOM', 'error', 20000);
-        }
+        alert('MODAL DEBUG (top of chain = .modal-content):\n\n' + lines.join('\n\n'));
     });
 }
