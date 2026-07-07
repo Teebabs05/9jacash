@@ -157,6 +157,16 @@ if (!function_exists('send_security_headers')) {
         header('X-XSS-Protection: 1; mode=block');
         header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
 
+        // Every page here is rendered per-request from session/DB state
+        // (account balances, pending transactions, CSRF tokens) - none of
+        // it is safe for a browser, CDN, or host-level page cache (e.g.
+        // LiteSpeed Cache, Cloudflare) to store and replay to a later
+        // request. A stale cached copy doesn't just show old data, it
+        // serves a stale CSRF token that no longer matches the visitor's
+        // actual session, breaking every form submission on the page.
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+
         // Every script/style/font/icon the app uses is self-hosted (no CDN
         // dependency anywhere), so this is a genuine restriction rather than
         // a no-op: it blocks a would-be XSS payload from exfiltrating data
