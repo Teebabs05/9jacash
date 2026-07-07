@@ -87,7 +87,23 @@ final class AdminAuth
 
     public static function isLoggedIn(): bool
     {
-        return !empty($_SESSION['admin_id']);
+        if (empty($_SESSION['admin_id'])) {
+            return false;
+        }
+
+        $stmt = db()->prepare("SELECT status FROM admins WHERE id = ? LIMIT 1");
+        $stmt->execute([$_SESSION['admin_id']]);
+        $row = $stmt->fetch();
+
+        if ($row && $row['status'] === 'active') {
+            return true;
+        }
+
+        // Stale session: the account was deleted/disabled/removed (e.g.
+        // via Staff Management) after this session was established.
+        unset($_SESSION['admin_id'], $_SESSION['admin_username']);
+
+        return false;
     }
 
     public static function requireLogin(): void

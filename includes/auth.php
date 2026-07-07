@@ -214,7 +214,22 @@ final class Auth
     public static function isLoggedIn(): bool
     {
         if (!empty($_SESSION['user_id'])) {
-            return true;
+            $stmt = db()->prepare('SELECT status FROM users WHERE id = ? LIMIT 1');
+            $stmt->execute([$_SESSION['user_id']]);
+            $row = $stmt->fetch();
+
+            if ($row && $row['status'] === USER_STATUS_ACTIVE) {
+                return true;
+            }
+
+            // Stale session: the account was deleted, or suspended/banned
+            // after this session was established. Clearing it here (rather
+            // than only checking at login time) means every page doesn't
+            // have to guard against current_user() returning null for a
+            // session that looks logged-in but points at a dead/blocked
+            // account - previously this crashed get_wallet() with a
+            // foreign key violation when $user['id'] silently became 0.
+            unset($_SESSION['user_id'], $_SESSION['username']);
         }
 
         return self::loginFromRememberCookie();
