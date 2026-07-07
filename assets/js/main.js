@@ -190,5 +190,33 @@ if (new URLSearchParams(window.location.search).has('debugjs')) {
             'info',
             20000
         );
+
+        const content = e.target.querySelector('.modal-content');
+        if (content) {
+            const cs = getComputedStyle(content);
+            const crect = content.getBoundingClientRect();
+            SureCashMining.toast(
+                'content: opacity=' + cs.opacity + ' visibility=' + cs.visibility + ' display=' + cs.display
+                    + ' bg=' + cs.backgroundColor + ' color=' + cs.color + ' z=' + cs.zIndex
+                    + ' transform=' + cs.transform + ' w=' + Math.round(crect.width) + ' h=' + Math.round(crect.height),
+                'info',
+                20000
+            );
+        }
+
+        const modalCs = getComputedStyle(e.target);
+        SureCashMining.toast(
+            'modal el: display=' + modalCs.display + ' opacity=' + modalCs.opacity + ' z=' + modalCs.zIndex,
+            'info',
+            20000
+        );
+
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            const bcs = getComputedStyle(backdrop);
+            SureCashMining.toast('backdrop: opacity=' + bcs.opacity + ' bg=' + bcs.backgroundColor + ' z=' + bcs.zIndex, 'info', 20000);
+        } else {
+            SureCashMining.toast('backdrop: NOT FOUND IN DOM', 'error', 20000);
+        }
     });
 }
