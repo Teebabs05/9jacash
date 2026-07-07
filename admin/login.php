@@ -39,6 +39,8 @@ $siteName = get_setting('site_name', 'SURECASH MINING');
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e($pageTitle) ?> · <?= e($siteName) ?></title>
 <?= favicon_link_html() ?>
+<link rel="preload" href="<?= e($assetBase) ?>/fonts/poppins/poppins-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="<?= e($assetBase) ?>/fonts/poppins/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap-icons.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/fonts.css">
@@ -83,11 +85,57 @@ $siteName = get_setting('site_name', 'SURECASH MINING');
                 </div>
                 <button type="submit" class="btn btn-brand w-100">Log In</button>
             </form>
+
+            <div id="biometricLoginWrap" class="d-none">
+                <div class="d-flex align-items-center gap-2 my-3">
+                    <hr class="flex-grow-1"><span class="small" style="color:var(--text-muted);">OR</span><hr class="flex-grow-1">
+                </div>
+                <button type="button" id="biometricLoginBtn" class="btn btn-outline-brand w-100"><i class="bi bi-fingerprint me-1"></i> Log In with Biometrics</button>
+            </div>
         </div>
     </div>
 </div>
+<script>window.CSRF_TOKEN = <?= json_encode(csrf_token()) ?>;</script>
 <script src="<?= e($assetBase) ?>/js/vendor/bootstrap.bundle.min.js"></script>
 <script src="<?= e($assetBase) ?>/js/theme.js"></script>
 <script src="<?= e($assetBase) ?>/js/main.js"></script>
+<script src="<?= e($assetBase) ?>/js/webauthn.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (!SureCashWebAuthn.supported()) return;
+    document.getElementById('biometricLoginWrap').classList.remove('d-none');
+
+    // Prefetch the login challenge as soon as the button is shown, and
+    // keep the *resolved* value (not just a pending promise) cached, so
+    // the click handler can reach navigator.credentials.get() without
+    // any await in between - even awaiting an already-resolved promise
+    // is enough to burn through the click's user-activation window.
+    let cachedOptions = null;
+    function refreshOptions() {
+        cachedOptions = null;
+        SureCashWebAuthn.fetchLoginOptions().then((res) => { cachedOptions = res; });
+    }
+    refreshOptions();
+
+    document.getElementById('biometricLoginBtn').addEventListener('click', async function () {
+        const btn = this;
+        SureCashMining.setLoading(btn, true);
+        try {
+            const optionsRes = cachedOptions || await SureCashWebAuthn.fetchLoginOptions();
+            const result = await SureCashWebAuthn.login('admin', optionsRes);
+            if (result.success) {
+                window.location.href = result.redirect;
+            } else {
+                SureCashMining.toast(result.message || 'Biometric login failed.', 'error');
+                SureCashMining.setLoading(btn, false);
+                refreshOptions();
+            }
+        } catch (e) {
+            SureCashMining.setLoading(btn, false);
+            refreshOptions();
+        }
+    });
+});
+</script>
 </body>
 </html>

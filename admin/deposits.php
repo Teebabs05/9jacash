@@ -79,7 +79,7 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                 <thead><tr><th>User</th><th>Method</th><th>Reference</th><th>Amount</th><th>Proof</th><th>Date</th><th>Status</th><th></th><th></th></tr></thead>
                 <tbody>
                     <?php foreach ($deposits as $d): ?>
-                        <tr>
+                        <tr data-href="receipt.php?type=deposit&id=<?= (int) $d['id'] ?>">
                             <td><?= e($d['full_name']) ?><div class="small" style="color:var(--text-muted);">@<?= e($d['username']) ?></div></td>
                             <td class="text-uppercase small"><?= e($d['method']) ?></td>
                             <td class="small"><?= e($d['reference']) ?></td>

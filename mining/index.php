@@ -36,6 +36,18 @@ $positions = $stmt->fetchAll();
 
 $wallet = get_wallet((int) $user['id']);
 
+$stmt = db()->prepare(
+    "SELECT COALESCE(SUM(mp.daily_return), 0) AS daily_total, COUNT(*) AS active_count
+     FROM user_mining um
+     INNER JOIN mining_plans mp ON mp.id = um.plan_id
+     WHERE um.user_id = ? AND um.status = 'active'"
+);
+$stmt->execute([$user['id']]);
+$dailyMiningSummary = $stmt->fetch();
+$dailyMiningTotal = (float) $dailyMiningSummary['daily_total'];
+$activePositionCount = (int) $dailyMiningSummary['active_count'];
+$effectiveSchedule = mining_effective_payout_schedule((string) $user['payout_schedule']);
+
 $pageTitle = 'Mining';
 $activeNav = 'mining';
 require __DIR__ . '/../includes/partials/app-head.php';
@@ -45,13 +57,41 @@ require __DIR__ . '/../includes/partials/app-head.php';
     <div class="card-surface px-3 py-2 small">Main Wallet Balance: <strong><?= e(money($wallet['main_balance'])) ?></strong></div>
 </div>
 
+<?php if ($activePositionCount > 0): ?>
+<div class="row g-4 mb-1">
+    <div class="col-6 col-xl-3">
+        <div class="stat-tile">
+            <div class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-graph-up-arrow"></i></div>
+            <div class="label">Total Daily Mining Earning</div>
+            <div class="value"><?= e(money($dailyMiningTotal)) ?></div>
+            <div class="small" style="color:var(--text-muted);">across <?= $activePositionCount ?> active position<?= $activePositionCount === 1 ? '' : 's' ?></div>
+        </div>
+    </div>
+    <?php if ((float) $wallet['pending_balance'] > 0): ?>
+    <div class="col-6 col-xl-3">
+        <div class="stat-tile">
+            <div class="icon-badge" style="background:rgba(247,144,9,0.14);color:var(--warning);"><i class="bi bi-hourglass-split"></i></div>
+            <div class="label">Pending Release</div>
+            <div class="value"><?= e(money($wallet['pending_balance'])) ?></div>
+            <div class="small" style="color:var(--text-muted);">Not yet withdrawable</div>
+        </div>
+    </div>
+    <?php endif; ?>
+</div>
+<?php if ($effectiveSchedule !== PAYOUT_SCHEDULE_DAILY): ?>
+<div class="alert alert-info py-2 px-3 small mb-4">
+    <i class="bi bi-info-circle me-1"></i> Your mining earnings accrue daily but only become withdrawable <?= e(strtolower(PAYOUT_SCHEDULE_LABELS[$effectiveSchedule])) ?>.
+</div>
+<?php endif; ?>
+<?php endif; ?>
+
 <h5 class="fw-bold mb-3">Available Mining Plans</h5>
 <div class="row g-4">
     <?php if (!$plans): ?>
         <div class="col-12 text-center py-4" style="color:var(--text-muted);">No mining plans are available right now. Please check back later.</div>
     <?php endif; ?>
     <?php foreach ($plans as $plan): ?>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-6 col-xl-3">
             <div class="mining-plan-card">
                 <h5 class="fw-bold mb-1"><?= e($plan['name']) ?></h5>
                 <div class="price"><?= e(money($plan['price'])) ?></div>

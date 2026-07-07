@@ -12,10 +12,23 @@ this script runs. It:
 
 1. Finds every `user_mining` position whose `next_payout_at` has
    elapsed.
-2. Credits that position's `daily_return` to the user's main wallet.
+2. Credits that position's `daily_return` — under the **Daily** payout
+   schedule straight into the user's withdrawable mining wallet; under
+   **Weekly**, **Every 2 Weeks**, or **At End of Mining Cycle** into a
+   locked "pending" wallet instead (see below).
 3. Advances `next_payout_at` by 24 hours.
 4. Marks the position `completed` once it has been paid out for its
    full `duration_days`, so it stops accruing further.
+5. Releases any pending earnings that are due: weekly/biweekly release
+   on their own recurring interval, cycle_end releases the full locked
+   amount once the position completes.
+
+**Mining payout schedule** (Admin → Settings → Mining Payout Schedule,
+overridable per-user from that user's Manage page) controls step 2/5 —
+it never changes how much a user earns, only when it becomes
+withdrawable. Money sitting in the pending wallet is visible to the
+user (Wallet page, "Pending Mining Earnings") but cannot be withdrawn
+until it's released to the mining wallet.
 
 It is a CLI-only script — it refuses to run if requested over HTTP, so
 there's no way to trigger it by just visiting a URL.

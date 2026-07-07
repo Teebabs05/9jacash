@@ -31,7 +31,7 @@ $activeNav = 'wallet';
 require __DIR__ . '/../includes/partials/app-head.php';
 ?>
 <div class="row g-4">
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-wallet2"></i></div>
             <div class="label">Main Wallet</div>
@@ -39,7 +39,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="small" style="color:var(--text-muted);">&asymp; <?= e(money_usd((float) $wallet['main_balance'])) ?></div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(242,201,76,0.16);color:var(--brand-gold-dark);"><i class="bi bi-gift-fill"></i></div>
             <div class="label">Bonus Wallet</div>
@@ -47,7 +47,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="small" style="color:var(--text-muted);">&asymp; <?= e(money_usd((float) $wallet['bonus_balance'])) ?></div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(46,144,250,0.14);color:var(--info);"><i class="bi bi-people-fill"></i></div>
             <div class="label">Referral Wallet</div>
@@ -55,7 +55,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="small" style="color:var(--text-muted);">&asymp; <?= e(money_usd((float) $wallet['referral_balance'])) ?></div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(11,37,69,0.10);color:var(--brand-navy);"><i class="bi bi-cpu-fill"></i></div>
             <div class="label">Mining Wallet</div>
@@ -63,6 +63,16 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="small" style="color:var(--text-muted);">&asymp; <?= e(money_usd((float) $wallet['mining_balance'])) ?></div>
         </div>
     </div>
+    <?php if ((float) $wallet['pending_balance'] > 0): ?>
+    <div class="col-6 col-xl-3">
+        <div class="stat-tile">
+            <div class="icon-badge" style="background:rgba(247,144,9,0.14);color:var(--warning);"><i class="bi bi-hourglass-split"></i></div>
+            <div class="label">Pending Mining Earnings</div>
+            <div class="value"><?= e(money($wallet['pending_balance'])) ?></div>
+            <div class="small" style="color:var(--text-muted);">Not yet withdrawable</div>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
 
 <div class="row g-4 mt-1">
@@ -85,10 +95,20 @@ require __DIR__ . '/../includes/partials/app-head.php';
                             <tr><th>Description</th><th>Wallet</th><th>Amount</th><th>Date</th></tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($recent as $row): ?>
-                                <tr>
+                            <?php foreach ($recent as $row):
+                                $rowDescription = $row['description'] ?: ($sourceLabels[$row['source']] ?? ucfirst($row['source']));
+                            ?>
+                                <tr data-ledger-row
+                                    data-ledger-description="<?= e($rowDescription) ?>"
+                                    data-ledger-wallet="<?= e($row['wallet_type']) ?>"
+                                    data-ledger-type="<?= e(ucfirst($row['type'])) ?>"
+                                    data-ledger-amount="<?= e(($row['type'] === 'credit' ? '+' : '-') . money($row['amount'])) ?>"
+                                    data-ledger-balance="<?= e(money($row['balance_after'])) ?>"
+                                    data-ledger-status="<?= e(ucfirst($row['status'])) ?>"
+                                    data-ledger-reference="<?= e($row['reference'] ?: '-') ?>"
+                                    data-ledger-date="<?= e(date('M d, Y H:i', strtotime($row['created_at']))) ?>">
                                     <td>
-                                        <?= e($row['description'] ?: ($sourceLabels[$row['source']] ?? ucfirst($row['source']))) ?>
+                                        <?= e($rowDescription) ?>
                                         <span class="pill pill-<?= $row['type'] === 'credit' ? 'credit' : 'debit' ?> ms-1"><?= e(ucfirst($row['type'])) ?></span>
                                     </td>
                                     <td class="text-capitalize"><?= e($row['wallet_type']) ?></td>
@@ -126,5 +146,7 @@ require __DIR__ . '/../includes/partials/app-head.php';
         </div>
     </div>
 </div>
+
+<?php require __DIR__ . '/../includes/partials/transaction-detail-modal.php'; ?>
 
 <?php require __DIR__ . '/../includes/partials/app-scripts.php'; ?>

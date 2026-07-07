@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `admins` (
     `password` VARCHAR(255) NOT NULL,
     `full_name` VARCHAR(150) NOT NULL DEFAULT 'Administrator',
     `avatar` VARCHAR(255) DEFAULT NULL,
-    `role` ENUM('super_admin','admin','support') NOT NULL DEFAULT 'admin',
+    `role` ENUM('super_admin','admin','moderator','support') NOT NULL DEFAULT 'admin',
     `status` ENUM('active','disabled') NOT NULL DEFAULT 'active',
     `last_login_at` DATETIME DEFAULT NULL,
     `last_login_ip` VARCHAR(45) DEFAULT NULL,
@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     `referred_by` INT UNSIGNED DEFAULT NULL,
     `status` ENUM('active','suspended','banned') NOT NULL DEFAULT 'active',
     `kyc_status` ENUM('unverified','pending','approved','rejected') NOT NULL DEFAULT 'unverified',
+    `payout_schedule` ENUM('default','daily','weekly','biweekly','cycle_end') NOT NULL DEFAULT 'default' COMMENT 'Per-user override for when mining earnings release to the withdrawable wallet; default = use site_settings.mining_payout_schedule',
     `email_verified_at` DATETIME DEFAULT NULL,
     `last_login_at` DATETIME DEFAULT NULL,
     `last_login_ip` VARCHAR(45) DEFAULT NULL,
@@ -199,8 +200,10 @@ CREATE TABLE IF NOT EXISTS `user_mining` (
     `plan_id` INT UNSIGNED NOT NULL,
     `amount_invested` DECIMAL(18,2) NOT NULL,
     `total_earned` DECIMAL(18,2) NOT NULL DEFAULT 0.00,
+    `released_earned` DECIMAL(18,2) NOT NULL DEFAULT 0.00 COMMENT 'How much of total_earned has been moved from the pending wallet into the withdrawable mining wallet so far',
     `started_at` DATETIME NOT NULL,
     `next_payout_at` DATETIME DEFAULT NULL,
+    `next_release_at` DATETIME DEFAULT NULL COMMENT 'Next time accrued pending earnings release to the withdrawable mining wallet (weekly/biweekly schedules only)',
     `ends_at` DATETIME NOT NULL,
     `status` ENUM('active','paused','completed') NOT NULL DEFAULT 'active',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -296,6 +299,7 @@ CREATE TABLE IF NOT EXISTS `task_submissions` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uniq_task_user` (`task_id`, `user_id`),
     KEY `idx_ts_user` (`user_id`),
+    KEY `idx_ts_status` (`status`),
     CONSTRAINT `fk_ts_task` FOREIGN KEY (`task_id`) REFERENCES `tasks` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_ts_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -404,6 +408,7 @@ CREATE TABLE IF NOT EXISTS `notifications` (
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `idx_notifications_user` (`user_id`),
+    KEY `idx_notifications_user_read` (`user_id`, `is_read`),
     CONSTRAINT `fk_notifications_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -482,6 +487,24 @@ CREATE TABLE IF NOT EXISTS `support_messages` (
     CONSTRAINT `fk_sm_admin` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =====================================================================
+-- BIOMETRIC LOGIN (WebAuthn/FIDO2 platform authenticators)
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS `webauthn_credentials` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `owner_type` ENUM('user','admin') NOT NULL,
+    `owner_id` INT UNSIGNED NOT NULL,
+    `credential_id` VARCHAR(255) NOT NULL COMMENT 'base64url-encoded authenticator credential ID',
+    `public_key` TEXT NOT NULL COMMENT 'PEM-encoded EC public key reconstructed from the COSE key',
+    `sign_count` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    `device_label` VARCHAR(100) DEFAULT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `last_used_at` DATETIME DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_webauthn_credential_id` (`credential_id`),
+    KEY `idx_webauthn_owner` (`owner_type`, `owner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- =====================================================================
@@ -536,6 +559,7 @@ INSERT INTO `site_settings` (`setting_key`, `setting_value`) VALUES
 ('ad_watch_duration_seconds', '15'),
 ('spin_daily_limit', '1'),
 ('spin_extra_price', '50'),
+('mining_payout_schedule', 'daily'),
 ('checkin_base_reward', '10'),
 ('mail_from_name', 'SURECASH MINING'),
 ('mail_from_address', 'no-reply@surecashmining.com'),

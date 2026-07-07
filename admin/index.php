@@ -22,28 +22,28 @@ require __DIR__ . '/../includes/partials/admin-head.php';
 <p style="color:var(--text-muted);">Platform overview at a glance.</p>
 
 <div class="row g-4 mt-1">
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(11,37,69,0.10);color:var(--brand-navy);"><i class="bi bi-people-fill"></i></div>
             <div class="label">Total Users</div>
             <div class="value"><?= number_format($totalUsers) ?></div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(46,144,250,0.14);color:var(--info);"><i class="bi bi-arrow-down-circle-fill"></i></div>
             <div class="label">Pending Deposits</div>
             <div class="value"><?= number_format($pendingDeposits) ?></div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(240,68,56,0.12);color:var(--danger);"><i class="bi bi-arrow-up-circle-fill"></i></div>
             <div class="label">Pending Withdrawals</div>
             <div class="value"><?= number_format($pendingWithdrawals) ?></div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
+    <div class="col-6 col-xl-3">
         <div class="stat-tile">
             <div class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-cpu-fill"></i></div>
             <div class="label">Active Mining Positions</div>

@@ -72,6 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = current_user();
 }
 
+$biometricCount = webauthn_credential_count('user', (int) $user['id']);
+
 $pageTitle = 'My Profile';
 $activeNav = 'profile';
 require __DIR__ . '/../includes/partials/app-head.php';
@@ -164,7 +166,63 @@ require __DIR__ . '/../includes/partials/app-head.php';
                 <span class="fw-semibold"><?= e($user['referral_code']) ?></span>
             </div>
         </div>
+
+        <div class="card-surface p-4 mt-4">
+            <h5 class="fw-bold mb-2">Biometric Login</h5>
+            <p class="small mb-3" style="color:var(--text-muted);">Use your device's fingerprint/face unlock to log in instead of typing your password.</p>
+            <div id="biometricNotSupported" class="alert alert-warning py-2 px-3 small mb-0 d-none">Your current browser/device doesn't support biometric login.</div>
+            <div id="biometricControls">
+                <?php if ($biometricCount > 0): ?>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="pill pill-active">Enabled</span>
+                        <form method="POST" action="<?= e(rtrim(APP_URL, '/')) ?>/webauthn/disable.php" onsubmit="return confirm('Turn off biometric login on this account?');">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Turn Off</button>
+                        </form>
+                    </div>
+                <?php else: ?>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="pill pill-rejected">Disabled</span>
+                        <button type="button" id="enableBiometricBtn" class="btn btn-brand btn-sm">Enable Biometric Login</button>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>window.CSRF_TOKEN = <?= json_encode(csrf_token()) ?>;</script>
+<script src="<?= e($assetBase) ?>/js/webauthn.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (!SureCashWebAuthn.supported()) {
+        const notSupported = document.getElementById('biometricNotSupported');
+        const controls = document.getElementById('biometricControls');
+        if (notSupported) notSupported.classList.remove('d-none');
+        if (controls) controls.classList.add('d-none');
+        return;
+    }
+
+    const enableBtn = document.getElementById('enableBiometricBtn');
+    if (!enableBtn) return;
+
+    enableBtn.addEventListener('click', async function () {
+        SureCashMining.setLoading(enableBtn, true);
+        try {
+            const result = await SureCashWebAuthn.register();
+            if (result.success) {
+                SureCashMining.toast(result.message || 'Biometric login enabled!');
+                setTimeout(() => window.location.reload(), 900);
+            } else {
+                SureCashMining.toast(result.message || 'Could not enable biometric login.', 'error');
+                SureCashMining.setLoading(enableBtn, false);
+            }
+        } catch (e) {
+            SureCashMining.toast('Biometric setup was cancelled or failed.', 'error');
+            SureCashMining.setLoading(enableBtn, false);
+        }
+    });
+});
+</script>
 
 <?php require __DIR__ . '/../includes/partials/app-scripts.php'; ?>

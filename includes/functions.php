@@ -32,13 +32,36 @@ if (!function_exists('app_log')) {
 }
 
 /**
- * Redirect helper (always exits).
+ * Redirect helper (always exits). Flushes the response to the client
+ * immediately when running under PHP-FPM, so any work deferred via
+ * defer_after_response() (e.g. sending a login-notification email)
+ * happens after the browser has already moved on to the next page
+ * instead of making the user wait on it.
  */
 if (!function_exists('redirect')) {
     function redirect(string $url): never
     {
         header('Location: ' . $url);
+
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
+
         exit;
+    }
+}
+
+/**
+ * Queue a callable to run after the response has been sent to the
+ * client (via redirect()'s fastcgi_finish_request(), or otherwise at
+ * script end) rather than blocking the current request on it. Used for
+ * best-effort side effects like login-notification emails, where a
+ * slow SMTP server shouldn't make every login/page load feel sluggish.
+ */
+if (!function_exists('defer_after_response')) {
+    function defer_after_response(callable $fn): void
+    {
+        register_shutdown_function($fn);
     }
 }
 

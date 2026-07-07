@@ -103,5 +103,33 @@ const SureCashMining = (function () {
         }
     });
 
+    // Clickable table rows: a <tr data-href="..."> navigates when clicked,
+    // unless the click landed on an actual interactive element inside it
+    // (buttons, links, form controls keep their own behavior).
+    document.addEventListener('click', function (e) {
+        const row = e.target.closest('tr[data-href]');
+        if (!row || e.target.closest('a, button, input, textarea, select, label, .modal')) return;
+        window.location.href = row.getAttribute('data-href');
+    });
+
+    // Clickable wallet_ledger rows: <tr data-ledger-row data-ledger-*> opens
+    // the shared #txnDetailModal (see includes/partials/transaction-detail-modal.php)
+    // populated entirely from the row's own data attributes - no extra request.
+    document.addEventListener('click', function (e) {
+        const row = e.target.closest('tr[data-ledger-row]');
+        if (!row || e.target.closest('a, button, input, textarea, select, label')) return;
+
+        const modalEl = document.getElementById('txnDetailModal');
+        if (!modalEl || typeof bootstrap === 'undefined') return;
+
+        const fields = ['description', 'wallet', 'type', 'amount', 'balance', 'status', 'reference', 'date'];
+        fields.forEach(function (field) {
+            const el = document.getElementById('txnDetail' + field.charAt(0).toUpperCase() + field.slice(1));
+            if (el) el.textContent = row.dataset['ledger' + field.charAt(0).toUpperCase() + field.slice(1)] || '-';
+        });
+
+        new bootstrap.Modal(modalEl).show();
+    });
+
     return { toast, setLoading };
 })();

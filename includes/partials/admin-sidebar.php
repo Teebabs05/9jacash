@@ -19,9 +19,15 @@ if (!function_exists('admin_nav_link')) {
     }
 }
 
-$pendingSubmissions = (int) db()->query("SELECT COUNT(*) AS c FROM task_submissions WHERE status = 'pending'")->fetch()['c'];
-$pendingDeposits = (int) db()->query("SELECT COUNT(*) AS c FROM deposits WHERE status = 'pending'")->fetch()['c'];
-$pendingWithdrawals = (int) db()->query("SELECT COUNT(*) AS c FROM withdrawals WHERE status = 'pending'")->fetch()['c'];
+$pendingCounts = db()->query(
+    "SELECT
+        (SELECT COUNT(*) FROM task_submissions WHERE status = 'pending') AS submissions,
+        (SELECT COUNT(*) FROM deposits WHERE status = 'pending') AS deposits,
+        (SELECT COUNT(*) FROM withdrawals WHERE status = 'pending') AS withdrawals"
+)->fetch();
+$pendingSubmissions = (int) $pendingCounts['submissions'];
+$pendingDeposits = (int) $pendingCounts['deposits'];
+$pendingWithdrawals = (int) $pendingCounts['withdrawals'];
 $unreadMessages = support_unread_total_for_admin();
 ?>
 <aside class="app-sidebar">
@@ -35,6 +41,9 @@ $unreadMessages = support_unread_total_for_admin();
 
         <div class="nav-section-label">Users</div>
         <?php admin_nav_link('users', $base . '/admin/users.php', 'bi-people-fill', 'Manage Users', $activeNav); ?>
+        <?php if (($authAdmin['role'] ?? '') === 'super_admin'): ?>
+            <?php admin_nav_link('staff', $base . '/admin/staff.php', 'bi-person-badge-fill', 'Staff Management', $activeNav); ?>
+        <?php endif; ?>
         <?php admin_nav_link('messages', $base . '/admin/messages.php', 'bi-chat-dots-fill', 'Messages', $activeNav, true, $unreadMessages ?: null); ?>
         <?php admin_nav_link('referral-settings', $base . '/admin/referral-settings.php', 'bi-diagram-3-fill', 'Referral Settings', $activeNav); ?>
 
@@ -52,6 +61,7 @@ $unreadMessages = support_unread_total_for_admin();
 
         <div class="nav-section-label">Platform</div>
         <?php admin_nav_link('settings', $base . '/admin/settings.php', 'bi-gear-fill', 'Settings', $activeNav); ?>
+        <?php admin_nav_link('profile', $base . '/admin/profile.php', 'bi-person-fill', 'My Profile', $activeNav); ?>
         <a href="<?= e($base) ?>/admin/logout.php" class="nav-link text-danger"><i class="bi bi-box-arrow-right"></i>Logout</a>
     </nav>
 </aside>

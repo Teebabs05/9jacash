@@ -144,6 +144,42 @@ final class Auth
         $stmt->execute([client_ip(), $user['id']]);
 
         log_activity((int) $user['id'], null, 'login', 'User logged in');
+        defer_after_response(fn () => Mailer::sendLoginNotificationEmail($user['email'], $user['full_name'], client_ip(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? '')));
+
+        return ['success' => true, 'message' => 'Welcome back!'];
+    }
+
+    /**
+     * Complete a login already authenticated by another factor (biometric
+     * WebAuthn assertion) - same session/notification/logging tail as
+     * attemptLogin(), skipping the password check it doesn't need.
+     */
+    public static function completeBiometricLogin(int $userId): array
+    {
+        $pdo = db();
+        $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ? LIMIT 1');
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            return ['success' => false, 'message' => 'Account not found.'];
+        }
+
+        if ($user['status'] === USER_STATUS_SUSPENDED) {
+            return ['success' => false, 'message' => 'Your account has been suspended. Contact support for assistance.'];
+        }
+
+        if ($user['status'] === USER_STATUS_BANNED) {
+            return ['success' => false, 'message' => 'Your account has been permanently banned.'];
+        }
+
+        self::establishSession($user);
+
+        $pdo->prepare('UPDATE users SET last_login_at = NOW(), last_login_ip = ? WHERE id = ?')
+            ->execute([client_ip(), $user['id']]);
+
+        log_activity((int) $user['id'], null, 'login', 'User logged in with biometrics');
+        defer_after_response(fn () => Mailer::sendLoginNotificationEmail($user['email'], $user['full_name'], client_ip(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? '')));
 
         return ['success' => true, 'message' => 'Welcome back!'];
     }
@@ -178,7 +214,22 @@ final class Auth
     public static function isLoggedIn(): bool
     {
         if (!empty($_SESSION['user_id'])) {
-            return true;
+            $stmt = db()->prepare('SELECT status FROM users WHERE id = ? LIMIT 1');
+            $stmt->execute([$_SESSION['user_id']]);
+            $row = $stmt->fetch();
+
+            if ($row && $row['status'] === USER_STATUS_ACTIVE) {
+                return true;
+            }
+
+            // Stale session: the account was deleted, or suspended/banned
+            // after this session was established. Clearing it here (rather
+            // than only checking at login time) means every page doesn't
+            // have to guard against current_user() returning null for a
+            // session that looks logged-in but points at a dead/blocked
+            // account - previously this crashed get_wallet() with a
+            // foreign key violation when $user['id'] silently became 0.
+            unset($_SESSION['user_id'], $_SESSION['username']);
         }
 
         return self::loginFromRememberCookie();

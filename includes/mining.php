@@ -28,6 +28,41 @@ if (!function_exists('mining_plan_cycles')) {
     }
 }
 
+/**
+ * A user's effective mining payout release schedule: their own override
+ * if set, otherwise the site-wide default. This controls when accrued
+ * daily earnings move from the locked pending wallet into the
+ * withdrawable mining wallet - it never changes how much is earned.
+ */
+if (!function_exists('mining_effective_payout_schedule')) {
+    function mining_effective_payout_schedule(string $userPayoutSchedule): string
+    {
+        if ($userPayoutSchedule !== PAYOUT_SCHEDULE_DEFAULT && in_array($userPayoutSchedule, PAYOUT_SCHEDULES, true)) {
+            return $userPayoutSchedule;
+        }
+
+        $global = (string) get_setting('mining_payout_schedule', PAYOUT_SCHEDULE_DAILY);
+
+        return in_array($global, PAYOUT_SCHEDULES, true) ? $global : PAYOUT_SCHEDULE_DAILY;
+    }
+}
+
+/**
+ * Days between releases for the periodic schedules. Daily releases
+ * immediately (no interval) and cycle_end releases once at completion,
+ * so neither has a recurring interval.
+ */
+if (!function_exists('mining_release_interval_days')) {
+    function mining_release_interval_days(string $schedule): ?int
+    {
+        return match ($schedule) {
+            PAYOUT_SCHEDULE_WEEKLY => 7,
+            PAYOUT_SCHEDULE_BIWEEKLY => 14,
+            default => null,
+        };
+    }
+}
+
 if (!function_exists('mining_purchase_plan')) {
     function mining_purchase_plan(int $userId, int $planId, int $cycleDays): array
     {
@@ -130,15 +165,22 @@ if (!function_exists('mining_process_payouts')) {
         $totalPaid = 0.0;
 
         $stmt = $pdo->query(
-            "SELECT um.*, mp.name AS plan_name, mp.daily_return AS plan_daily_return
+            "SELECT um.*, mp.name AS plan_name, mp.daily_return AS plan_daily_return, u.payout_schedule AS user_payout_schedule
              FROM user_mining um
              INNER JOIN mining_plans mp ON mp.id = um.plan_id
+             INNER JOIN users u ON u.id = um.user_id
              WHERE um.status = 'active' AND um.next_payout_at <= NOW()"
         );
         $due = $stmt->fetchAll();
 
         foreach ($due as $position) {
             $dailyReturn = (float) $position['plan_daily_return'];
+            $schedule = mining_effective_payout_schedule((string) $position['user_payout_schedule']);
+            // Daily schedule pays straight into the withdrawable mining
+            // wallet like before; every other schedule accrues into the
+            // locked pending wallet until mining_process_releases() moves
+            // it across on the configured cadence.
+            $creditWallet = $schedule === PAYOUT_SCHEDULE_DAILY ? WALLET_MINING : WALLET_PENDING;
 
             // wallet_credit() runs its own top-level transaction (PDO/MySQL
             // doesn't support nesting), so the ledger credit is committed
@@ -147,10 +189,10 @@ if (!function_exists('mining_process_payouts')) {
             try {
                 wallet_credit(
                     (int) $position['user_id'],
-                    WALLET_MINING,
+                    $creditWallet,
                     $dailyReturn,
                     LEDGER_SOURCE_MINING,
-                    'Daily mining payout - ' . $position['plan_name']
+                    ($creditWallet === WALLET_PENDING ? 'Mining earning accrued (pending release) - ' : 'Daily mining payout - ') . $position['plan_name']
                 );
             } catch (Throwable $e) {
                 app_log('error', 'Mining payout credit failed for position #' . $position['id'] . ': ' . $e->getMessage());
@@ -167,25 +209,127 @@ if (!function_exists('mining_process_payouts')) {
                 $isFinished = strtotime($nextPayoutAt) >= strtotime((string) $position['ends_at']);
                 $newStatus = $isFinished ? MINING_STATUS_COMPLETED : MINING_STATUS_ACTIVE;
 
+                // released_earned tracks how much of total_earned has
+                // actually reached the withdrawable mining wallet so far,
+                // regardless of which schedule paid it out - keeping it in
+                // sync here (not just in mining_process_releases()) means a
+                // mid-course schedule change never double-releases funds
+                // that were already paid out immediately under 'daily'.
+                $releasedIncrement = $creditWallet === WALLET_MINING ? $dailyReturn : 0.0;
+
                 $updateStmt = $pdo->prepare(
-                    'UPDATE user_mining SET total_earned = total_earned + ?, next_payout_at = ?, status = ? WHERE id = ?'
+                    'UPDATE user_mining SET total_earned = total_earned + ?, released_earned = released_earned + ?, next_payout_at = ?, status = ? WHERE id = ?'
                 );
-                $updateStmt->execute([$dailyReturn, $isFinished ? $position['next_payout_at'] : $nextPayoutAt, $newStatus, $position['id']]);
+                $updateStmt->execute([$dailyReturn, $releasedIncrement, $isFinished ? $position['next_payout_at'] : $nextPayoutAt, $newStatus, $position['id']]);
 
                 $processed++;
                 $totalPaid += $dailyReturn;
                 if ($isFinished) {
                     $completed++;
                     notify_user((int) $position['user_id'], 'Mining Plan Completed', "Your {$position['plan_name']} mining plan has completed its cycle.", NOTIFY_TYPE_MINING);
-                } else {
+                } elseif ($creditWallet === WALLET_MINING) {
                     notify_user((int) $position['user_id'], 'Mining Payout Received', 'You received ' . money($dailyReturn) . " from your {$position['plan_name']} plan.", NOTIFY_TYPE_MINING);
                 }
             } catch (Throwable $e) {
                 app_log('error', 'Mining payout bookkeeping failed for position #' . $position['id'] . ', reverting credit: ' . $e->getMessage());
-                wallet_debit((int) $position['user_id'], WALLET_MINING, $dailyReturn, LEDGER_SOURCE_MINING, 'Reverted mining payout due to a processing error');
+                wallet_debit((int) $position['user_id'], $creditWallet, $dailyReturn, LEDGER_SOURCE_MINING, 'Reverted mining payout due to a processing error');
             }
         }
 
         return ['processed' => $processed, 'completed' => $completed, 'total_paid' => $totalPaid];
+    }
+}
+
+/**
+ * Release accrued mining earnings sitting in the pending wallet into the
+ * withdrawable mining wallet for users on a weekly/every-2-weeks/cycle-end
+ * schedule. Safe to run as often as mining_process_payouts() (it only
+ * acts once a position's next_release_at has elapsed, or once a
+ * cycle_end position completes).
+ */
+if (!function_exists('mining_process_releases')) {
+    function mining_process_releases(): array
+    {
+        $pdo = db();
+        $released = 0;
+        $totalReleased = 0.0;
+
+        $stmt = $pdo->query(
+            "SELECT um.*, mp.name AS plan_name, u.payout_schedule AS user_payout_schedule
+             FROM user_mining um
+             INNER JOIN mining_plans mp ON mp.id = um.plan_id
+             INNER JOIN users u ON u.id = um.user_id
+             WHERE um.status IN ('active','completed') AND um.released_earned < um.total_earned"
+        );
+        $candidates = $stmt->fetchAll();
+
+        foreach ($candidates as $position) {
+            $schedule = mining_effective_payout_schedule((string) $position['user_payout_schedule']);
+
+            if ($schedule === PAYOUT_SCHEDULE_DAILY) {
+                continue;
+            }
+
+            $intervalDays = mining_release_interval_days($schedule);
+            $dueNow = false;
+
+            if ($schedule === PAYOUT_SCHEDULE_CYCLE_END) {
+                $dueNow = $position['status'] === MINING_STATUS_COMPLETED;
+            } elseif ($intervalDays !== null) {
+                if ($position['next_release_at'] === null) {
+                    // First time we've seen this position under a periodic
+                    // schedule - start the clock, nothing to release yet.
+                    $pdo->prepare('UPDATE user_mining SET next_release_at = ? WHERE id = ?')
+                        ->execute([date('Y-m-d H:i:s', strtotime('+' . $intervalDays . ' days')), $position['id']]);
+                    continue;
+                }
+
+                $dueNow = strtotime((string) $position['next_release_at']) <= time();
+            }
+
+            if (!$dueNow) {
+                continue;
+            }
+
+            $releasable = round((float) $position['total_earned'] - (float) $position['released_earned'], 2);
+            if ($releasable <= 0.01) {
+                if ($intervalDays !== null) {
+                    $pdo->prepare('UPDATE user_mining SET next_release_at = ? WHERE id = ?')
+                        ->execute([date('Y-m-d H:i:s', strtotime('+' . $intervalDays . ' days')), $position['id']]);
+                }
+                continue;
+            }
+
+            try {
+                wallet_debit(
+                    (int) $position['user_id'],
+                    WALLET_PENDING,
+                    $releasable,
+                    LEDGER_SOURCE_MINING,
+                    'Mining earning released to wallet - ' . $position['plan_name']
+                );
+                wallet_credit(
+                    (int) $position['user_id'],
+                    WALLET_MINING,
+                    $releasable,
+                    LEDGER_SOURCE_MINING,
+                    'Mining earning released to wallet - ' . $position['plan_name']
+                );
+            } catch (Throwable $e) {
+                app_log('error', 'Mining release failed for position #' . $position['id'] . ': ' . $e->getMessage());
+                continue;
+            }
+
+            $updateStmt = $pdo->prepare('UPDATE user_mining SET released_earned = total_earned' . ($intervalDays !== null ? ', next_release_at = ?' : '') . ' WHERE id = ?');
+            $intervalDays !== null
+                ? $updateStmt->execute([date('Y-m-d H:i:s', strtotime('+' . $intervalDays . ' days')), $position['id']])
+                : $updateStmt->execute([$position['id']]);
+
+            $released++;
+            $totalReleased += $releasable;
+            notify_user((int) $position['user_id'], 'Mining Earnings Released', money($releasable) . " from your {$position['plan_name']} plan is now available in your wallet for withdrawal.", NOTIFY_TYPE_MINING);
+        }
+
+        return ['released' => $released, 'total_released' => $totalReleased];
     }
 }

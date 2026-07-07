@@ -130,6 +130,23 @@
     color: var(--text);
 }
 
+.app-topbar h5 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 575.98px) {
+    .app-topbar {
+        padding: 12px 14px;
+        gap: 8px;
+    }
+    .app-topbar h5 {
+        max-width: 34vw;
+        font-size: 1rem;
+    }
+}
+
 .app-content {
     padding: 28px;
 }
@@ -196,6 +213,82 @@
     font-weight: 700;
 }
 
+@media (max-width: 575.98px) {
+    .stat-tile {
+        padding: 16px;
+    }
+    .stat-tile .icon-badge {
+        width: 36px;
+        height: 36px;
+        font-size: 1.05rem;
+        margin-bottom: 10px;
+    }
+    .stat-tile .label {
+        font-size: .74rem;
+    }
+    .stat-tile .value {
+        font-size: 1.15rem;
+    }
+}
+
+/* ---------------------------------------------------------------
+   Quick Access grid - icon tiles instead of stacked full-width
+   buttons, used for the user dashboard's shortcut panel (and any
+   other "jump to a feature" panel).
+   --------------------------------------------------------------- */
+.quick-access-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.quick-access-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+    color: var(--text);
+    text-decoration: none;
+    text-align: center;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.quick-access-item:hover {
+    color: var(--text);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+
+.quick-access-item .icon-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    background: rgba(15,81,50,0.12);
+    color: var(--brand-emerald);
+}
+
+.quick-access-item span {
+    font-size: .76rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+@media (max-width: 400px) {
+    .quick-access-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 /* ---------------------------------------------------------------
    Ledger table
    --------------------------------------------------------------- */
@@ -212,6 +305,16 @@
     border-bottom: 1px solid var(--border);
     vertical-align: middle;
     font-size: .9rem;
+}
+
+.ledger-table tbody tr[data-href],
+.ledger-table tbody tr[data-ledger-row] {
+    cursor: pointer;
+}
+
+.ledger-table tbody tr[data-href]:hover,
+.ledger-table tbody tr[data-ledger-row]:hover {
+    background: var(--surface-alt);
 }
 
 .pill {
@@ -262,6 +365,19 @@
     display: flex;
     gap: 8px;
     align-items: center;
+}
+
+@media (max-width: 575.98px) {
+    .mining-plan-card {
+        padding: 16px;
+    }
+    .mining-plan-card .price {
+        font-size: 1.25rem;
+        word-break: break-word;
+    }
+    .mining-plan-card ul li {
+        font-size: .8rem;
+    }
 }
 
 .progress-thin {
@@ -357,6 +473,34 @@
     justify-content: center;
     color: var(--brand-gold);
     font-size: 1.3rem;
+}
+
+/* ---------------------------------------------------------------
+   Modals - keep header/footer reachable even when a mobile on-screen
+   keyboard shrinks the visual viewport. Bootstrap's default (non
+   -scrollable) modal only scrolls at the outer .modal level, so a
+   tall body can push the footer buttons below the fold; sticking the
+   header/footer to that scrollport keeps them visible at all times.
+   --------------------------------------------------------------- */
+.modal-header, .modal-footer {
+    position: sticky;
+    background: var(--surface);
+    z-index: 2;
+}
+
+.modal-header { top: 0; }
+.modal-footer { bottom: 0; }
+
+@media (max-width: 575.98px) {
+    .modal-dialog {
+        margin: 0.75rem;
+    }
+    .modal-footer {
+        flex-wrap: wrap;
+    }
+    .modal-footer > * {
+        flex: 1 1 auto;
+    }
 }
 
 /* ---------------------------------------------------------------
