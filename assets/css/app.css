@@ -493,9 +493,20 @@
    100%) only reliably resolves against a *definite* ancestor height,
    not an auto height that merely happens to be capped, which is why
    an earlier max-height-only version of this rendered inconsistently.
+
+   The height subtracts Bootstrap's own --bs-modal-margin (applied on
+   all 4 sides by .modal-dialog{margin:var(--bs-modal-margin)}) rather
+   than a hardcoded value, because that margin itself is responsive -
+   0.5rem under 576px, 1.75rem at/above it. A phone in landscape is
+   often wider than 576px, so it uses the *larger* desktop margin;
+   subtracting a fixed mobile-sized number there left far too little
+   room for the header/body and clipped them entirely with no way to
+   scroll to reveal them.
    --------------------------------------------------------------- */
 .modal-dialog {
-    height: calc(var(--vvh, 100dvh) - 1.5rem);
+    height: calc(var(--vvh, 100dvh) - (var(--bs-modal-margin, 0.5rem) * 2));
+    display: flex;
+    align-items: center;
 }
 
 .modal-content {
@@ -505,6 +516,7 @@
 
 .modal-body {
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-header, .modal-footer {
@@ -518,10 +530,6 @@
 .modal-footer { bottom: 0; }
 
 @media (max-width: 575.98px) {
-    .modal-dialog {
-        margin: 0.75rem;
-        height: calc(var(--vvh, 100dvh) - 1rem);
-    }
     .modal-footer {
         flex-wrap: wrap;
     }
