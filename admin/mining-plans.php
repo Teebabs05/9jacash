@@ -32,6 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($price <= 0 || $dailyReturn <= 0 || $duration <= 0) {
             $errors[] = 'Price, daily return and duration must all be greater than zero.';
         }
+        if (!in_array($duration, MINING_CYCLE_OPTIONS, true)) {
+            $errors[] = 'Reference duration must be one of the allowed mining cycles (' . implode(' or ', MINING_CYCLE_OPTIONS) . ' days).';
+        }
 
         if (!$errors) {
             if ($id > 0) {
@@ -148,7 +151,7 @@ require __DIR__ . '/../includes/partials/admin-head.php';
                 </div>
                 <div class="mb-3">
                     <label class="form-label small">Reference Duration (days)</label>
-                    <input type="number" min="1" class="form-control" name="duration_days" value="<?= e((string) ($editPlan['duration_days'] ?? 30)) ?>" required>
+                    <input type="number" min="1" class="form-control" name="duration_days" value="<?= e((string) ($editPlan['duration_days'] ?? 14)) ?>" required>
                     <div class="form-text">Used for admin-assigned (gifted) positions. Users purchasing normally pick one of the cycles below instead.</div>
                 </div>
                 <div class="mb-4">

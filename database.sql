@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS `mining_plans` (
     `price` DECIMAL(18,2) NOT NULL,
     `daily_return` DECIMAL(18,2) NOT NULL,
     `duration_days` SMALLINT UNSIGNED NOT NULL DEFAULT 30,
-    `available_cycles` VARCHAR(50) NOT NULL DEFAULT '7,14,21,30' COMMENT 'Comma-separated day-cycle choices offered to the user at purchase time',
+    `available_cycles` VARCHAR(50) NOT NULL DEFAULT '7,14' COMMENT 'Comma-separated day-cycle choices offered to the user at purchase time',
     `description` TEXT DEFAULT NULL,
     `status` ENUM('active','inactive') NOT NULL DEFAULT 'active',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -588,10 +588,15 @@ INSERT INTO `spin_settings` (`label`, `amount`, `probability`, `color`, `is_acti
 ('₦50', 50.00, 2.00, '#F2C94C', 1)
 ON DUPLICATE KEY UPDATE `label` = VALUES(`label`);
 
--- Starter mining plans (shown on the landing page and in the Mining module)
-INSERT INTO `mining_plans` (`name`, `price`, `daily_return`, `duration_days`, `description`, `status`) VALUES
-('Starter Miner', 2000.00, 150.00, 30, 'A low-risk entry plan perfect for first-time miners.', 'active'),
-('Bronze Miner', 5000.00, 400.00, 30, 'Balanced daily returns with a 30-day mining cycle.', 'active'),
-('Silver Miner', 15000.00, 1350.00, 30, 'Our most popular plan for consistent daily earners.', 'active'),
-('Gold Miner', 50000.00, 4750.00, 30, 'Premium returns for serious investors.', 'active')
+-- Mining plans (shown on the landing page and in the Mining module).
+-- All plans offer 7-day and 14-day mining cycles only.
+INSERT INTO `mining_plans` (`name`, `price`, `daily_return`, `duration_days`, `available_cycles`, `description`, `status`) VALUES
+('Starter Miner', 2000.00, 150.00, 14, '7,14', 'A low-risk entry plan perfect for first-time miners.', 'active'),
+('Bronze Miner', 5000.00, 400.00, 14, '7,14', 'Balanced daily returns with a fast mining cycle.', 'active'),
+('Silver Miner', 15000.00, 1350.00, 14, '7,14', 'Our most popular plan for consistent daily earners.', 'active'),
+('Gold Miner', 50000.00, 4750.00, 14, '7,14', 'Premium returns for serious investors.', 'active'),
+('Platinum Miner', 100000.00, 10000.00, 14, '7,14', 'High-yield plan for experienced miners.', 'active'),
+('Diamond Miner', 150000.00, 15750.00, 14, '7,14', 'Elevated daily returns for larger portfolios.', 'active'),
+('Titanium Miner', 200000.00, 22000.00, 14, '7,14', 'Premium-tier returns for major investors.', 'active'),
+('Elite Miner', 250000.00, 28750.00, 14, '7,14', 'Our top-tier plan with the highest daily returns.', 'active')
 ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);

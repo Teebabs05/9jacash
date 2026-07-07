@@ -15,7 +15,7 @@ declare(strict_types=1);
  * a comma-separated subset of this list (admin-configurable per plan).
  */
 if (!defined('MINING_CYCLE_OPTIONS')) {
-    define('MINING_CYCLE_OPTIONS', [7, 14, 21, 30]);
+    define('MINING_CYCLE_OPTIONS', [7, 14]);
 }
 
 if (!function_exists('mining_plan_cycles')) {
