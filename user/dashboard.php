@@ -133,12 +133,11 @@ $hour = (int) date('G');
 $greeting = $hour < 12 ? 'Good morning' : ($hour < 17 ? 'Good afternoon' : 'Good evening');
 ?>
 
-<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
-    <div>
-        <h4 class="fw-bold mb-1"><?= e($greeting) ?>, <?= e(explode(' ', trim($user['full_name']))[0] ?? $user['full_name']) ?> 👋</h4>
-        <p style="color:var(--text-muted);" class="mb-0">Here's what's happening with your account today.</p>
-    </div>
-    <?php require __DIR__ . '/../includes/partials/app-download-badges.php'; ?>
+<?php $downloadBadgesCompact = true; require __DIR__ . '/../includes/partials/app-download-badges.php'; ?>
+
+<div class="mb-3">
+    <h4 class="fw-bold mb-1"><?= e($greeting) ?>, <?= e(explode(' ', trim($user['full_name']))[0] ?? $user['full_name']) ?> 👋</h4>
+    <p style="color:var(--text-muted);" class="mb-0">Here's what's happening with your account today.</p>
 </div>
 
 <div class="balance-card">

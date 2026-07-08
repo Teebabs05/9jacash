@@ -29,6 +29,10 @@ $assetBase = rtrim(APP_URL, '/') . '/assets';
 </head>
 <body>
 <div class="auth-mobile-brand">
-    <?= brand_mark_html(40) ?>
-    <span><?= e($siteName) ?></span>
+    <div class="d-flex align-items-center gap-2">
+        <?= brand_mark_html(36) ?>
+        <span><?= e($siteName) ?></span>
+    </div>
+    <a href="<?= e(rtrim(APP_URL, '/')) ?>/index.php" class="auth-home-link"><i class="bi bi-arrow-left"></i> Home</a>
 </div>
+<div class="auth-hero-mark"><?= brand_mark_html(72) ?></div>
