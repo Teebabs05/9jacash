@@ -227,34 +227,41 @@ a { text-decoration: none; }
 
 @media (max-width: 991.98px) {
     .auth-visual { display: none; }
-    .auth-form-side { flex: 1 1 100%; }
+    .auth-form-side {
+        flex: 1 1 100%;
+        align-items: flex-start;
+        padding-top: 4px;
+    }
 
     .auth-mobile-brand {
         display: flex;
         align-items: center;
-        justify-content: space-between;
         gap: 10px;
-        padding: 18px 20px;
+        padding: 18px 56px 18px 20px;
         font-weight: 700;
         font-size: 1.1rem;
         color: var(--text);
+        position: relative;
     }
 
     .auth-home-link {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        font-size: 0.85rem;
+        gap: 4px;
+        font-size: 0.78rem;
         font-weight: 600;
         color: var(--text-muted);
         text-decoration: none;
         white-space: nowrap;
+        position: absolute;
+        top: 20px;
+        right: 20px;
     }
 
     .auth-hero-mark {
         display: flex;
         justify-content: center;
-        padding: 8px 20px 4px;
+        padding: 4px 20px 14px;
     }
 
     .auth-hero-mark .brand-mark {
