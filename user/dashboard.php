@@ -94,6 +94,21 @@ if ($lastWeekEarnings > 0) {
     $weekTrendPercent = 100.0;
 }
 
+// Mini colorful preview of the real spin wheel segments, used as the
+// "Spin & Earn" quick-action icon so it always matches whatever's
+// actually configured in admin > Spin Wheel.
+$spinColors = db()->query("SELECT color FROM spin_settings WHERE is_active = 1 ORDER BY id ASC")->fetchAll(PDO::FETCH_COLUMN);
+if ($spinColors) {
+    $sliceAngle = 360 / count($spinColors);
+    $spinGradientParts = [];
+    foreach ($spinColors as $i => $color) {
+        $spinGradientParts[] = e($color) . ' ' . ($i * $sliceAngle) . 'deg ' . (($i + 1) * $sliceAngle) . 'deg';
+    }
+    $spinWheelGradient = 'conic-gradient(' . implode(', ', $spinGradientParts) . ')';
+} else {
+    $spinWheelGradient = 'linear-gradient(135deg, var(--brand-gold), var(--brand-emerald))';
+}
+
 // Preferred withdrawal account shown on the dashboard (default first,
 // falling back to the oldest saved account).
 $stmt = db()->prepare('SELECT * FROM bank_accounts WHERE user_id = ? ORDER BY is_default DESC, created_at ASC LIMIT 1');
@@ -152,12 +167,12 @@ $greeting = $hour < 12 ? 'Good morning' : ($hour < 17 ? 'Good afternoon' : 'Good
 
 <div class="quick-row">
     <a href="<?= e(rtrim(APP_URL, '/')) ?>/mining/index.php" class="quick-btn primary">
-        <i class="bi bi-cpu-fill"></i><span>Mine</span>
+        <i class="bi bi-cpu-fill"></i><span>Mining</span>
     </a>
     <a href="<?= e(rtrim(APP_URL, '/')) ?>/spin/index.php" class="quick-btn">
-        <i class="bi bi-disc-fill"></i><span>Spin &amp; Earn</span>
+        <span class="spin-icon-wheel" style="background: <?= $spinWheelGradient ?>;"></span><span>Spin &amp; Earn</span>
     </a>
-    <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/withdraw.php" class="quick-btn">
+    <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/withdraw.php" class="quick-btn danger">
         <i class="bi bi-arrow-up-circle-fill"></i><span>Withdraw</span>
     </a>
 </div>
