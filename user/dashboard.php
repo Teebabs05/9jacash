@@ -43,6 +43,13 @@ $stmt->execute([$user['id']]);
 $directReferrals = (int) $stmt->fetch()['c'];
 
 $stmt = db()->prepare(
+    "SELECT COALESCE(SUM(amount), 0) AS total FROM wallet_ledger
+     WHERE user_id = ? AND type = ? AND source = ?"
+);
+$stmt->execute([$user['id'], LEDGER_CREDIT, LEDGER_SOURCE_REFERRAL]);
+$referralBonusesEarned = (float) $stmt->fetch()['total'];
+
+$stmt = db()->prepare(
     "SELECT COALESCE(SUM(mp.daily_return), 0) AS daily_total, COUNT(*) AS active_count
      FROM user_mining um
      INNER JOIN mining_plans mp ON mp.id = um.plan_id
@@ -202,6 +209,26 @@ $greeting = $hour < 12 ? 'Good morning' : ($hour < 17 ? 'Good afternoon' : 'Good
     <div class="app-stat-card"><i class="bi bi-graph-up-arrow"></i><div class="val"><?= e(money($totalEarnings)) ?></div><div class="lbl">Total Earned</div></div>
     <div class="app-stat-card"><i class="bi bi-cpu-fill"></i><div class="val"><?= $activePositionCount ?> Active</div><div class="lbl">Mining Plans</div></div>
     <div class="app-stat-card"><i class="bi bi-fire"></i><div class="val"><?= $checkinCurrentStreak ?></div><div class="lbl">Day Streak</div></div>
+</div>
+
+<div class="app-stats-row">
+    <div class="app-stat-card">
+        <i class="bi bi-cpu-fill"></i>
+        <div class="val"><?= e(money($dailyMiningTotal)) ?></div>
+        <div class="lbl">Daily Mining Earning</div>
+        <div class="sub"><?= $activePositionCount ?> active position<?= $activePositionCount === 1 ? '' : 's' ?></div>
+    </div>
+    <div class="app-stat-card">
+        <i class="bi bi-people-fill"></i>
+        <div class="val"><?= number_format($directReferrals) ?></div>
+        <div class="lbl">Direct Referrals</div>
+        <div class="sub"><?= e(money($referralBonusesEarned)) ?> in bonuses</div>
+    </div>
+    <div class="app-stat-card">
+        <i class="bi bi-sun-fill"></i>
+        <div class="val"><?= e(money($todayEarnings)) ?></div>
+        <div class="lbl">Today's Earnings</div>
+    </div>
 </div>
 
 <div class="row g-4 mt-1">

@@ -816,6 +816,7 @@
 .app-stat-card i { font-size: 17px; color: var(--accent); }
 .app-stat-card .val { font-weight: 800; font-size: 14.5px; margin: 6px 0 2px; color: var(--text); }
 .app-stat-card .lbl { font-size: 9.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
+.app-stat-card .sub { font-size: 9.5px; color: var(--text-muted); margin-top: 3px; }
 
 /* =====================================================================
    Mobile bottom tab bar with floating center action button. Desktop
