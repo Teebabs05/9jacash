@@ -35,6 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('admin_profile', 'Password updated successfully.', 'success');
             redirect(rtrim(APP_URL, '/') . '/admin/profile.php');
         }
+    } elseif ($action === 'toggle_login_notifications') {
+        $enabled = ((int) ($admin['login_notifications_enabled'] ?? 1)) === 1 ? 0 : 1;
+        db()->prepare('UPDATE admins SET login_notifications_enabled = ?, updated_at = NOW() WHERE id = ?')
+            ->execute([$enabled, $admin['id']]);
+        flash('admin_profile', $enabled ? 'Login notification emails turned on.' : 'Login notification emails turned off.', 'success');
+        redirect(rtrim(APP_URL, '/') . '/admin/profile.php');
     }
 }
 
@@ -65,6 +71,19 @@ require __DIR__ . '/../includes/partials/admin-head.php';
             <div class="mb-0">
                 <label class="form-label small">Role</label>
                 <input type="text" class="form-control" value="<?= e(ucwords(str_replace('_', ' ', $admin['role']))) ?>" disabled>
+            </div>
+        </div>
+
+        <div class="card-surface p-4 mt-4">
+            <h5 class="fw-bold mb-2">Login Notification Emails</h5>
+            <p class="small mb-3" style="color:var(--text-muted);">Get an email every time this admin account signs in, with the IP address and device used.</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="pill pill-<?= ((int) ($admin['login_notifications_enabled'] ?? 1)) === 1 ? 'active' : 'rejected' ?>"><?= ((int) ($admin['login_notifications_enabled'] ?? 1)) === 1 ? 'On' : 'Off' ?></span>
+                <form method="POST" action="">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="toggle_login_notifications">
+                    <button type="submit" class="btn btn-outline-brand btn-sm"><?= ((int) ($admin['login_notifications_enabled'] ?? 1)) === 1 ? 'Turn Off' : 'Turn On' ?></button>
+                </form>
             </div>
         </div>
 

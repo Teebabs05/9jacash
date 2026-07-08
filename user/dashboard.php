@@ -9,6 +9,14 @@ Auth::requireLogin();
 $user = current_user();
 $wallet = get_wallet((int) $user['id']);
 
+// Admin-sent push notifications this user hasn't acknowledged yet -
+// shown as a pop-up below, one at a time, on this page only.
+$stmt = db()->prepare(
+    "SELECT id, title, message FROM notifications WHERE user_id = ? AND type = 'broadcast' AND is_read = 0 ORDER BY created_at ASC"
+);
+$stmt->execute([$user['id']]);
+$pendingBroadcasts = $stmt->fetchAll();
+
 // "Earnings" means credits actually earned through platform activity -
 // mining payouts, tasks, ads, spin wins, check-ins and referral bonuses.
 // Deposits, withdrawal refunds, admin adjustments and internal
@@ -334,6 +342,61 @@ $greeting = $hour < 12 ? 'Good morning' : ($hour < 17 ? 'Good afternoon' : 'Good
 </div>
 
 <?php require __DIR__ . '/../includes/partials/transaction-detail-modal.php'; ?>
+
+<?php if ($pendingBroadcasts): ?>
+<div class="modal fade" id="broadcastModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:var(--surface);color:var(--text);">
+            <div class="modal-header">
+                <h6 class="modal-title"><i class="bi bi-megaphone-fill me-2" style="color:var(--brand-gold-dark);"></i><span id="broadcastModalTitle"></span></h6>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0" id="broadcastModalMessage" style="white-space:pre-line;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-brand w-100" id="broadcastModalOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var queue = <?= json_encode(array_map(fn ($n) => ['id' => (int) $n['id'], 'title' => $n['title'], 'message' => $n['message']], $pendingBroadcasts), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    var modalEl = document.getElementById('broadcastModal');
+    var modal = new bootstrap.Modal(modalEl);
+    var titleEl = document.getElementById('broadcastModalTitle');
+    var messageEl = document.getElementById('broadcastModalMessage');
+    var okBtn = document.getElementById('broadcastModalOkBtn');
+    var csrfToken = <?= json_encode(csrf_token()) ?>;
+
+    function showNext() {
+        if (!queue.length) {
+            modal.hide();
+            return;
+        }
+        var next = queue[0];
+        titleEl.textContent = next.title;
+        messageEl.textContent = next.message;
+        modal.show();
+    }
+
+    okBtn.addEventListener('click', function () {
+        var current = queue.shift();
+        okBtn.disabled = true;
+        fetch('<?= e(rtrim(APP_URL, '/')) ?>/ajax/notifications-ack.php', {
+            method: 'POST',
+            body: new URLSearchParams({ csrf_token: csrfToken, notification_id: current.id }),
+        })
+            .finally(function () {
+                okBtn.disabled = false;
+                showNext();
+            });
+    });
+
+    showNext();
+});
+</script>
+<?php endif; ?>
 
 <script>
 (function () {

@@ -67,6 +67,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('profile', 'Password updated successfully.', 'success');
             redirect(rtrim(APP_URL, '/') . '/user/profile.php');
         }
+    } elseif ($action === 'toggle_login_notifications') {
+        $enabled = ((int) ($user['login_notifications_enabled'] ?? 1)) === 1 ? 0 : 1;
+        db()->prepare('UPDATE users SET login_notifications_enabled = ?, updated_at = NOW() WHERE id = ?')
+            ->execute([$enabled, $user['id']]);
+        flash('profile', $enabled ? 'Login notification emails turned on.' : 'Login notification emails turned off.', 'success');
+        redirect(rtrim(APP_URL, '/') . '/user/profile.php');
     }
 
     $user = current_user();
@@ -164,6 +170,19 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="d-flex justify-content-between py-2">
                 <span style="color:var(--text-muted);">Referral Code</span>
                 <span class="fw-semibold"><?= e($user['referral_code']) ?></span>
+            </div>
+        </div>
+
+        <div class="card-surface p-4 mt-4">
+            <h5 class="fw-bold mb-2">Login Notification Emails</h5>
+            <p class="small mb-3" style="color:var(--text-muted);">Get an email every time your account signs in, with the IP address and device used.</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="pill pill-<?= ((int) ($user['login_notifications_enabled'] ?? 1)) === 1 ? 'active' : 'rejected' ?>"><?= ((int) ($user['login_notifications_enabled'] ?? 1)) === 1 ? 'On' : 'Off' ?></span>
+                <form method="POST" action="">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="toggle_login_notifications">
+                    <button type="submit" class="btn btn-outline-brand btn-sm"><?= ((int) ($user['login_notifications_enabled'] ?? 1)) === 1 ? 'Turn Off' : 'Turn On' ?></button>
+                </form>
             </div>
         </div>
 

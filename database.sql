@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `admins` (
     `avatar` VARCHAR(255) DEFAULT NULL,
     `role` ENUM('super_admin','admin','moderator','support') NOT NULL DEFAULT 'admin',
     `status` ENUM('active','disabled') NOT NULL DEFAULT 'active',
+    `login_notifications_enabled` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Whether a "new login" email is sent to this admin when they sign in',
     `last_login_at` DATETIME DEFAULT NULL,
     `last_login_ip` VARCHAR(45) DEFAULT NULL,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -45,6 +46,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     `status` ENUM('active','suspended','banned') NOT NULL DEFAULT 'active',
     `kyc_status` ENUM('unverified','pending','approved','rejected') NOT NULL DEFAULT 'unverified',
     `payout_schedule` ENUM('default','daily','weekly','biweekly','cycle_end') NOT NULL DEFAULT 'default' COMMENT 'Per-user override for when mining earnings release to the withdrawable wallet; default = use site_settings.mining_payout_schedule',
+    `login_notifications_enabled` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Whether a "new login" email is sent to this user when they sign in',
     `email_verified_at` DATETIME DEFAULT NULL,
     `last_login_at` DATETIME DEFAULT NULL,
     `last_login_ip` VARCHAR(45) DEFAULT NULL,
@@ -410,6 +412,63 @@ CREATE TABLE IF NOT EXISTS `notifications` (
     KEY `idx_notifications_user` (`user_id`),
     KEY `idx_notifications_user_read` (`user_id`, `is_read`),
     CONSTRAINT `fk_notifications_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================================
+-- ADMIN BROADCAST NOTIFICATIONS
+-- Audit trail for admin-sent "push" notifications. The actual delivery
+-- fans out into one row per recipient in `notifications` (type =
+-- 'broadcast') so each user has an independent read state and the
+-- message shows up in their normal notification history; this table
+-- just records the campaign itself for the admin's own history view.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS `broadcast_campaigns` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `admin_id` INT UNSIGNED DEFAULT NULL,
+    `title` VARCHAR(150) NOT NULL,
+    `message` TEXT NOT NULL,
+    `recipient_count` INT UNSIGNED NOT NULL DEFAULT 0,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_broadcast_admin` (`admin_id`),
+    CONSTRAINT `fk_broadcast_admin` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================================
+-- BULK EMAIL
+-- A campaign (subject/body/audience) plus one recipient row per target
+-- user, queued and processed in small batches by
+-- cron/send-bulk-emails.php so sending to a large user base can never
+-- time out a web request.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS `bulk_emails` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `admin_id` INT UNSIGNED DEFAULT NULL,
+    `subject` VARCHAR(200) NOT NULL,
+    `body` TEXT NOT NULL,
+    `audience` ENUM('all','selected') NOT NULL DEFAULT 'all',
+    `total_recipients` INT UNSIGNED NOT NULL DEFAULT 0,
+    `sent_count` INT UNSIGNED NOT NULL DEFAULT 0,
+    `failed_count` INT UNSIGNED NOT NULL DEFAULT 0,
+    `status` ENUM('pending','processing','completed') NOT NULL DEFAULT 'pending',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `completed_at` DATETIME DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_bulk_emails_status` (`status`),
+    CONSTRAINT `fk_bulk_emails_admin` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `bulk_email_recipients` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `bulk_email_id` INT UNSIGNED NOT NULL,
+    `user_id` INT UNSIGNED NOT NULL,
+    `status` ENUM('pending','sent','failed') NOT NULL DEFAULT 'pending',
+    `sent_at` DATETIME DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_ber_bulk_email` (`bulk_email_id`),
+    KEY `idx_ber_status` (`status`),
+    CONSTRAINT `fk_ber_bulk_email` FOREIGN KEY (`bulk_email_id`) REFERENCES `bulk_emails` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_ber_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================================================================

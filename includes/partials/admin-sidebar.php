@@ -47,6 +47,10 @@ $unreadMessages = support_unread_total_for_admin();
         <?php admin_nav_link('messages', $base . '/admin/messages.php', 'bi-chat-dots-fill', 'Messages', $activeNav, true, $unreadMessages ?: null); ?>
         <?php admin_nav_link('referral-settings', $base . '/admin/referral-settings.php', 'bi-diagram-3-fill', 'Referral Settings', $activeNav); ?>
 
+        <div class="nav-section-label">Communications</div>
+        <?php admin_nav_link('broadcast', $base . '/admin/broadcast.php', 'bi-megaphone-fill', 'Broadcast Notifications', $activeNav); ?>
+        <?php admin_nav_link('send-email', $base . '/admin/send-email.php', 'bi-envelope-fill', 'Send Email', $activeNav); ?>
+
         <div class="nav-section-label">Finance</div>
         <?php admin_nav_link('deposits', $base . '/admin/deposits.php', 'bi-arrow-down-circle-fill', 'Deposits', $activeNav, true, $pendingDeposits ?: null); ?>
         <?php admin_nav_link('deposit-settings', $base . '/admin/deposit-settings.php', 'bi-credit-card-fill', 'Deposit Settings', $activeNav); ?>
