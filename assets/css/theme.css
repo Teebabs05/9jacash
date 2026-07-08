@@ -28,6 +28,16 @@
     --warning: #f79009;
     --info: #2e90fa;
 
+    /* Semantic accent used by "app-card" style components (dashboard
+       quick actions, buttons, active nav state, streak highlights).
+       Resolves to navy in light mode and gold in dark mode so those
+       components re-skin automatically when the theme is toggled -
+       no per-component dark-mode overrides needed. */
+    --accent: var(--brand-navy);
+    --accent-dark: var(--brand-navy-dark);
+    --accent-contrast: #ffffff;
+    --accent-glow: rgba(11, 37, 69, 0.35);
+
     color-scheme: light;
 }
 
@@ -42,6 +52,11 @@
         --border: #1e2b45;
         --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
         color-scheme: dark;
+
+        --accent: var(--brand-gold);
+        --accent-dark: var(--brand-gold-dark);
+        --accent-contrast: #181225;
+        --accent-glow: rgba(242, 201, 76, 0.35);
     }
 }
 
@@ -55,6 +70,11 @@
     --border: #1e2b45;
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     color-scheme: dark;
+
+    --accent: var(--brand-gold);
+    --accent-dark: var(--brand-gold-dark);
+    --accent-contrast: #181225;
+    --accent-glow: rgba(242, 201, 76, 0.35);
 }
 
 * { box-sizing: border-box; }

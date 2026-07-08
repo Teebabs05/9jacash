@@ -64,57 +64,137 @@ $sourceLabels = [
     'admin_adjustment' => 'Admin Adjustment', 'transfer' => 'Transfer',
 ];
 
+// Week-over-week earnings trend for the balance card.
+$stmt = db()->prepare(
+    "SELECT COALESCE(SUM(amount), 0) AS total FROM wallet_ledger
+     WHERE user_id = ? AND type = ? AND source IN ({$sourcePlaceholders}) AND created_at >= NOW() - INTERVAL 7 DAY"
+);
+$stmt->execute([$user['id'], LEDGER_CREDIT, ...$earningSources]);
+$thisWeekEarnings = (float) $stmt->fetch()['total'];
+
+$stmt = db()->prepare(
+    "SELECT COALESCE(SUM(amount), 0) AS total FROM wallet_ledger
+     WHERE user_id = ? AND type = ? AND source IN ({$sourcePlaceholders})
+     AND created_at >= NOW() - INTERVAL 14 DAY AND created_at < NOW() - INTERVAL 7 DAY"
+);
+$stmt->execute([$user['id'], LEDGER_CREDIT, ...$earningSources]);
+$lastWeekEarnings = (float) $stmt->fetch()['total'];
+
+$weekTrendPercent = null;
+if ($lastWeekEarnings > 0) {
+    $weekTrendPercent = round((($thisWeekEarnings - $lastWeekEarnings) / $lastWeekEarnings) * 100, 1);
+} elseif ($thisWeekEarnings > 0) {
+    $weekTrendPercent = 100.0;
+}
+
+// Preferred withdrawal account shown on the dashboard (default first,
+// falling back to the oldest saved account).
+$stmt = db()->prepare('SELECT * FROM bank_accounts WHERE user_id = ? ORDER BY is_default DESC, created_at ASC LIMIT 1');
+$stmt->execute([$user['id']]);
+$primaryAccount = $stmt->fetch() ?: null;
+
+// Daily check-in preview strip (today + next 4 days of the cycle).
+$checkinAlready = checkin_has_checked_in_today((int) $user['id']);
+$checkinNextDay = checkin_next_streak_day((int) $user['id']);
+$checkinCurrentStreak = $checkinAlready ? $checkinNextDay : max(0, $checkinNextDay - 1);
+$checkinStrip = [];
+for ($i = 0; $i < 5; $i++) {
+    $day = (($checkinNextDay - 1 + $i) % CHECKIN_CYCLE_DAYS) + 1;
+    $checkinStrip[] = ['day' => $day, 'reward' => checkin_reward_for_day($day)];
+}
+
 $pageTitle = 'Dashboard';
 $activeNav = 'dashboard';
 require __DIR__ . '/../includes/partials/app-head.php';
+
+$hour = (int) date('G');
+$greeting = $hour < 12 ? 'Good morning' : ($hour < 17 ? 'Good afternoon' : 'Good evening');
 ?>
 
-<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-2">
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
     <div>
-        <h4 class="fw-bold mb-1">Welcome back, <?= e($user['full_name']) ?> 👋</h4>
+        <h4 class="fw-bold mb-1"><?= e($greeting) ?>, <?= e(explode(' ', trim($user['full_name']))[0] ?? $user['full_name']) ?> 👋</h4>
         <p style="color:var(--text-muted);" class="mb-0">Here's what's happening with your account today.</p>
     </div>
     <?php require __DIR__ . '/../includes/partials/app-download-badges.php'; ?>
 </div>
 
-<div class="row g-4 mt-1">
-    <div class="col-6 col-xl-3">
-        <div class="stat-tile">
-            <div class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-wallet2"></i></div>
-            <div class="label">Wallet Balance</div>
-            <div class="value"><?= e(money(wallet_total_balance((int) $user['id']))) ?></div>
-            <div class="small" style="color:var(--text-muted);">&asymp; <?= e(money_usd(wallet_total_balance((int) $user['id']))) ?></div>
-        </div>
+<div class="balance-card">
+    <div class="top-row">
+        <span class="balance-label">Total Balance</span>
+        <button type="button" class="balance-eye" id="balanceEyeToggle" aria-label="Show or hide balance"><i class="bi bi-eye-fill"></i></button>
     </div>
-    <div class="col-6 col-xl-3">
-        <div class="stat-tile">
-            <div class="icon-badge" style="background:rgba(242,201,76,0.16);color:var(--brand-gold-dark);"><i class="bi bi-graph-up-arrow"></i></div>
-            <div class="label">Total Earnings</div>
-            <div class="value"><?= e(money($totalEarnings)) ?></div>
-        </div>
+    <div class="balance-amount" id="balanceAmount" data-value="<?= e(money(wallet_total_balance((int) $user['id']))) ?>">
+        <?= e(money(wallet_total_balance((int) $user['id']))) ?>
     </div>
-    <div class="col-6 col-xl-3">
-        <div class="stat-tile">
-            <div class="icon-badge" style="background:rgba(46,144,250,0.14);color:var(--info);"><i class="bi bi-sun-fill"></i></div>
-            <div class="label">Today's Earnings</div>
-            <div class="value"><?= e(money($todayEarnings)) ?></div>
+    <div class="balance-usd">&asymp; <?= e(money_usd(wallet_total_balance((int) $user['id']))) ?></div>
+    <?php if ($weekTrendPercent !== null): ?>
+        <div class="balance-trend <?= $weekTrendPercent >= 0 ? 'up' : 'down' ?>">
+            <i class="bi bi-graph-<?= $weekTrendPercent >= 0 ? 'up' : 'down' ?>-arrow"></i>
+            <?= $weekTrendPercent >= 0 ? '+' : '' ?><?= e((string) $weekTrendPercent) ?>% this week
         </div>
-    </div>
-    <div class="col-6 col-xl-3">
-        <div class="stat-tile">
-            <div class="icon-badge" style="background:rgba(11,37,69,0.10);color:var(--brand-navy);"><i class="bi bi-people-fill"></i></div>
-            <div class="label">Direct Referrals</div>
-            <div class="value"><?= number_format($directReferrals) ?></div>
+    <?php endif; ?>
+</div>
+
+<div class="quick-row">
+    <a href="<?= e(rtrim(APP_URL, '/')) ?>/mining/index.php" class="quick-btn primary">
+        <i class="bi bi-cpu-fill"></i><span>Mine</span>
+    </a>
+    <a href="<?= e(rtrim(APP_URL, '/')) ?>/ads/index.php" class="quick-btn">
+        <i class="bi bi-play-btn-fill"></i><span>Watch</span>
+    </a>
+    <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/withdraw.php" class="quick-btn">
+        <i class="bi bi-arrow-up-circle-fill"></i><span>Withdraw</span>
+    </a>
+</div>
+
+<?php if ($primaryAccount): ?>
+    <div class="app-info-card">
+        <div class="info-icon"><i class="bi bi-bank"></i></div>
+        <div class="info-body">
+            <div class="info-title"><?= e($primaryAccount['type'] === 'usdt' ? 'USDT (' . $primaryAccount['network'] . ')' : $primaryAccount['bank_name']) ?></div>
+            <div class="info-sub">
+                <?= $primaryAccount['type'] === 'usdt'
+                    ? e(substr((string) $primaryAccount['usdt_address'], 0, 6) . '...' . substr((string) $primaryAccount['usdt_address'], -4))
+                    : e('**** ' . substr((string) $primaryAccount['account_number'], -4) . ' · ' . $primaryAccount['account_name']) ?>
+            </div>
         </div>
+        <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/bank-accounts.php" style="color:var(--text-muted);font-size:13px;"><i class="bi bi-pencil-fill"></i></a>
     </div>
-    <div class="col-6 col-xl-3">
-        <div class="stat-tile">
-            <div class="icon-badge" style="background:rgba(15,81,50,0.12);color:var(--brand-emerald);"><i class="bi bi-cpu-fill"></i></div>
-            <div class="label">Daily Mining Earning</div>
-            <div class="value"><?= e(money($dailyMiningTotal)) ?></div>
-            <div class="small" style="color:var(--text-muted);"><?= $activePositionCount ?> active position<?= $activePositionCount === 1 ? '' : 's' ?></div>
+<?php else: ?>
+    <div class="app-info-card">
+        <div class="info-icon"><i class="bi bi-bank"></i></div>
+        <div class="info-body">
+            <div class="info-title">No withdrawal account yet</div>
+            <div class="info-sub">Add a bank or USDT account to withdraw</div>
         </div>
+        <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/bank-accounts.php" class="pill-btn">Add</a>
     </div>
+<?php endif; ?>
+
+<div class="section-title" style="font-weight:700;font-size:15px;margin:20px 0 10px;">🔥 Daily Check-in</div>
+<div class="checkin-strip">
+    <?php foreach ($checkinStrip as $i => $d): ?>
+        <div class="day-card<?= $i === 0 ? ' active' : '' ?>">
+            <div class="num"><?= (int) $d['day'] ?></div>
+            <div class="lbl"><?= $i === 0 ? 'Today' : 'Day ' . $d['day'] ?></div>
+            <div class="rwd"><?= e(money($d['reward'])) ?></div>
+        </div>
+    <?php endforeach; ?>
+</div>
+<?php if ($checkinAlready): ?>
+    <button type="button" class="checkin-cta-btn" disabled><i class="bi bi-check-circle-fill"></i> Checked In Today</button>
+<?php else: ?>
+    <form method="POST" action="<?= e(rtrim(APP_URL, '/')) ?>/checkin/index.php">
+        <?= csrf_field() ?>
+        <button type="submit" class="checkin-cta-btn"><i class="bi bi-calendar-check-fill"></i> Check In Now</button>
+    </form>
+<?php endif; ?>
+
+<div class="app-stats-row">
+    <div class="app-stat-card"><i class="bi bi-graph-up-arrow"></i><div class="val"><?= e(money($totalEarnings)) ?></div><div class="lbl">Total Earned</div></div>
+    <div class="app-stat-card"><i class="bi bi-cpu-fill"></i><div class="val"><?= $activePositionCount ?> Active</div><div class="lbl">Mining Plans</div></div>
+    <div class="app-stat-card"><i class="bi bi-fire"></i><div class="val"><?= $checkinCurrentStreak ?></div><div class="lbl">Day Streak</div></div>
 </div>
 
 <div class="row g-4 mt-1">
@@ -162,7 +242,10 @@ require __DIR__ . '/../includes/partials/app-head.php';
 
     <div class="col-lg-4">
         <div class="card-surface p-4 mb-4">
-            <h5 class="fw-bold mb-3">Your Referral Link</h5>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Your Referral Link</h5>
+                <span class="small fw-semibold" style="color:var(--text-muted);"><i class="bi bi-people-fill me-1"></i><?= number_format($directReferrals) ?> direct</span>
+            </div>
             <div class="input-group mb-2">
                 <input type="text" class="form-control form-control-sm" readonly id="refLink" value="<?= e(rtrim(APP_URL, '/')) ?>/user/register.php?ref=<?= e($user['referral_code']) ?>">
                 <button class="btn btn-outline-brand btn-sm" type="button" onclick="navigator.clipboard.writeText(document.getElementById('refLink').value); SureCashMining.toast('Referral link copied!');">Copy</button>
@@ -203,5 +286,20 @@ require __DIR__ . '/../includes/partials/app-head.php';
 </div>
 
 <?php require __DIR__ . '/../includes/partials/transaction-detail-modal.php'; ?>
+
+<script>
+(function () {
+    var toggle = document.getElementById('balanceEyeToggle');
+    var amount = document.getElementById('balanceAmount');
+    if (!toggle || !amount) return;
+    var real = amount.getAttribute('data-value');
+    var hidden = false;
+    toggle.addEventListener('click', function () {
+        hidden = !hidden;
+        amount.textContent = hidden ? '••••••' : real;
+        toggle.innerHTML = hidden ? '<i class="bi bi-eye-slash-fill"></i>' : '<i class="bi bi-eye-fill"></i>';
+    });
+})();
+</script>
 
 <?php require __DIR__ . '/../includes/partials/app-scripts.php'; ?>
