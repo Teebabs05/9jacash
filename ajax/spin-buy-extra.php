@@ -28,4 +28,14 @@ if (!verify_csrf($token)) {
 $user = current_user();
 $result = spin_buy_extra_and_play((int) $user['id']);
 
+if ($result['success']) {
+    $extraPrice = spin_extra_price();
+    $balance = wallet_total_balance((int) $user['id']);
+
+    $result['daily_limit_reached'] = true;
+    $result['extra_price'] = $extraPrice;
+    $result['extra_price_formatted'] = money($extraPrice);
+    $result['can_afford_extra'] = $balance >= $extraPrice;
+}
+
 echo json_encode($result);
