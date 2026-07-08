@@ -147,8 +147,8 @@ $greeting = $hour < 12 ? 'Good morning' : ($hour < 17 ? 'Good afternoon' : 'Good
     <a href="<?= e(rtrim(APP_URL, '/')) ?>/mining/index.php" class="quick-btn primary">
         <i class="bi bi-cpu-fill"></i><span>Mine</span>
     </a>
-    <a href="<?= e(rtrim(APP_URL, '/')) ?>/ads/index.php" class="quick-btn">
-        <i class="bi bi-play-btn-fill"></i><span>Watch</span>
+    <a href="<?= e(rtrim(APP_URL, '/')) ?>/spin/index.php" class="quick-btn">
+        <i class="bi bi-disc-fill"></i><span>Spin &amp; Earn</span>
     </a>
     <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/withdraw.php" class="quick-btn">
         <i class="bi bi-arrow-up-circle-fill"></i><span>Withdraw</span>

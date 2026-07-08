@@ -12,8 +12,8 @@ $bnBase = rtrim(APP_URL, '/');
     <a href="<?= e($bnBase) ?>/user/dashboard.php" class="bn-item<?= $activeNav === 'dashboard' ? ' active' : '' ?>">
         <i class="bi bi-house-door-fill"></i>Home
     </a>
-    <a href="<?= e($bnBase) ?>/mining/index.php" class="bn-item<?= $activeNav === 'mining' ? ' active' : '' ?>">
-        <i class="bi bi-cpu-fill"></i>Mining
+    <a href="<?= e($bnBase) ?>/ads/index.php" class="bn-item<?= $activeNav === 'ads' ? ' active' : '' ?>">
+        <i class="bi bi-play-btn-fill"></i>Watch &amp; Earn
     </a>
     <a href="<?= e($bnBase) ?>/mining/index.php" class="bn-fab" aria-label="Mine">
         <i class="bi bi-hammer"></i>
