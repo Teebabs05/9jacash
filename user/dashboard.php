@@ -124,16 +124,23 @@ $greeting = $hour < 12 ? 'Good morning' : ($hour < 17 ? 'Good afternoon' : 'Good
         <span class="balance-label">Total Balance</span>
         <button type="button" class="balance-eye" id="balanceEyeToggle" aria-label="Show or hide balance"><i class="bi bi-eye-fill"></i></button>
     </div>
-    <div class="balance-amount" id="balanceAmount" data-value="<?= e(money(wallet_total_balance((int) $user['id']))) ?>">
-        <?= e(money(wallet_total_balance((int) $user['id']))) ?>
-    </div>
-    <div class="balance-usd">&asymp; <?= e(money_usd(wallet_total_balance((int) $user['id']))) ?></div>
-    <?php if ($weekTrendPercent !== null): ?>
-        <div class="balance-trend <?= $weekTrendPercent >= 0 ? 'up' : 'down' ?>">
-            <i class="bi bi-graph-<?= $weekTrendPercent >= 0 ? 'up' : 'down' ?>-arrow"></i>
-            <?= $weekTrendPercent >= 0 ? '+' : '' ?><?= e((string) $weekTrendPercent) ?>% this week
+    <div class="balance-body">
+        <div class="balance-info">
+            <div class="balance-amount" id="balanceAmount" data-value="<?= e(money(wallet_total_balance((int) $user['id']))) ?>">
+                <?= e(money(wallet_total_balance((int) $user['id']))) ?>
+            </div>
+            <div class="balance-usd">&asymp; <?= e(money_usd(wallet_total_balance((int) $user['id']))) ?></div>
+            <?php if ($weekTrendPercent !== null): ?>
+                <div class="balance-trend <?= $weekTrendPercent >= 0 ? 'up' : 'down' ?>">
+                    <i class="bi bi-graph-<?= $weekTrendPercent >= 0 ? 'up' : 'down' ?>-arrow"></i>
+                    <?= $weekTrendPercent >= 0 ? '+' : '' ?><?= e((string) $weekTrendPercent) ?>% this week
+                </div>
+            <?php endif; ?>
         </div>
-    <?php endif; ?>
+        <a href="<?= e(rtrim(APP_URL, '/')) ?>/payments/deposit.php" class="balance-deposit-btn">
+            <i class="bi bi-plus-circle-fill"></i><span>Deposit<br>Funds</span>
+        </a>
+    </div>
 </div>
 
 <div class="quick-row">

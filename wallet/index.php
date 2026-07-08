@@ -30,6 +30,22 @@ $pageTitle = 'Wallet';
 $activeNav = 'wallet';
 require __DIR__ . '/../includes/partials/app-head.php';
 ?>
+<div class="card-surface p-4 mb-4">
+    <h5 class="fw-bold mb-3">Quick Actions</h5>
+    <div class="row g-2">
+        <div class="col-6">
+            <a href="<?= e(rtrim(APP_URL, '/')) ?>/payments/deposit.php" class="btn btn-brand w-100">
+                <i class="bi bi-arrow-down-circle me-1"></i> Deposit Funds
+            </a>
+        </div>
+        <div class="col-6">
+            <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/withdraw.php" class="btn btn-outline-brand w-100">
+                <i class="bi bi-arrow-up-circle me-1"></i> Withdraw Funds
+            </a>
+        </div>
+    </div>
+</div>
+
 <div class="row g-4">
     <div class="col-6 col-xl-3">
         <div class="stat-tile">
@@ -126,16 +142,6 @@ require __DIR__ . '/../includes/partials/app-head.php';
     </div>
 
     <div class="col-lg-4">
-        <div class="card-surface p-4 mb-4">
-            <h5 class="fw-bold mb-3">Quick Actions</h5>
-            <a href="<?= e(rtrim(APP_URL, '/')) ?>/payments/deposit.php" class="btn btn-brand w-100 mb-2">
-                <i class="bi bi-arrow-down-circle me-1"></i> Deposit Funds
-            </a>
-            <a href="<?= e(rtrim(APP_URL, '/')) ?>/wallet/withdraw.php" class="btn btn-outline-brand w-100">
-                <i class="bi bi-arrow-up-circle me-1"></i> Withdraw Funds
-            </a>
-        </div>
-
         <div class="card-surface p-4">
             <h5 class="fw-bold mb-3">Your Referral Link</h5>
             <div class="input-group mb-2">
