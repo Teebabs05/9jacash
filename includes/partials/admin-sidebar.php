@@ -47,6 +47,10 @@ $unreadMessages = support_unread_total_for_admin();
         <?php admin_nav_link('messages', $base . '/admin/messages.php', 'bi-chat-dots-fill', 'Messages', $activeNav, true, $unreadMessages ?: null); ?>
         <?php admin_nav_link('referral-settings', $base . '/admin/referral-settings.php', 'bi-diagram-3-fill', 'Referral Settings', $activeNav); ?>
 
+        <div class="nav-section-label">Communications</div>
+        <?php admin_nav_link('broadcast', $base . '/admin/broadcast.php', 'bi-megaphone-fill', 'Broadcast Notifications', $activeNav); ?>
+        <?php admin_nav_link('send-email', $base . '/admin/send-email.php', 'bi-envelope-fill', 'Send Email', $activeNav); ?>
+
         <div class="nav-section-label">Finance</div>
         <?php admin_nav_link('deposits', $base . '/admin/deposits.php', 'bi-arrow-down-circle-fill', 'Deposits', $activeNav, true, $pendingDeposits ?: null); ?>
         <?php admin_nav_link('deposit-settings', $base . '/admin/deposit-settings.php', 'bi-credit-card-fill', 'Deposit Settings', $activeNav); ?>
@@ -58,6 +62,7 @@ $unreadMessages = support_unread_total_for_admin();
         <?php admin_nav_link('tasks', $base . '/admin/tasks.php', 'bi-list-check', 'Tasks', $activeNav); ?>
         <?php admin_nav_link('task-submissions', $base . '/admin/task-submissions.php', 'bi-inbox-fill', 'Task Submissions', $activeNav, true, $pendingSubmissions ?: null); ?>
         <?php admin_nav_link('spin-settings', $base . '/admin/spin-settings.php', 'bi-disc-fill', 'Spin Wheel', $activeNav); ?>
+        <?php admin_nav_link('watch-settings', $base . '/admin/watch-settings.php', 'bi-play-btn-fill', 'Watch & Earn', $activeNav); ?>
 
         <div class="nav-section-label">Platform</div>
         <?php admin_nav_link('settings', $base . '/admin/settings.php', 'bi-gear-fill', 'Settings', $activeNav); ?>

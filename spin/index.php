@@ -51,15 +51,14 @@ require __DIR__ . '/../includes/partials/app-head.php';
                 <div class="spin-hub"><i class="bi bi-stars"></i></div>
             </div>
 
+            <div class="alert alert-info small py-2 px-3 mb-3<?= $canPlay ? ' d-none' : '' ?>" id="spinLimitAlert">You've used today's free spin. Buy an extra spin from your wallet balance to keep playing.</div>
+
             <?php if ($canPlay): ?>
                 <button type="button" class="btn btn-brand w-100" id="spinBtn" data-endpoint="spin-play.php">Spin Now</button>
+            <?php elseif ($canAffordExtra): ?>
+                <button type="button" class="btn btn-brand w-100" id="spinBtn" data-endpoint="spin-buy-extra.php">Buy Extra Spin (<?= e(money($extraPrice)) ?>)</button>
             <?php else: ?>
-                <div class="alert alert-info small py-2 px-3 mb-3">You've used today's free spin. Buy an extra spin from your wallet balance to keep playing.</div>
-                <?php if ($canAffordExtra): ?>
-                    <button type="button" class="btn btn-brand w-100" id="spinBtn" data-endpoint="spin-buy-extra.php">Buy Extra Spin (<?= e(money($extraPrice)) ?>)</button>
-                <?php else: ?>
-                    <button type="button" class="btn btn-outline-brand w-100" disabled>Insufficient wallet balance for an extra spin (<?= e(money($extraPrice)) ?>)</button>
-                <?php endif; ?>
+                <button type="button" class="btn btn-outline-brand w-100" id="spinBtn" data-endpoint="spin-buy-extra.php" disabled>Insufficient wallet balance for an extra spin (<?= e(money($extraPrice)) ?>)</button>
             <?php endif; ?>
         </div>
     </div>
@@ -97,19 +96,45 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!spinBtn) return;
 
     const wheel = document.getElementById('spinWheel');
+    const limitAlert = document.getElementById('spinLimitAlert');
     const segmentCount = <?= (int) $segmentCount ?>;
     const segmentAngle = 360 / segmentCount;
     const csrfToken = document.querySelector('#csrfForm input[name="csrf_token"]').value;
     let cumulativeRotation = 0;
     let spinning = false;
 
+    // Morphs the button (and limit notice) in place based on what the
+    // server just told us, instead of reloading the page - covers both
+    // "free spin just used up" and "extra spin balance changed".
+    function applyPostSpinState(data) {
+        if (!data.daily_limit_reached) {
+            spinBtn.className = 'btn btn-brand w-100';
+            spinBtn.disabled = false;
+            spinBtn.textContent = 'Spin Now';
+            spinBtn.setAttribute('data-endpoint', 'spin-play.php');
+            return;
+        }
+
+        if (limitAlert) limitAlert.classList.remove('d-none');
+        spinBtn.setAttribute('data-endpoint', 'spin-buy-extra.php');
+
+        if (data.can_afford_extra) {
+            spinBtn.className = 'btn btn-brand w-100';
+            spinBtn.disabled = false;
+            spinBtn.textContent = 'Buy Extra Spin (' + data.extra_price_formatted + ')';
+        } else {
+            spinBtn.className = 'btn btn-outline-brand w-100';
+            spinBtn.disabled = true;
+            spinBtn.textContent = 'Insufficient wallet balance for an extra spin (' + data.extra_price_formatted + ')';
+        }
+    }
+
     spinBtn.addEventListener('click', function () {
-        if (spinning) return;
+        if (spinning || spinBtn.disabled) return;
         spinning = true;
         SureCashMining.setLoading(spinBtn, true);
 
         const endpoint = spinBtn.getAttribute('data-endpoint');
-        const isPaid = endpoint === 'spin-buy-extra.php';
 
         fetch('<?= e(rtrim(APP_URL, '/')) ?>/ajax/' + endpoint, {
             method: 'POST',
@@ -133,15 +158,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 setTimeout(function () {
                     SureCashMining.toast(data.message, data.amount > 0 ? 'success' : 'info');
-                    if (isPaid) {
-                        // Reload so the button re-evaluates the (now lower)
-                        // wallet balance against the extra-spin price.
-                        window.location.reload();
-                        return;
-                    }
                     SureCashMining.setLoading(spinBtn, false);
-                    spinBtn.disabled = true;
-                    spinBtn.textContent = "You've used today's spin — come back tomorrow!";
+                    applyPostSpinState(data);
                     spinning = false;
                 }, 4600);
             })

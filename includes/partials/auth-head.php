@@ -25,10 +25,14 @@ $assetBase = rtrim(APP_URL, '/') . '/assets';
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap-icons.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/fonts.css">
-<link rel="stylesheet" href="<?= e($assetBase) ?>/css/theme.css">
+<link rel="stylesheet" href="<?= e(asset_url('css/theme.css')) ?>">
 </head>
 <body>
 <div class="auth-mobile-brand">
-    <?= brand_mark_html(40) ?>
-    <span><?= e($siteName) ?></span>
+    <div class="d-flex align-items-center gap-2">
+        <?= brand_mark_html(36) ?>
+        <span><?= e($siteName) ?></span>
+    </div>
+    <a href="<?= e(rtrim(APP_URL, '/')) ?>/index.php" class="auth-home-link"><i class="bi bi-arrow-left"></i> Home</a>
 </div>
+<div class="auth-hero-mark"><?= brand_mark_html(104) ?></div>

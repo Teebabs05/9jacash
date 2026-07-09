@@ -44,7 +44,7 @@ $siteName = get_setting('site_name', 'SURECASH MINING');
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/vendor/bootstrap-icons.min.css">
 <link rel="stylesheet" href="<?= e($assetBase) ?>/css/fonts.css">
-<link rel="stylesheet" href="<?= e($assetBase) ?>/css/theme.css">
+<link rel="stylesheet" href="<?= e(asset_url('css/theme.css')) ?>">
 </head>
 <body>
 <div class="auth-mobile-brand">

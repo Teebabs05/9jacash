@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `admins` (
     `avatar` VARCHAR(255) DEFAULT NULL,
     `role` ENUM('super_admin','admin','moderator','support') NOT NULL DEFAULT 'admin',
     `status` ENUM('active','disabled') NOT NULL DEFAULT 'active',
+    `login_notifications_enabled` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Whether a "new login" email is sent to this admin when they sign in',
     `last_login_at` DATETIME DEFAULT NULL,
     `last_login_ip` VARCHAR(45) DEFAULT NULL,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -45,6 +46,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     `status` ENUM('active','suspended','banned') NOT NULL DEFAULT 'active',
     `kyc_status` ENUM('unverified','pending','approved','rejected') NOT NULL DEFAULT 'unverified',
     `payout_schedule` ENUM('default','daily','weekly','biweekly','cycle_end') NOT NULL DEFAULT 'default' COMMENT 'Per-user override for when mining earnings release to the withdrawable wallet; default = use site_settings.mining_payout_schedule',
+    `login_notifications_enabled` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Whether a "new login" email is sent to this user when they sign in',
     `email_verified_at` DATETIME DEFAULT NULL,
     `last_login_at` DATETIME DEFAULT NULL,
     `last_login_ip` VARCHAR(45) DEFAULT NULL,
@@ -186,7 +188,7 @@ CREATE TABLE IF NOT EXISTS `mining_plans` (
     `price` DECIMAL(18,2) NOT NULL,
     `daily_return` DECIMAL(18,2) NOT NULL,
     `duration_days` SMALLINT UNSIGNED NOT NULL DEFAULT 30,
-    `available_cycles` VARCHAR(50) NOT NULL DEFAULT '7,14,21,30' COMMENT 'Comma-separated day-cycle choices offered to the user at purchase time',
+    `available_cycles` VARCHAR(50) NOT NULL DEFAULT '7,14' COMMENT 'Comma-separated day-cycle choices offered to the user at purchase time',
     `description` TEXT DEFAULT NULL,
     `status` ENUM('active','inactive') NOT NULL DEFAULT 'active',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -413,6 +415,63 @@ CREATE TABLE IF NOT EXISTS `notifications` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================================================================
+-- ADMIN BROADCAST NOTIFICATIONS
+-- Audit trail for admin-sent "push" notifications. The actual delivery
+-- fans out into one row per recipient in `notifications` (type =
+-- 'broadcast') so each user has an independent read state and the
+-- message shows up in their normal notification history; this table
+-- just records the campaign itself for the admin's own history view.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS `broadcast_campaigns` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `admin_id` INT UNSIGNED DEFAULT NULL,
+    `title` VARCHAR(150) NOT NULL,
+    `message` TEXT NOT NULL,
+    `recipient_count` INT UNSIGNED NOT NULL DEFAULT 0,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_broadcast_admin` (`admin_id`),
+    CONSTRAINT `fk_broadcast_admin` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================================
+-- BULK EMAIL
+-- A campaign (subject/body/audience) plus one recipient row per target
+-- user, queued and processed in small batches by
+-- cron/send-bulk-emails.php so sending to a large user base can never
+-- time out a web request.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS `bulk_emails` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `admin_id` INT UNSIGNED DEFAULT NULL,
+    `subject` VARCHAR(200) NOT NULL,
+    `body` TEXT NOT NULL,
+    `audience` ENUM('all','selected') NOT NULL DEFAULT 'all',
+    `total_recipients` INT UNSIGNED NOT NULL DEFAULT 0,
+    `sent_count` INT UNSIGNED NOT NULL DEFAULT 0,
+    `failed_count` INT UNSIGNED NOT NULL DEFAULT 0,
+    `status` ENUM('pending','processing','completed') NOT NULL DEFAULT 'pending',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `completed_at` DATETIME DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_bulk_emails_status` (`status`),
+    CONSTRAINT `fk_bulk_emails_admin` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `bulk_email_recipients` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `bulk_email_id` INT UNSIGNED NOT NULL,
+    `user_id` INT UNSIGNED NOT NULL,
+    `status` ENUM('pending','sent','failed') NOT NULL DEFAULT 'pending',
+    `sent_at` DATETIME DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_ber_bulk_email` (`bulk_email_id`),
+    KEY `idx_ber_status` (`status`),
+    CONSTRAINT `fk_ber_bulk_email` FOREIGN KEY (`bulk_email_id`) REFERENCES `bulk_emails` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_ber_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================================
 -- ACTIVITY / AUDIT LOGS
 -- =====================================================================
 CREATE TABLE IF NOT EXISTS `activity_logs` (
@@ -553,6 +612,7 @@ INSERT INTO `site_settings` (`setting_key`, `setting_value`) VALUES
 ('max_withdrawal', '500000'),
 ('withdrawal_charge_percent', '2'),
 ('daily_withdrawal_limit', '1'),
+('ad_link', ''),
 ('ad_reward_amount', '10'),
 ('ad_daily_limit', '10'),
 ('ad_cooldown_seconds', '30'),
@@ -588,10 +648,15 @@ INSERT INTO `spin_settings` (`label`, `amount`, `probability`, `color`, `is_acti
 ('₦50', 50.00, 2.00, '#F2C94C', 1)
 ON DUPLICATE KEY UPDATE `label` = VALUES(`label`);
 
--- Starter mining plans (shown on the landing page and in the Mining module)
-INSERT INTO `mining_plans` (`name`, `price`, `daily_return`, `duration_days`, `description`, `status`) VALUES
-('Starter Miner', 2000.00, 150.00, 30, 'A low-risk entry plan perfect for first-time miners.', 'active'),
-('Bronze Miner', 5000.00, 400.00, 30, 'Balanced daily returns with a 30-day mining cycle.', 'active'),
-('Silver Miner', 15000.00, 1350.00, 30, 'Our most popular plan for consistent daily earners.', 'active'),
-('Gold Miner', 50000.00, 4750.00, 30, 'Premium returns for serious investors.', 'active')
+-- Mining plans (shown on the landing page and in the Mining module).
+-- All plans offer 7-day and 14-day mining cycles only.
+INSERT INTO `mining_plans` (`name`, `price`, `daily_return`, `duration_days`, `available_cycles`, `description`, `status`) VALUES
+('Starter Miner', 2000.00, 150.00, 14, '7,14', 'A low-risk entry plan perfect for first-time miners.', 'active'),
+('Bronze Miner', 5000.00, 400.00, 14, '7,14', 'Balanced daily returns with a fast mining cycle.', 'active'),
+('Silver Miner', 15000.00, 1350.00, 14, '7,14', 'Our most popular plan for consistent daily earners.', 'active'),
+('Gold Miner', 50000.00, 4750.00, 14, '7,14', 'Premium returns for serious investors.', 'active'),
+('Platinum Miner', 100000.00, 10000.00, 14, '7,14', 'High-yield plan for experienced miners.', 'active'),
+('Diamond Miner', 150000.00, 15750.00, 14, '7,14', 'Elevated daily returns for larger portfolios.', 'active'),
+('Titanium Miner', 200000.00, 22000.00, 14, '7,14', 'Premium-tier returns for major investors.', 'active'),
+('Elite Miner', 250000.00, 28750.00, 14, '7,14', 'Our top-tier plan with the highest daily returns.', 'active')
 ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);

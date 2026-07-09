@@ -1,9 +1,9 @@
 # SURECASH MINING — Cron Job Guide
 
-The platform has exactly one scheduled job. Everything else (referral
-bonuses, task/ad/spin/check-in rewards) is credited synchronously the
-moment the user performs the action or an admin approves it — nothing
-else needs a scheduler.
+The platform has two scheduled jobs. Everything else (referral
+bonuses, task/ad/spin/check-in rewards, admin broadcast notifications)
+is credited/delivered synchronously the moment the user performs the
+action or an admin approves it — nothing else needs a scheduler.
 
 ## Mining payouts (`cron/mining-payout.php`)
 
@@ -83,3 +83,34 @@ credited per subsequent run (still counted as "due" as long as
 few scheduled runs rather than all at once. With an hourly schedule this
 resolves within a few hours of the job resuming; the only real risk is
 leaving the job disabled for so long that users notice the delay.
+
+## Bulk email delivery (`cron/send-bulk-emails.php`)
+
+Admin → Send Email queues a campaign (subject/body + all users or a
+hand-picked list) instantly — one row per recipient in
+`bulk_email_recipients`. Nothing is actually emailed until this script
+runs; it sends a bounded batch (50 by default) of still-pending
+recipients per run and updates each campaign's sent/failed counts and
+status. Queuing is deliberately decoupled from sending so a campaign
+to a large user base can never time out the admin's request — it's
+mailed out gradually as the cron job ticks.
+
+It is a CLI-only script, same as the mining payout job above.
+
+### Setting it up
+
+```
+*/2 * * * * /usr/bin/php /home/USERNAME/public_html/cron/send-bulk-emails.php >> /home/USERNAME/public_html/logs/cron.log 2>&1
+```
+
+Every 2 minutes is a reasonable default — at 50 recipients per run
+that's up to 1,500/hour, comfortably ahead of how fast most SMTP
+providers want mail sent anyway. Slower hosts or stricter SMTP rate
+limits may want a longer interval or a smaller `BULK_EMAIL_BATCH_SIZE`
+(edit the constant at the top of the script).
+
+### What happens if the cron job doesn't run for a while
+
+Nothing is lost — queued recipients just stay `pending` until the job
+resumes, then get picked up in the next batch(es). A campaign's status
+only flips to `completed` once every recipient has been attempted.

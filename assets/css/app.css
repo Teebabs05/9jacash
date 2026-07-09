@@ -545,7 +545,8 @@
     .sidebar-backdrop,
     .receipt-toolbar,
     .whatsapp-float,
-    .toast-stack {
+    .toast-stack,
+    .app-bottom-nav {
         display: none !important;
     }
 
@@ -559,4 +560,336 @@
         box-shadow: none !important;
         border: 1px solid #ccc !important;
     }
+}
+
+/* =====================================================================
+   Dashboard "app card" components (balance card, quick actions,
+   check-in strip, stat cards). Use var(--accent) so they automatically
+   re-skin between light (navy) and dark (gold) mode - see theme.css.
+   ===================================================================== */
+.balance-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px 22px 24px;
+    margin-bottom: 18px;
+}
+
+.balance-card .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.balance-card .balance-label {
+    font-size: 11px;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.balance-card .balance-eye {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--surface-alt);
+    border: none;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.balance-card .balance-amount {
+    font-size: 32px;
+    font-weight: 800;
+    margin-top: 10px;
+    letter-spacing: -0.5px;
+    color: var(--text);
+}
+
+.balance-card .balance-amount .decimals {
+    color: var(--accent);
+}
+
+.balance-card .balance-usd {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+.balance-card .balance-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.balance-card .balance-trend.up { color: var(--success); }
+.balance-card .balance-trend.down { color: var(--danger); }
+
+.balance-card .balance-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.balance-card .balance-info { flex: 1; min-width: 0; }
+
+.balance-card .balance-deposit-btn {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 76px;
+    height: 76px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--brand-emerald-light), var(--brand-emerald));
+    color: #fff;
+    text-decoration: none;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.15;
+    box-shadow: 0 8px 20px rgba(15, 81, 50, 0.32);
+}
+
+.balance-card .balance-deposit-btn i { font-size: 20px; }
+.balance-card .balance-deposit-btn:hover { color: #fff; }
+
+.quick-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.quick-btn {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 6px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    color: var(--text);
+    text-decoration: none;
+    display: block;
+}
+
+.quick-btn.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    border: none;
+    color: var(--accent-contrast);
+}
+
+.quick-btn.danger {
+    background: linear-gradient(135deg, #f4695f, var(--danger));
+    border: none;
+    color: #fff;
+}
+
+.quick-btn i {
+    font-size: 19px;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.quick-btn span {
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.quick-btn .spin-icon-wheel {
+    display: block;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    margin: 0 auto 6px;
+    border: 2px solid var(--brand-gold);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
+}
+
+.app-info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+}
+
+.app-info-card .info-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(15, 81, 50, 0.12);
+    color: var(--brand-emerald);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+:root[data-theme="dark"] .app-info-card .info-icon {
+    background: rgba(27, 196, 125, 0.16);
+    color: #1bc47d;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .app-info-card .info-icon {
+        background: rgba(27, 196, 125, 0.16);
+        color: #1bc47d;
+    }
+}
+
+.app-info-card .info-body { flex: 1; min-width: 0; }
+.app-info-card .info-title { font-weight: 700; font-size: 14px; }
+.app-info-card .info-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+.app-info-card .pill-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: var(--accent-contrast);
+    border: none;
+    border-radius: 10px;
+    padding: 9px 16px;
+    font-weight: 700;
+    font-size: 12.5px;
+    white-space: nowrap;
+}
+
+.checkin-strip {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+}
+
+.checkin-strip .day-card {
+    flex: 1;
+    min-width: 58px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    text-align: center;
+    padding: 10px 2px;
+    box-shadow: var(--shadow);
+}
+
+.checkin-strip .day-card.active { border-color: var(--accent); }
+.checkin-strip .day-card.done { opacity: 0.55; }
+.checkin-strip .day-card .num { font-weight: 800; font-size: 16px; color: var(--text); }
+.checkin-strip .day-card .lbl { font-size: 9px; color: var(--text-muted); text-transform: uppercase; margin: 3px 0 2px; letter-spacing: 0.3px; }
+.checkin-strip .day-card .rwd { font-size: 11px; font-weight: 700; color: var(--brand-emerald); }
+:root[data-theme="dark"] .checkin-strip .day-card .rwd { color: #1bc47d; }
+
+.checkin-cta-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: var(--accent-contrast);
+    border: none;
+    border-radius: 16px;
+    padding: 16px;
+    font-weight: 700;
+    font-size: 14.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: var(--shadow);
+    margin-bottom: 18px;
+}
+
+.checkin-cta-btn:disabled { opacity: 0.6; }
+
+.app-stats-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.app-stat-card {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 8px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.app-stat-card i { font-size: 17px; color: var(--accent); }
+.app-stat-card .val { font-weight: 800; font-size: 14.5px; margin: 6px 0 2px; color: var(--text); }
+.app-stat-card .lbl { font-size: 9.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
+.app-stat-card .sub { font-size: 9.5px; color: var(--text-muted); margin-top: 3px; }
+
+/* =====================================================================
+   Mobile bottom tab bar with floating center action button. Desktop
+   keeps the existing sidebar; this only appears at narrow widths and
+   is a shortcut to the most-used sections, not a sidebar replacement.
+   ===================================================================== */
+.app-bottom-nav {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    .app-bottom-nav {
+        display: flex;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1040;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        align-items: center;
+        justify-content: space-around;
+        padding: 8px 6px calc(10px + env(safe-area-inset-bottom));
+    }
+
+    .app-bottom-nav .bn-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        color: var(--text-muted);
+        font-size: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        min-width: 48px;
+    }
+
+    .app-bottom-nav .bn-item i { font-size: 19px; }
+    .app-bottom-nav .bn-item.active { color: var(--accent); }
+
+    .app-bottom-nav .bn-fab {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-contrast);
+        font-size: 21px;
+        margin-top: -28px;
+        box-shadow: 0 10px 24px var(--accent-glow);
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+
+    /* Keep page content and the WhatsApp bubble clear of the fixed nav */
+    .app-content { padding-bottom: 92px; }
+    .whatsapp-float { bottom: 92px !important; }
 }

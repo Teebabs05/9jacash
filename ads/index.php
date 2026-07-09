@@ -7,6 +7,7 @@ require_once __DIR__ . '/../config/config.php';
 Auth::requireLogin();
 
 $user = current_user();
+$adLink = (string) get_setting('ad_link', '');
 $dailyLimit = (int) get_setting('ad_daily_limit', 10);
 $rewardAmount = (float) get_setting('ad_reward_amount', 10);
 $watchedToday = ads_today_count((int) $user['id']);
@@ -83,7 +84,9 @@ require __DIR__ . '/../includes/partials/app-head.php';
             <div class="modal-body text-center py-5">
                 <i class="bi bi-play-btn" style="font-size:2.5rem;color:var(--brand-emerald);"></i>
                 <div class="fs-2 fw-bold mt-3" id="adCountdownNumber">--</div>
-                <p class="small mb-0" style="color:var(--text-muted);">Please wait while your ad plays...</p>
+                <p class="small mb-0" style="color:var(--text-muted);">
+                    <?= $adLink !== '' ? 'The ad opened in a new tab &mdash; keep this tab open while it plays.' : 'Please wait while your ad plays...' ?>
+                </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-brand w-100" id="claimAdBtn" disabled>Claim Reward</button>
@@ -104,10 +107,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const claimBtn = document.getElementById('claimAdBtn');
     const countdownEl = document.getElementById('adCountdownNumber');
     const csrfToken = document.querySelector('#csrfForm input[name="csrf_token"]').value;
+    const adLink = <?= json_encode($adLink) ?>;
     let watchToken = null;
     let timer = null;
 
     watchBtn.addEventListener('click', function () {
+        if (adLink) {
+            window.open(adLink, '_blank', 'noopener');
+        }
         SureCashMining.setLoading(watchBtn, true);
         fetch('<?= e(rtrim(APP_URL, '/')) ?>/ajax/ads-start.php', {
             method: 'POST',
