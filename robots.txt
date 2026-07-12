@@ -1,0 +1,24 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /ajax/
+Disallow: /includes/
+Disallow: /config/
+Disallow: /database/
+Disallow: /logs/
+Disallow: /install/
+Disallow: /vendor/
+Disallow: /docs/
+Disallow: /uploads/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /payments/
+Disallow: /mining/
+Disallow: /tasks/
+Disallow: /ads/
+Disallow: /spin/
+Disallow: /checkin/
+Disallow: /webauthn/
+Disallow: /cron/
+
+Allow: /

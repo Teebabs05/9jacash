@@ -35,7 +35,42 @@ Options -Indexes
 # ---------------------------------------------------------------
 # Protect sensitive directories from direct web access
 # ---------------------------------------------------------------
-RewriteRule ^(config|includes|database|logs|vendor)/ - [F,L]
+RewriteRule ^(config|includes|database|logs|vendor|docs)/ - [F,L]
+
+# Lock the installer out entirely once the site has been installed -
+# nothing under /install/ (DB credentials wizard, schema loader) should
+# stay reachable on a live production site.
+RewriteCond %{DOCUMENT_ROOT}/install/installed.lock -f
+RewriteRule ^install/ - [F,L]
+
+# ---------------------------------------------------------------
+# Block common vulnerability-scanner / exploit-probe requests at the
+# web-server layer, before PHP even boots (belt-and-suspenders on top
+# of the application-level firewall in includes/firewall.php).
+# ---------------------------------------------------------------
+RewriteRule ^wp-(login\.php|admin|content|includes|json) - [F,L]
+RewriteRule ^xmlrpc\.php$ - [F,L]
+RewriteRule (^|/)\.(git|svn|hg)(/|$) - [F,L]
+RewriteRule ^(phpmyadmin|pma|myadmin|adminer(\.php)?)(/|$) - [F,L]
+RewriteRule ^cgi-bin/ - [F,L]
+RewriteRule (^|/)(shell|c99|r57|wso|b374k|webshell)\.php$ - [F,L]
+
+# ---------------------------------------------------------------
+# Hide server/technology fingerprint (domain & hosting recon defense)
+# ---------------------------------------------------------------
+ServerSignature Off
+
+# ServerTokens (trims the Apache version string, e.g. "Apache" instead of
+# "Apache/2.4.41 (Ubuntu) PHP/8.2.1") can only be set in the main server
+# config (httpd.conf / apache2.conf), never in .htaccess. On shared cPanel
+# hosting, ask your host to set "ServerTokens Prod", or add it yourself if
+# you have root/WHM access. Likewise, hiding the PHP version from the
+# X-Powered-By header at the source (belt-and-suspenders with the Header
+# unset below) requires `expose_php = Off` in php.ini.
+<IfModule mod_headers.c>
+    Header unset X-Powered-By
+    Header always unset X-Powered-By
+</IfModule>
 
 # ---------------------------------------------------------------
 # Security headers

@@ -60,6 +60,7 @@ $unreadMessages = support_unread_total_for_admin();
         <?php admin_nav_link('spin-settings', $base . '/admin/spin-settings.php', 'bi-disc-fill', 'Spin Wheel', $activeNav); ?>
 
         <div class="nav-section-label">Platform</div>
+        <?php admin_nav_link('security', $base . '/admin/security.php', 'bi-shield-lock-fill', 'Security & Firewall', $activeNav); ?>
         <?php admin_nav_link('settings', $base . '/admin/settings.php', 'bi-gear-fill', 'Settings', $activeNav); ?>
         <?php admin_nav_link('profile', $base . '/admin/profile.php', 'bi-person-fill', 'My Profile', $activeNav); ?>
         <a href="<?= e($base) ?>/admin/logout.php" class="nav-link text-danger"><i class="bi bi-box-arrow-right"></i>Logout</a>

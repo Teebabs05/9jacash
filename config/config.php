@@ -50,6 +50,16 @@ if (is_file(BASE_PATH . '/vendor/autoload.php')) {
 
 require_once BASE_PATH . '/includes/session.php';
 require_once BASE_PATH . '/includes/security.php';
+require_once BASE_PATH . '/includes/firewall.php';
+
+// Reject known scanners / exploit-probes / malicious payloads before any
+// auth, session business-logic, or module code below gets a chance to
+// run. Skipped only for the installer, which isn't routable once
+// installed.lock exists and has no session/data worth protecting yet.
+if (!defined('INSTALLER_CONTEXT')) {
+    block_malicious_requests();
+}
+
 require_once BASE_PATH . '/includes/auth.php';
 require_once BASE_PATH . '/includes/admin-auth.php';
 require_once BASE_PATH . '/includes/mailer.php';
